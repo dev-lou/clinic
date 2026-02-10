@@ -191,6 +191,53 @@
 
                 <!-- CTA -->
                 <div class="flex items-center space-x-3">
+                    {% if current_user.is_authenticated %}
+                    <!-- Logged in view -->
+                    <a href="{{ url_for('appointments.my_appointments') }}"
+                        class="hidden lg:inline-flex items-center px-4 py-2 text-sm font-medium text-gray-600 hover:text-primary-700 rounded-lg hover:bg-primary-50 transition-all">
+                        <i class="fas fa-calendar-alt mr-1.5"></i>My Appointments
+                    </a>
+                    <a href="{{ url_for('reservations.my_reservations') }}"
+                        class="hidden md:inline-flex items-center px-4 py-2 text-sm font-medium text-gray-600 hover:text-primary-700 rounded-lg hover:bg-primary-50 transition-all">
+                        <i class="fas fa-capsules mr-1.5"></i>My Reservations
+                    </a>
+                    <div class="relative group">
+                        <button
+                            class="flex items-center space-x-2 px-3 py-2 rounded-lg hover:bg-gray-50 transition-all">
+                            <div class="w-8 h-8 bg-primary-100 rounded-lg flex items-center justify-center">
+                                <span class="text-xs font-bold text-primary-700">{{ current_user.first_name[0] }}{{
+                                    current_user.last_name[0] }}</span>
+                            </div>
+                            <span class="hidden sm:block text-sm font-semibold text-gray-700">{{ current_user.first_name
+                                }}</span>
+                            <i class="fas fa-chevron-down text-xs text-gray-400"></i>
+                        </button>
+                        <!-- Dropdown -->
+                        <div
+                            class="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-lg border border-gray-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
+                            <div class="px-4 py-3 border-b border-gray-100">
+                                <p class="text-sm font-semibold text-gray-900">{{ current_user.first_name }} {{
+                                    current_user.last_name }}</p>
+                                <p class="text-xs text-gray-500">{{ current_user.email }}</p>
+                            </div>
+                            <div class="py-2">
+                                <a href="{{ url_for('appointments.my_appointments') }}"
+                                    class="flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors lg:hidden">
+                                    <i class="fas fa-calendar-alt w-5 text-gray-400"></i>My Appointments
+                                </a>
+                                <a href="{{ url_for('reservations.my_reservations') }}"
+                                    class="flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors md:hidden">
+                                    <i class="fas fa-capsules w-5 text-gray-400"></i>My Reservations
+                                </a>
+                                <a href="{{ url_for('auth.logout') }}"
+                                    class="flex items-center px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors">
+                                    <i class="fas fa-sign-out-alt w-5 text-red-400"></i>Sign Out
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    {% else %}
+                    <!-- Logged out view -->
                     <a href="{{ url_for('auth.login') }}"
                         class="hidden sm:inline-flex px-4 py-2 text-sm font-semibold text-primary-700 hover:text-primary-800 transition-colors">
                         Sign In
@@ -199,6 +246,7 @@
                         class="px-5 py-2.5 bg-primary-700 text-white text-sm font-semibold rounded-xl hover:bg-primary-800 transition-all shadow-lg shadow-primary-700/25 hover:shadow-primary-700/40">
                         Get Started
                     </a>
+                    {% endif %}
                 </div>
             </div>
         </div>
