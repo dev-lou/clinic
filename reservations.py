@@ -89,3 +89,50 @@ def cancel_reservation(reservation_id):
     
     flash('Reservation cancelled successfully.', 'success')
     return redirect(url_for('reservations.my_reservations'))
+
+
+# ═══════════ ADMIN ROUTES ═══════════
+def require_staff(f):
+    """Decorator to require nurse or admin role."""
+    from functools import wraps
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if current_user.role not in ['nurse', 'admin']:
+            flash('Access denied. Staff only.', 'error')
+            return redirect(url_for('index'))
+        return f(*args, **kwargs)
+    return decorated_function
+
+
+@reservations.route('/admin')
+@login_required
+@require_staff
+def admin_list():
+    """Admin view to manage all medicine reservations."""
+    filter_status = request.args.get('status', 'all')
+    
+    query = MedicineReservation.query
+    
+    if filter_status != 'all':
+        query = query.filter_by(status=filter_status)
+    
+    reservations_list = query.order_by(MedicineReservation.reserved_at.desc()).all()
+    
+    return render_template('admin_reservations.html', reservations=reservations_list, filter_status=filter_status)
+
+
+@reservations.route('/admin/<int:reservation_id>/mark-picked-up', methods=['POST'])
+@login_required
+@require_staff
+def admin_mark_picked_up(reservation_id):
+    """Admin route to mark reservation as picked up."""
+    reservation = MedicineReservation.query.get_or_404(reservation_id)
+    
+    if reservation.status == 'Reserved':
+        reservation.status = 'Picked Up'
+        db.session.commit()
+        flash(f'Marked as picked up.', 'success')
+    else:
+        flash('Cannot update status.', 'error')
+    
+    return redirect(url_for('reservations.admin_list'))

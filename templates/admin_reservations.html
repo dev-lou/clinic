@@ -1,0 +1,104 @@
+{% extends "admin_base.html" %}
+{% set active_page = 'reservations' %}
+
+{% block title %}Manage Reservations{% endblock %}
+{% block page_title %}Manage Medicine Reservations{% endblock %}
+{% block page_subtitle %}View and manage all medicine pickup requests{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <!-- Filter bar -->
+    <div class="bg-white rounded-2xl border border-gray-100 p-4">
+        <form method="GET" class="flex flex-col sm:flex-row gap-3">
+            <select name="status"
+                class="px-4 py-2 rounded-xl border border-gray-200 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 outline-none transition-all text-sm bg-white">
+                <option value="all" {% if filter_status=='all' %}selected{% endif %}>All Status</option>
+                <option value="Reserved" {% if filter_status=='Reserved' %}selected{% endif %}>Reserved</option>
+                <option value="Picked Up" {% if filter_status=='Picked Up' %}selected{% endif %}>Picked Up</option>
+                <option value="Cancelled" {% if filter_status=='Cancelled' %}selected{% endif %}>Cancelled</option>
+            </select>
+            <button type="submit"
+                class="px-5 py-2 bg-primary-700 text-white rounded-xl font-semibold text-sm hover:bg-primary-800 transition-all">
+                <i class="fas fa-filter mr-1"></i>Filter
+            </button>
+            <a href="{{ url_for('reservations.admin_list') }}"
+                class="px-5 py-2 bg-gray-100 text-gray-700 rounded-xl font-semibold text-sm hover:bg-gray-200 transition-all text-center">
+                Clear
+            </a>
+        </form>
+    </div>
+
+    <!-- Reservations table -->
+    <div class="bg-white rounded-2xl border border-gray-100 overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="w-full">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-5 py-4 text-left text-[11px] font-bold text-gray-500 uppercase tracking-wider">
+                            Student</th>
+                        <th class="px-5 py-4 text-left text-[11px] font-bold text-gray-500 uppercase tracking-wider">
+                            Medicine</th>
+                        <th class="px-5 py-4 text-left text-[11px] font-bold text-gray-500 uppercase tracking-wider">Qty
+                        </th>
+                        <th
+                            class="px-5 py-4 text-left text-[11px] font-bold text-gray-500 uppercase tracking-wider hidden sm:table-cell">
+                            Reserved</th>
+                        <th class="px-5 py-4 text-left text-[11px] font-bold text-gray-500 uppercase tracking-wider">
+                            Status</th>
+                        <th class="px-5 py-4 text-left text-[11px] font-bold text-gray-500 uppercase tracking-wider">
+                            Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-100">
+                    {% for res in reservations %}
+                    <tr class="hover:bg-gray-50 transition-colors">
+                        <td class="px-5 py-4">
+                            <p class="text-sm font-semibold text-gray-900">{{ res.student.first_name }} {{
+                                res.student.last_name }}</p>
+                            <p class="text-xs text-gray-400">{{ res.student.email }}</p>
+                        </td>
+                        <td class="px-5 py-4 text-sm font-medium text-gray-700">{{ res.medicine_name }}</td>
+                        <td class="px-5 py-4 text-sm text-gray-700">{{ res.quantity }}</td>
+                        <td class="px-5 py-4 text-sm text-gray-600 hidden sm:table-cell">{{ res.reserved_at.strftime('%b
+                            %d, %Y') }}</td>
+                        <td class="px-5 py-4">
+                            <span class="px-2.5 py-1 rounded-full text-[11px] font-bold
+                                {% if res.status == 'Reserved' %}bg-amber-100 text-amber-700
+                                {% elif res.status == 'Picked Up' %}bg-emerald-100 text-emerald-700
+                                {% else %}bg-gray-100 text-gray-600{% endif %}">
+                                {{ res.status }}
+                            </span>
+                        </td>
+                        <td class="px-5 py-4">
+                            {% if res.status == 'Reserved' %}
+                            <form method="POST"
+                                action="{{ url_for('reservations.admin_mark_picked_up', reservation_id=res.id) }}"
+                                class="inline">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <button type="submit"
+                                    class="px-3 py-1.5 bg-emerald-600 text-white rounded-lg text-xs font-semibold hover:bg-emerald-700 transition-colors">
+                                    <i class="fas fa-check mr-1"></i>Mark Picked Up
+                                </button>
+                            </form>
+                            {% else %}
+                            <span class="text-xs text-gray-400">—</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="6" class="px-5 py-12 text-center">
+                            <div
+                                class="w-14 h-14 bg-gray-100 rounded-2xl flex items-center justify-center mx-auto mb-3">
+                                <i class="fas fa-box-open text-gray-300 text-xl"></i>
+                            </div>
+                            <p class="text-sm text-gray-400 font-medium">No reservations found</p>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,122 @@
+{% extends "admin_base.html" %}
+{% set active_page = 'appointments' %}
+
+{% block title %}Manage Appointments{% endblock %}
+{% block page_title %}Manage Appointments{% endblock %}
+{% block page_subtitle %}View and manage all student appointments{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <!-- Filter bar -->
+    <div class="bg-white rounded-2xl border border-gray-100 p-4">
+        <form method="GET" class="flex flex-col sm:flex-row gap-3">
+            <select name="status"
+                class="px-4 py-2 rounded-xl border border-gray-200 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 outline-none transition-all text-sm bg-white">
+                <option value="all" {% if filter_status=='all' %}selected{% endif %}>All Status</option>
+                <option value="Pending" {% if filter_status=='Pending' %}selected{% endif %}>Pending</option>
+                <option value="Confirmed" {% if filter_status=='Confirmed' %}selected{% endif %}>Confirmed</option>
+                <option value="Completed" {% if filter_status=='Completed' %}selected{% endif %}>Completed</option>
+                <option value="Cancelled" {% if filter_status=='Cancelled' %}selected{% endif %}>Cancelled</option>
+            </select>
+            <input type="date" name="date" value="{{ request.args.get('date', '') }}"
+                class="px-4 py-2 rounded-xl border border-gray-200 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 outline-none transition-all text-sm">
+            <button type="submit"
+                class="px-5 py-2 bg-primary-700 text-white rounded-xl font-semibold text-sm hover:bg-primary-800 transition-all">
+                <i class="fas fa-filter mr-1"></i>Filter
+            </button>
+            <a href="{{ url_for('appointments.admin_list') }}"
+                class="px-5 py-2 bg-gray-100 text-gray-700 rounded-xl font-semibold text-sm hover:bg-gray-200 transition-all text-center">
+                Clear
+            </a>
+        </form>
+    </div>
+
+    <!-- Appointments table -->
+    <div class="bg-white rounded-2xl border border-gray-100 overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="w-full">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-5 py-4 text-left text-[11px] font-bold text-gray-500 uppercase tracking-wider">
+                            Student</th>
+                        <th
+                            class="px-5 py-4 text-left text-[11px] font-bold text-gray-500 uppercase tracking-wider hidden md:table-cell">
+                            Service</th>
+                        <th class="px-5 py-4 text-left text-[11px] font-bold text-gray-500 uppercase tracking-wider">
+                            Date</th>
+                        <th
+                            class="px-5 py-4 text-left text-[11px] font-bold text-gray-500 uppercase tracking-wider hidden sm:table-cell">
+                            Time</th>
+                        <th class="px-5 py-4 text-left text-[11px] font-bold text-gray-500 uppercase tracking-wider">
+                            Status</th>
+                        <th class="px-5 py-4 text-left text-[11px] font-bold text-gray-500 uppercase tracking-wider">
+                            Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-100">
+                    {% for appt in appointments %}
+                    <tr class="hover:bg-gray-50 transition-colors">
+                        <td class="px-5 py-4">
+                            <p class="text-sm font-semibold text-gray-900">{{ appt.student.first_name }} {{
+                                appt.student.last_name }}</p>
+                            <p class="text-xs text-gray-400">{{ appt.student.email }}</p>
+                        </td>
+                        <td class="px-5 py-4 hidden md:table-cell">
+                            <span
+                                class="px-2.5 py-1 rounded-full text-[11px] font-bold {% if appt.service_type == 'Dental' %}bg-purple-100 text-purple-700{% else %}bg-blue-100 text-blue-700{% endif %}">
+                                {{ appt.service_type }}
+                            </span>
+                        </td>
+                        <td class="px-5 py-4 text-sm text-gray-700">{{ appt.appointment_date.strftime('%b %d, %Y') }}
+                        </td>
+                        <td class="px-5 py-4 text-sm text-gray-600 hidden sm:table-cell">{{
+                            appt.start_time.strftime('%I:%M %p') }}</td>
+                        <td class="px-5 py-4">
+                            <span class="px-2.5 py-1 rounded-full text-[11px] font-bold
+                                {% if appt.status == 'Confirmed' %}bg-emerald-100 text-emerald-700
+                                {% elif appt.status == 'Pending' %}bg-amber-100 text-amber-700
+                                {% elif appt.status == 'Completed' %}bg-gray-100 text-gray-600
+                                {% else %}bg-red-100 text-red-600{% endif %}">
+                                {{ appt.status }}
+                            </span>
+                        </td>
+                        <td class="px-5 py-4">
+                            <form method="POST"
+                                action="{{ url_for('appointments.admin_update_status', appointment_id=appt.id) }}"
+                                class="inline-flex items-center gap-2">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <select name="status"
+                                    class="px-2 py-1 rounded-lg border border-gray-200 text-xs focus:border-primary-500 focus:ring-1 focus:ring-primary-500/20 outline-none bg-white">
+                                    <option value="Pending" {% if appt.status=='Pending' %}selected{% endif %}>Pending
+                                    </option>
+                                    <option value="Confirmed" {% if appt.status=='Confirmed' %}selected{% endif %}>
+                                        Confirmed</option>
+                                    <option value="Completed" {% if appt.status=='Completed' %}selected{% endif %}>
+                                        Completed</option>
+                                    <option value="Cancelled" {% if appt.status=='Cancelled' %}selected{% endif %}>
+                                        Cancelled</option>
+                                </select>
+                                <button type="submit"
+                                    class="px-2 py-1 bg-primary-600 text-white rounded-lg text-xs font-semibold hover:bg-primary-700 transition-colors">
+                                    <i class="fas fa-check"></i>
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="6" class="px-5 py-12 text-center">
+                            <div
+                                class="w-14 h-14 bg-gray-100 rounded-2xl flex items-center justify-center mx-auto mb-3">
+                                <i class="fas fa-calendar-times text-gray-300 text-xl"></i>
+                            </div>
+                            <p class="text-sm text-gray-400 font-medium">No appointments found</p>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

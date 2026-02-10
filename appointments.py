@@ -243,3 +243,62 @@ def api_check_availability():
         return jsonify({'available': available})
     except (KeyError, ValueError) as e:
         return jsonify({'error': 'Invalid data'}), 400
+
+
+# ═══════════ ADMIN ROUTES ═══════════
+def require_staff(f):
+    """Decorator to require nurse or admin role."""
+    from functools import wraps
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if current_user.role not in ['nurse', 'admin']:
+            flash('Access denied. Staff only.', 'error')
+            return redirect(url_for('index'))
+        return f(*args, **kwargs)
+    return decorated_function
+
+
+@appointments.route('/admin')
+@login_required
+@require_staff
+def admin_list():
+    """Admin view to manage all appointments."""
+    filter_status = request.args.get('status', 'all')
+    filter_date = request.args.get('date')
+    
+    query = Appointment.query
+    
+    if filter_status != 'all':
+        query = query.filter_by(status=filter_status)
+    
+    if filter_date:
+        try:
+            filter_date_obj = datetime.strptime(filter_date, '%Y-%m-%d').date()
+            query = query.filter_by(appointment_date=filter_date_obj)
+        except ValueError:
+            pass
+    
+    appointments_list = query.order_by(
+        Appointment.appointment_date.desc(),
+        Appointment.start_time.desc()
+    ).all()
+    
+    return render_template('admin_appointments.html', appointments=appointments_list, filter_status=filter_status)
+
+
+@appointments.route('/admin/<int:appointment_id>/update-status', methods=['POST'])
+@login_required
+@require_staff
+def admin_update_status(appointment_id):
+    """Admin route to update appointment status."""
+    appointment = Appointment.query.get_or_404(appointment_id)
+    new_status = request.form.get('status')
+    
+    if new_status in ['Pending', 'Confirmed', 'Completed', 'Cancelled']:
+        appointment.status = new_status
+        db.session.commit()
+        flash(f'Appointment status updated to {new_status}.', 'success')
+    else:
+        flash('Invalid status.', 'error')
+    
+    return redirect(url_for('appointments.admin_list'))

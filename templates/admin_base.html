@@ -140,6 +140,20 @@
                     class="fas fa-plus-circle w-5 text-center {% if active_page == 'add_medicine' %}text-blue-300{% else %}text-blue-300/60{% endif %}"></i><span>Add
                     Medicine</span>
             </a>
+            <a href="{{ url_for('appointments.admin_list') }}"
+                class="sidebar-link {% if active_page == 'appointments' %}active{% endif %} flex items-center space-x-3 px-3 py-2.5 rounded-xl text-sm font-medium {% if active_page != 'appointments' %}text-blue-200/80{% endif %}">
+                <i
+                    class="fas fa-calendar-check w-5 text-center {% if active_page == 'appointments' %}text-blue-300{% else %}text-blue-300/60{% endif %}"></i><span>Appointments</span>
+            </a>
+            <a href="{{ url_for('reservations.admin_list') }}"
+                class="sidebar-link {% if active_page == 'reservations' %}active{% endif %} flex items-center space-x-3 px-3 py-2.5 rounded-xl text-sm font-medium {% if active_page != 'reservations' %}text-blue-200/80{% endif %}">
+                <i
+                    class="fas fa-hand-holding-heart w-5 text-center {% if active_page == 'reservations' %}text-blue-300{% else %}text-blue-300/60{% endif %}"></i><span>Reservations</span>
+            </a>
+            <a href="/admin#queue-section"
+                class="sidebar-link flex items-center space-x-3 px-3 py-2.5 rounded-xl text-sm font-medium text-blue-200/80">
+                <i class="fas fa-users w-5 text-center text-blue-300/60"></i><span>Patient Queue</span>
+            </a>
 
             <p class="text-[10px] text-blue-300/40 font-bold uppercase tracking-widest px-3 pt-5 pb-2">Quick Links</p>
             <a href="{{ url_for('reservations.view_medicines') }}"
@@ -208,6 +222,20 @@
                         class="fas fa-plus-circle w-5 text-center {% if active_page == 'add_medicine' %}text-blue-300{% else %}text-blue-300/60{% endif %}"></i><span>Add
                         Medicine</span>
                 </a>
+                <a href="{{ url_for('appointments.admin_list') }}"
+                    class="sidebar-link {% if active_page == 'appointments' %}active{% endif %} flex items-center space-x-3 px-3 py-2.5 rounded-xl text-sm font-medium {% if active_page != 'appointments' %}text-blue-200/80{% endif %}">
+                    <i
+                        class="fas fa-calendar-check w-5 text-center {% if active_page == 'appointments' %}text-blue-300{% else %}text-blue-300/60{% endif %}"></i><span>Appointments</span>
+                </a>
+                <a href="{{ url_for('reservations.admin_list') }}"
+                    class="sidebar-link {% if active_page == 'reservations' %}active{% endif %} flex items-center space-x-3 px-3 py-2.5 rounded-xl text-sm font-medium {% if active_page != 'reservations' %}text-blue-200/80{% endif %}">
+                    <i
+                        class="fas fa-hand-holding-heart w-5 text-center {% if active_page == 'reservations' %}text-blue-300{% else %}text-blue-300/60{% endif %}"></i><span>Reservations</span>
+                </a>
+                <a href="/admin#queue-section"
+                    class="sidebar-link flex items-center space-x-3 px-3 py-2.5 rounded-xl text-sm font-medium text-blue-200/80">
+                    <i class="fas fa-users w-5 text-center text-blue-300/60"></i><span>Patient Queue</span>
+                </a>
 
                 <p class="text-[10px] text-blue-300/40 font-bold uppercase tracking-widest px-3 pt-6 pb-2">Quick Links
                 </p>
@@ -253,7 +281,8 @@
                                 %}Dashboard{% endblock %}</h2>
                             <p class="text-sm text-gray-500 hidden sm:block">{% block page_subtitle %}Welcome back,
                                 <span class="font-semibold text-primary-700">{{ current_user.first_name }}</span>{%
-                                endblock %}</p>
+                                endblock %}
+                            </p>
                         </div>
                     </div>
                     <div class="flex items-center space-x-2">
