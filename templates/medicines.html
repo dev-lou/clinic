@@ -1,226 +1,278 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Available Medicines - ISUFST CareHub</title>
+    <title>Medicine Pharmacy — ISUFST CareHub</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/fontawesome.min.css') }}">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap"
+        rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/animations.css') }}">
-    <style>
-        * { font-family: 'Inter', sans-serif; }
-        .medicine-card {
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { 'display': ['"Plus Jakarta Sans"', 'sans-serif'], 'body': ['Inter', 'sans-serif'] },
+                    colors: {
+                        'primary': { 50: '#eff6ff', 100: '#dbeafe', 200: '#bfdbfe', 600: '#2563eb', 700: '#1d4ed8', 800: '#1e3a5f', 900: '#0f1d30' },
+                        'accent': '#10b981',
+                    }
+                }
+            }
         }
-        .medicine-card:hover {
-            transform: translateY(-8px) scale(1.02);
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+    </script>
+    <style>
+        * {
+            font-family: 'Inter', sans-serif;
+        }
+
+        h1,
+        h2,
+        h3 {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        .feature-card {
+            transition: all 0.4s cubic-bezier(.16, 1, .3, 1);
+        }
+
+        .feature-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.12);
+        }
+
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.7s cubic-bezier(.16, 1, .3, 1);
+        }
+
+        .reveal.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .dots-bg {
+            background-image: radial-gradient(rgba(37, 99, 235, .06) 1px, transparent 1px);
+            background-size: 24px 24px;
         }
     </style>
-    <script>
-        tailwind.config = { theme: { extend: { colors: { 'deep-blue': '#0047AB', 'gold': '#FFD700' } } } }
-    </script>
 </head>
 
-<body class="bg-gradient-to-br from-blue-50 via-white to-green-50 min-h-screen">
-    <!-- Navbar with ISUFST Logo -->
-    <nav class="bg-gradient-to-r from-deep-blue to-blue-600 text-white shadow-2xl sticky top-0 z-50">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-            <div class="flex items-center justify-between">
-                <div class="flex items-center space-x-4">
-                    <div class="w-16 h-16 bg-white rounded-xl flex items-center justify-center shadow-lg heartbeat">
-                        <i class="fas fa-heartbeat text-deep-blue text-3xl"></i>
+<body class="bg-gray-50 min-h-screen dots-bg">
+
+    <!-- Navbar -->
+    <nav class="sticky top-0 z-50 bg-white/80 backdrop-blur-xl border-b border-gray-100 shadow-sm">
+        <div class="max-w-7xl mx-auto px-6 lg:px-8">
+            <div class="flex items-center justify-between h-[72px]">
+                <a href="/" class="flex items-center space-x-3">
+                    <div
+                        class="w-10 h-10 bg-gradient-to-br from-primary-600 to-accent rounded-xl flex items-center justify-center shadow-lg">
+                        <i class="fas fa-heartbeat text-white text-lg"></i>
                     </div>
-                    <div>
-                        <h1 class="text-2xl font-bold">ISUFST CareHub</h1>
-                        <p class="text-sm text-blue-100">Medicine Reservation System</p>
-                    </div>
-                </div>
-                <div class="flex items-center space-x-4">
-                    {% if current_user.is_authenticated %}
-                    <a href="/reservations/my" class="bg-white text-deep-blue px-4 py-2 rounded-lg hover:bg-blue-50 transition-all duration-200 font-semibold">
-                        <i class="fas fa-list mr-2"></i>My Reservations
+                    <span class="text-lg font-bold text-primary-900">CareHub</span>
+                </a>
+                <div class="flex items-center space-x-3">
+                    <a href="/"
+                        class="px-4 py-2 text-sm font-medium text-gray-600 hover:text-primary-700 rounded-lg hover:bg-primary-50 transition-all">
+                        <i class="fas fa-home mr-1.5"></i>Home
                     </a>
-                    {% endif %}
-                    <a href="/" class="bg-white bg-opacity-20 backdrop-blur-sm px-4 py-2 rounded-lg hover:bg-opacity-30 transition-all duration-200 font-semibold">
-                        <i class="fas fa-home mr-2"></i>Home
+                    <a href="{{ url_for('auth.login') }}"
+                        class="px-5 py-2.5 bg-primary-700 text-white text-sm font-semibold rounded-xl hover:bg-primary-800 transition-all shadow-lg shadow-primary-700/25">
+                        Sign In
                     </a>
                 </div>
             </div>
         </div>
     </nav>
 
-    <div class="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
-        <!-- Header -->
-        <div class="text-center mb-12 fade-in">
-            <div class="inline-block mb-6">
-                <div class="w-32 h-32 bg-gradient-to-br from-green-500 to-emerald-600 rounded-3xl flex items-center justify-center shadow-2xl pulse">
-                    <i class="fas fa-pills text-white text-5xl"></i>
+    <!-- Header -->
+    <div class="max-w-7xl mx-auto px-6 lg:px-8 pt-12 pb-6">
+        <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-6 reveal">
+            <div>
+                <span
+                    class="inline-block px-4 py-1.5 bg-emerald-100 text-emerald-700 text-sm font-semibold rounded-full mb-4">
+                    <i class="fas fa-pills mr-1.5"></i>Free for Students
+                </span>
+                <h1 class="text-4xl sm:text-5xl font-extrabold text-primary-900">
+                    Medicine Pharmacy
+                </h1>
+                <p class="text-gray-500 mt-2 text-lg max-w-lg">
+                    Reserve medicines for free. Pick up anytime during clinic hours — 9 AM to 5 PM, Mon–Fri.
+                </p>
+            </div>
+            <div class="flex-shrink-0">
+                <div
+                    class="inline-flex items-center gap-3 px-5 py-3 bg-white rounded-2xl shadow-sm border border-gray-100">
+                    <div class="w-10 h-10 bg-emerald-100 rounded-xl flex items-center justify-center">
+                        <i class="fas fa-box-open text-emerald-600"></i>
+                    </div>
+                    <div>
+                        <p class="text-2xl font-extrabold text-primary-900">{{ medicines|length }}</p>
+                        <p class="text-xs text-gray-400">Available Items</p>
+                    </div>
                 </div>
             </div>
-            <h1 class="text-6xl font-bold bg-gradient-to-r from-deep-blue to-green-600 bg-clip-text text-transparent mb-4">
-                Available Medicines
-            </h1>
-            <p class="text-xl text-gray-600 mb-4">Reserve medicines for FREE pickup at the school clinic</p>
-            
-            <!-- Info Banner -->
-            <div class="max-w-3xl mx-auto bg-gradient-to-r from-blue-500 to-green-500 rounded-2xl p-6 text-white shadow-xl mb-8">
-                <div class="flex items-start space-x-4">
-                    <i class="fas fa-info-circle text-3xl flex-shrink-0 bounce"></i>
-                    <div class="text-left">
-                        <h3 class="text-xl font-bold mb-2">How to Reserve</h3>
-                        <p class="text-blue-50 text-sm leading-relaxed">
-                            📋 Browse available medicines below<br>
-                            🎯 Click "Reserve" on the medicine you need<br>
-                            💊 Once reserved, visit the school clinic ANYTIME during clinic hours (9:00 AM - 5:00 PM)<br>
-                            ✅ FREE for all ISUFST students!
+        </div>
+    </div>
+
+    <!-- Flash Messages -->
+    <div class="max-w-7xl mx-auto px-6 lg:px-8">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        {% for category, message in messages %}
+        <div class="mb-4 px-5 py-4 rounded-2xl text-sm font-medium bounce
+                {% if category == 'error' %}bg-red-50 text-red-700 border border-red-200
+                {% else %}bg-emerald-50 text-emerald-700 border border-emerald-200{% endif %}">
+            <i
+                class="fas {% if category == 'error' %}fa-exclamation-circle{% else %}fa-check-circle{% endif %} mr-2"></i>{{
+            message }}
+        </div>
+        {% endfor %}
+        {% endif %}
+        {% endwith %}
+    </div>
+
+    <!-- Medicines Grid -->
+    <div class="max-w-7xl mx-auto px-6 lg:px-8 py-8">
+        {% if medicines %}
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {% for medicine in medicines %}
+            <div class="feature-card bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden reveal">
+                <!-- Color bar -->
+                <div
+                    class="h-1.5 bg-gradient-to-r {% if medicine.is_expiring_soon() %}from-red-500 to-orange-500{% else %}from-emerald-500 to-teal-500{% endif %}">
+                </div>
+
+                <div class="p-6">
+                    <!-- Header -->
+                    <div class="flex items-start justify-between mb-4">
+                        <div
+                            class="w-12 h-12 bg-gradient-to-br from-primary-600 to-primary-700 rounded-xl flex items-center justify-center shadow-lg shadow-primary-600/20">
+                            <i class="fas fa-capsules text-white"></i>
+                        </div>
+                        {% if medicine.is_expiring_soon() %}
+                        <span
+                            class="px-2.5 py-1 bg-red-50 text-red-600 rounded-lg text-xs font-semibold flex items-center">
+                            <span class="w-1.5 h-1.5 bg-red-500 rounded-full mr-1.5 pulse"></span>Expiring
+                        </span>
+                        {% else %}
+                        <span class="px-2.5 py-1 bg-emerald-50 text-emerald-600 rounded-lg text-xs font-semibold">
+                            In Stock
+                        </span>
+                        {% endif %}
+                    </div>
+
+                    <!-- Info -->
+                    <h3 class="text-lg font-bold text-gray-900 mb-3 line-clamp-1">{{ medicine.name }}</h3>
+
+                    <div class="space-y-2 text-sm text-gray-500 mb-5">
+                        <div class="flex items-center justify-between">
+                            <span><i class="fas fa-warehouse w-4 mr-1.5 text-gray-400"></i>Stock</span>
+                            <span class="font-bold text-primary-900">{{ medicine.quantity }} units</span>
+                        </div>
+                        {% if medicine.batch_number %}
+                        <div class="flex items-center justify-between">
+                            <span><i class="fas fa-barcode w-4 mr-1.5 text-gray-400"></i>Batch</span>
+                            <span class="font-mono text-xs text-gray-600">{{ medicine.batch_number }}</span>
+                        </div>
+                        {% endif %}
+                        {% if medicine.expiry_date %}
+                        <div class="flex items-center justify-between">
+                            <span><i class="fas fa-calendar w-4 mr-1.5 text-gray-400"></i>Expires</span>
+                            <span class="text-gray-600">{{ medicine.expiry_date.strftime('%b %d, %Y') }}</span>
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Reserve form -->
+                    {% if medicine.quantity > 0 %}
+                    <form method="POST"
+                        action="{{ url_for('reservations.reserve_medicine', medicine_id=medicine.id) }}">
+                        <div class="flex gap-2">
+                            <input type="number" name="quantity" min="1" max="{{ medicine.quantity }}" value="1"
+                                class="w-20 px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:border-primary-600 focus:outline-none focus:ring-2 focus:ring-primary-600/10">
+                            <button type="submit"
+                                class="flex-1 py-2.5 bg-primary-700 text-white text-sm font-semibold rounded-xl hover:bg-primary-800 transition-all shadow-sm hover:shadow-lg">
+                                <i class="fas fa-hand-holding-heart mr-1.5"></i>Reserve
+                            </button>
+                        </div>
+                    </form>
+                    {% else %}
+                    <button disabled
+                        class="w-full py-2.5 bg-gray-100 text-gray-400 text-sm font-medium rounded-xl cursor-not-allowed">
+                        Out of Stock
+                    </button>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="text-center py-24 reveal">
+            <div class="w-20 h-20 bg-gray-100 rounded-3xl flex items-center justify-center mx-auto mb-6">
+                <i class="fas fa-pills text-gray-300 text-3xl"></i>
+            </div>
+            <h3 class="text-2xl font-bold text-gray-900 mb-2">No medicines available</h3>
+            <p class="text-gray-500">Check back soon — the clinic restocks regularly.</p>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- How it Works -->
+    <div class="max-w-5xl mx-auto px-6 lg:px-8 py-16">
+        <div
+            class="bg-gradient-to-br from-primary-800 via-primary-700 to-primary-900 rounded-3xl p-10 sm:p-14 relative overflow-hidden reveal">
+            <div class="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -translate-y-1/3 translate-x-1/3">
+            </div>
+            <div class="absolute bottom-0 left-0 w-40 h-40 bg-accent/10 rounded-full translate-y-1/3 -translate-x-1/3">
+            </div>
+
+            <div class="relative z-10">
+                <h3 class="text-3xl font-extrabold text-white mb-8 text-center">How It Works</h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <div class="text-center">
+                        <div
+                            class="w-14 h-14 bg-white/10 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-white/20">
+                            <span class="text-2xl font-extrabold text-white">1</span>
+                        </div>
+                        <h4 class="text-white font-bold mb-2">Browse & Select</h4>
+                        <p class="text-blue-200/80 text-sm">Find the medicine you need and select your quantity</p>
+                    </div>
+                    <div class="text-center">
+                        <div
+                            class="w-14 h-14 bg-white/10 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-white/20">
+                            <span class="text-2xl font-extrabold text-white">2</span>
+                        </div>
+                        <h4 class="text-white font-bold mb-2">Reserve Online</h4>
+                        <p class="text-blue-200/80 text-sm">Click Reserve — it's completely free for all students</p>
+                    </div>
+                    <div class="text-center">
+                        <div
+                            class="w-14 h-14 bg-white/10 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-white/20">
+                            <span class="text-2xl font-extrabold text-white">3</span>
+                        </div>
+                        <h4 class="text-white font-bold mb-2">Pick Up Anytime</h4>
+                        <p class="text-blue-200/80 text-sm">Visit the clinic during hours — your medicine will be ready
                         </p>
                     </div>
                 </div>
             </div>
         </div>
-
-        <!-- Flash Messages -->
-        {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-        {% for category, message in messages %}
-        <div class="mb-6 px-6 py-4 rounded-xl shadow-lg {% if category == 'error' %}bg-red-50 border-l-4 border-red-500 text-red-700{% else %}bg-green-50 border-l-4 border-green-500 text-green-700{% endif %} bounce">
-            <i class="fas {% if category == 'error' %}fa-exclamation-circle{% else %}fa-check-circle{% endif %} mr-2"></i>
-            {{ message }}
-        </div>
-        {% endfor %}
-        {% endif %}
-        {% endwith %}
-
-        <!-- Search Bar -->
-        <div class="mb-8 slide-up">
-            <div class="max-w-2xl mx-auto">
-                <div class="relative">
-                    <input type="text" id="searchInput" placeholder="Search medicines..." 
-                           class="w-full px-6 py-4 pl-14 rounded-2xl border-2 border-gray-200 focus:border-deep-blue focus:outline-none text-lg shadow-lg transition-all duration-200">
-                    <i class="fas fa-search absolute left-5 top-5 text-gray-400 text-xl"></i>
-                </div>
-            </div>
-        </div>
-
-        <!-- Medicines Grid -->
-        {% if medicines %}
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="medicinesGrid">
-            {% for medicine in medicines %}
-            <div class="medicine-card bg-white rounded-2xl p-6 shadow-lg slide-up" style="animation-delay: {{ loop.index0 * 0.05 }}s" data-name="{{ medicine.name.lower() }}">
-                <div class="flex items-start justify-between mb-4">
-                    <div class="w-16 h-16 bg-gradient-to-br from-green-400 to-emerald-500 rounded-xl flex items-center justify-center shadow-lg">
-                        <i class="fas fa-capsules text-white text-2xl"></i>
-                    </div>
-                    <span class="px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm font-semibold">
-                        <i class="fas fa-check-circle mr-1"></i>Available
-                    </span>
-                </div>
-                
-                <h3 class="text-2xl font-bold text-gray-800 mb-2">{{ medicine.name }}</h3>
-                
-                <div class="space-y-2 mb-4">
-                    <div class="flex items-center text-gray-600">
-                        <i class="fas fa-box w-5 text-deep-blue"></i>
-                        <span class="font-semibold">Stock:</span>
-                        <span class="ml-2 font-bold text-deep-blue">{{ medicine.quantity }} units</span>
-                    </div>
-                    
-                    {% if medicine.batch_number %}
-                    <div class="flex items-center text-gray-600 text-sm">
-                        <i class="fas fa-barcode w-5 text-gray-400"></i>
-                        <span>Batch: {{ medicine.batch_number }}</span>
-                    </div>
-                    {% endif %}
-                    
-                    {% if medicine.expiry_date %}
-                    <div class="flex items-center text-gray-600 text-sm">
-                        <i class="fas fa-calendar w-5 text-gray-400"></i>
-                        <span>Expires: {{ medicine.expiry_date.strftime('%B %d, %Y') }}</span>
-                    </div>
-                    {% endif %}
-                </div>
-                
-                {% if current_user.is_authenticated and current_user.role == 'student' %}
-                <form method="POST" action="/reservations/reserve/{{ medicine.id }}" class="mt-4">
-                    <div class="flex items-center space-x-3 mb-3">
-                        <label class="text-sm font-semibold text-gray-700">Quantity:</label>
-                        <input type="number" name="quantity" value="1" min="1" max="{{ min(medicine.quantity, 10) }}" 
-                               class="w-20 px-3 py-2 border-2 border-gray-200 rounded-lg focus:border-deep-blue focus:outline-none text-center font-bold">
-                    </div>
-                    <button type="submit" class="w-full bg-gradient-to-r from-deep-blue to-blue-600 text-white py-3 rounded-xl font-bold hover:shadow-xl hover:scale-105 transition-all duration-200">
-                        <i class="fas fa-hand-holding-medical mr-2"></i>
-                        Reserve for FREE
-                    </button>
-                </form>
-                {% else %}
-                <div class="mt-4 p-3 bg-blue-50 rounded-lg text-center">
-                    <i class="fas fa-info-circle text-deep-blue mr-2"></i>
-                    <a href="/auth/login" class="text-deep-blue font-semibold hover:underline">Login to reserve</a>
-                </div>
-                {% endif %}
-            </div>
-            {% endfor %}
-        </div>
-        {% else %}
-        <div class="text-center py-16 slide-up">
-            <div class="inline-block mb-6">
-                <div class="w-32 h-32 bg-gray-100 rounded-3xl flex items-center justify-center">
-                    <i class="fas fa-pills text-gray-400 text-5xl"></i>
-                </div>
-            </div>
-            <h2 class="text-3xl font-bold text-gray-600 mb-4">No Medicines Available</h2>
-            <p class="text-gray-500">Please check back later for updates.</p>
-        </div>
-        {% endif %}
     </div>
 
-    <!-- Footer -->
-    <footer class="bg-deep-blue text-white mt-16 py-8">
-        <div class="max-w-7xl mx-auto px-4 text-center">
-            <div class="mb-4">
-                <i class="fas fa-heartbeat text-4xl text-blue-300"></i>
-            </div>
-            <p class="text-lg font-semibold mb-2">ISUFST CareHub</p>
-            <p class="text-blue-200 text-sm">Your health, our priority</p>
-            <p class="text-blue-300 text-xs mt-4">
-                Clinic Hours: Monday - Friday, 9:00 AM - 5:00 PM
-            </p>
-        </div>
-    </footer>
-
     <script>
-        // Search functionality
-        const searchInput = document.getElementById('searchInput');
-        const medicineCards = document.querySelectorAll('.medicine-card');
-        
-        searchInput.addEventListener('input', function() {
-            const searchTerm = this.value.toLowerCase();
-            
-            medicineCards.forEach(card => {
-                const medicineName = card.getAttribute('data-name');
-                if (medicineName.includes(searchTerm)) {
-                    card.style.display = 'block';
-                    setTimeout(() => {
-                        card.classList.add('slide-up');
-                    }, 10);
-                } else {
-                    card.style.display = 'none';
-                }
-            });
-        });
-        
-        // Smooth scroll
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
-                e.preventDefault();
-                const target = document.querySelector(this.getAttribute('href'));
-                if (target) {
-                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                }
-            });
-        });
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => { if (entry.isIntersecting) entry.target.classList.add('visible'); });
+        }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+        document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
     </script>
+
 </body>
+
 </html>
