@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: isufst-carehub
+    runtime: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn "app:create_app('production')" --bind 0.0.0.0:$PORT
+    envVars:
+      - key: FLASK_CONFIG
+        value: production
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DATABASE_URL
+        sync: false  # Set to your Turso database URL in Render dashboard
+      - key: TURSO_AUTH_TOKEN
+        sync: false  # Set to your Turso auth token in Render dashboard
+      - key: PYTHON_VERSION
+        value: "3.12.3"

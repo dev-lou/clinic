@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - ISUFST CareHub</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family:Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <style>
+        * {
+            font-family: 'Inter', sans-serif;
+        }
+
+        .expiring-soon {
+            background-color: #fef2f2;
+            border-left: 4px solid #ef4444;
+        }
+    </style>
+    <script>
+        tailwind.config = { theme: { extend: { colors: { 'deep-blue': '#0047AB', 'gold': '#FFD700' } } } }
+    </script>
+</head>
+
+<body class="bg-gray-50 min-h-screen">
+    <div class="flex h-screen overflow-hidden">
+        <!-- Sidebar -->
+        <aside class="w-64 bg-deep-blue text-white flex-shrink-0 hidden lg:block">
+            <div class="p-6">
+                <div class="flex items-center space-x-3 mb-8">
+                    <div class="w-10 h-10 bg-gold rounded-xl flex items-center justify-center">
+                        <i class="fas fa-heartbeat text-deep-blue text-xl"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-lg font-bold">CareHub Admin</h1>
+                        <p class="text-xs text-white/70">Management Portal</p>
+                    </div>
+                </div>
+                <nav class="space-y-2">
+                    <a href="/admin"
+                        class="flex items-center space-x-3 px-4 py-3 rounded-lg bg-white/10 hover:bg-white/20 transition-colors">
+                        <i class="fas fa-home w-5"></i><span>Dashboard</span>
+                    </a>
+                    <a href="{{ url_for('inventory.list_inventory') }}"
+                        class="flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-white/10 transition-colors">
+                        <i class="fas fa-pills w-5"></i><span>Inventory</span>
+                    </a>
+                </nav>
+            </div>
+            <div class="absolute bottom-0 w-64 p-6 border-t border-white/10">
+                <a href="{{ url_for('auth.logout') }}"
+                    class="flex items-center space-x-3 hover:text-gold transition-colors">
+                    <i class="fas fa-sign-out-alt"></i><span>Logout</span>
+                </a>
+            </div>
+        </aside>
+
+        <!-- Main -->
+        <div class="flex-1 overflow-y-auto">
+            <header class="bg-white border-b border-gray-200 px-6 py-4 sticky top-0 z-10">
+                <h2 class="text-2xl font-bold text-gray-900">Dashboard</h2>
+                <p class="text-sm text-gray-500">Welcome back, Admin</p>
+            </header>
+
+            <main class="p-6 space-y-6">
+                <!-- Stats -->
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                    <div class="bg-white rounded-lg shadow-sm border border-gray-100 p-6">
+                        <p class="text-sm text-gray-500 font-medium">Today's Patients</p>
+                        <p class="text-3xl font-bold text-gray-900 mt-2">{{ today_patients }}</p>
+                    </div>
+                    <div class="bg-white rounded-lg shadow-sm border border-gray-100 p-6">
+                        <p class="text-sm text-gray-500 font-medium">In Queue</p>
+                        <p class="text-3xl font-bold text-gray-900 mt-2">{{ queue_count }}</p>
+                    </div>
+                    <div class="bg-white rounded-lg shadow-sm border border-gray-100 p-6">
+                        <p class="text-sm text-gray-500 font-medium">Appointments</p>
+                        <p class="text-3xl font-bold text-gray-900 mt-2">{{ today_appointments }}</p>
+                    </div>
+                    <div class="bg-white rounded-lg shadow-sm border border-gray-100 p-6">
+                        <p class="text-sm text-gray-500 font-medium">Low Stock</p>
+                        <p class="text-3xl font-bold text-red-600 mt-2">{{ low_stock_count }}</p>
+                    </div>
+                </div>
+
+                <!-- Queue -->
+                <div class="bg-white rounded-lg shadow-sm border border-gray-100 p-6">
+                    <div class="flex items-center justify-between mb-6">
+                        <h3 class="text-xl font-bold text-gray-900">
+                            <i class="fas fa-users-cog text-deep-blue mr-2"></i>Queue Controller
+                        </h3>
+                        <span class="text-sm text-gray-500">{{ queue_count }} patients waiting</span>
+                    </div>
+
+                    {% if next_patient %}
+                    <div class="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-xl p-8 border-2 border-blue-200 mb-6">
+                        <div class="text-center">
+                            <p class="text-sm font-medium text-gray-600 mb-2">NEXT PATIENT</p>
+                            <h4 class="text-4xl font-bold text-deep-blue mb-2">{{ next_patient.student_name }}</h4>
+                            <div class="flex items-center justify-center space-x-3 mb-4">
+                                <span class="px-4 py-1.5 rounded-full text-sm font-semibold
+                                    {% if next_patient.severity_score == 1 %}bg-red-100 text-red-700
+                                    {% elif next_patient.severity_score == 2 %}bg-yellow-100 text-yellow-700
+                                    {% else %}bg-green-100 text-green-700{% endif %}">
+                                    {{ next_patient.priority_label }}
+                                </span>
+                                <span class="text-gray-600 text-sm">
+                                    Arrived: <span class="font-semibold">{{ next_patient.arrival_time.strftime('%I:%M
+                                        %p') }}</span>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <form method="POST" action="{{ url_for('queue.call_next') }}">
+                            <button type="submit"
+                                class="w-full px-6 py-4 bg-green-600 hover:bg-green-700 text-white rounded-lg font-semibold text-lg transition-colors">
+                                <i class="fas fa-phone mr-2"></i>Call Next Patient
+                            </button>
+                        </form>
+                        <form method="POST" action="{{ url_for('queue.mark_absent', queue_id=next_patient.id) }}">
+                            <button type="submit"
+                                class="w-full px-6 py-4 bg-gray-500 hover:bg-gray-600 text-white rounded-lg font-semibold text-lg transition-colors">
+                                <i class="fas fa-user-times mr-2"></i>Mark Absent
+                            </button>
+                        </form>
+                    </div>
+                    {% else %}
+                    <p class="text-center text-gray-500 py-8">Queue is empty</p>
+                    {% endif %}
+                </div>
+
+                <!-- Inventory -->
+                <div class="bg-white rounded-lg shadow-sm border border-gray-100 p-6">
+                    <div class="flex items-center justify-between mb-6">
+                        <h3 class="text-xl font-bold text-gray-900">
+                            <i class="fas fa-pills text-deep-blue mr-2"></i>Expiring Items
+                        </h3>
+                        <a href="{{ url_for('inventory.list_inventory') }}"
+                            class="px-4 py-2 bg-deep-blue text-white rounded-lg text-sm font-semibold hover:bg-opacity-90">
+                            View All Inventory
+                        </a>
+                    </div>
+                    {% if expiring_items %}
+                    <div class="overflow-x-auto">
+                        <table class="w-full">
+                            <thead class="border-b border-gray-200">
+                                <tr>
+                                    <th class="text-left py-3 px-4 text-sm font-semibold text-gray-700">Name</th>
+                                    <th class="text-left py-3 px-4 text-sm font-semibold text-gray-700">Batch</th>
+                                    <th class="text-left py-3 px-4 text-sm font-semibold text-gray-700">Quantity</th>
+                                    <th class="text-left py-3 px-4 text-sm font-semibold text-gray-700">Expiry</th>
+                                    <th class="text-left py-3 px-4 text-sm font-semibold text-gray-700">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in expiring_items %}
+                                <tr class="border-b border-gray-100 expiring-soon">
+                                    <td class="py-3 px-4 font-medium text-gray-900">{{ item.name }}</td>
+                                    <td class="py-3 px-4 text-gray-600">{{ item.batch_number or 'N/A' }}</td>
+                                    <td class="py-3 px-4 text-gray-900 font-semibold">{{ item.quantity }}</td>
+                                    <td class="py-3 px-4 text-red-600 font-semibold">{{ item.expiry_date.strftime('%b
+                                        %d, %Y') if item.expiry_date else 'N/A' }}</td>
+                                    <td class="py-3 px-4">
+                                        <a href="{{ url_for('inventory.edit', item_id=item.id) }}"
+                                            class="text-deep-blue hover:text-blue-700">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <p class="text-center text-gray-500 py-8">No items expiring soon</p>
+                    {% endif %}
+                </div>
+            </main>
+        </div>
+    </div>
+</body>
+
+</html>

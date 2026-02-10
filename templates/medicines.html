@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Available Medicines - ISUFST CareHub</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/animations.css') }}">
+    <style>
+        * { font-family: 'Inter', sans-serif; }
+        .medicine-card {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .medicine-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+        }
+    </style>
+    <script>
+        tailwind.config = { theme: { extend: { colors: { 'deep-blue': '#0047AB', 'gold': '#FFD700' } } } }
+    </script>
+</head>
+
+<body class="bg-gradient-to-br from-blue-50 via-white to-green-50 min-h-screen">
+    <!-- Navbar with ISUFST Logo -->
+    <nav class="bg-gradient-to-r from-deep-blue to-blue-600 text-white shadow-2xl sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-4">
+                    <div class="w-16 h-16 bg-white rounded-xl flex items-center justify-center shadow-lg heartbeat">
+                        <i class="fas fa-heartbeat text-deep-blue text-3xl"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-2xl font-bold">ISUFST CareHub</h1>
+                        <p class="text-sm text-blue-100">Medicine Reservation System</p>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-4">
+                    {% if current_user.is_authenticated %}
+                    <a href="/reservations/my" class="bg-white text-deep-blue px-4 py-2 rounded-lg hover:bg-blue-50 transition-all duration-200 font-semibold">
+                        <i class="fas fa-list mr-2"></i>My Reservations
+                    </a>
+                    {% endif %}
+                    <a href="/" class="bg-white bg-opacity-20 backdrop-blur-sm px-4 py-2 rounded-lg hover:bg-opacity-30 transition-all duration-200 font-semibold">
+                        <i class="fas fa-home mr-2"></i>Home
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
+        <!-- Header -->
+        <div class="text-center mb-12 fade-in">
+            <div class="inline-block mb-6">
+                <div class="w-32 h-32 bg-gradient-to-br from-green-500 to-emerald-600 rounded-3xl flex items-center justify-center shadow-2xl pulse">
+                    <i class="fas fa-pills text-white text-5xl"></i>
+                </div>
+            </div>
+            <h1 class="text-6xl font-bold bg-gradient-to-r from-deep-blue to-green-600 bg-clip-text text-transparent mb-4">
+                Available Medicines
+            </h1>
+            <p class="text-xl text-gray-600 mb-4">Reserve medicines for FREE pickup at the school clinic</p>
+            
+            <!-- Info Banner -->
+            <div class="max-w-3xl mx-auto bg-gradient-to-r from-blue-500 to-green-500 rounded-2xl p-6 text-white shadow-xl mb-8">
+                <div class="flex items-start space-x-4">
+                    <i class="fas fa-info-circle text-3xl flex-shrink-0 bounce"></i>
+                    <div class="text-left">
+                        <h3 class="text-xl font-bold mb-2">How to Reserve</h3>
+                        <p class="text-blue-50 text-sm leading-relaxed">
+                            📋 Browse available medicines below<br>
+                            🎯 Click "Reserve" on the medicine you need<br>
+                            💊 Once reserved, visit the school clinic ANYTIME during clinic hours (9:00 AM - 5:00 PM)<br>
+                            ✅ FREE for all ISUFST students!
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Flash Messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        {% for category, message in messages %}
+        <div class="mb-6 px-6 py-4 rounded-xl shadow-lg {% if category == 'error' %}bg-red-50 border-l-4 border-red-500 text-red-700{% else %}bg-green-50 border-l-4 border-green-500 text-green-700{% endif %} bounce">
+            <i class="fas {% if category == 'error' %}fa-exclamation-circle{% else %}fa-check-circle{% endif %} mr-2"></i>
+            {{ message }}
+        </div>
+        {% endfor %}
+        {% endif %}
+        {% endwith %}
+
+        <!-- Search Bar -->
+        <div class="mb-8 slide-up">
+            <div class="max-w-2xl mx-auto">
+                <div class="relative">
+                    <input type="text" id="searchInput" placeholder="Search medicines..." 
+                           class="w-full px-6 py-4 pl-14 rounded-2xl border-2 border-gray-200 focus:border-deep-blue focus:outline-none text-lg shadow-lg transition-all duration-200">
+                    <i class="fas fa-search absolute left-5 top-5 text-gray-400 text-xl"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Medicines Grid -->
+        {% if medicines %}
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="medicinesGrid">
+            {% for medicine in medicines %}
+            <div class="medicine-card bg-white rounded-2xl p-6 shadow-lg slide-up" style="animation-delay: {{ loop.index0 * 0.05 }}s" data-name="{{ medicine.name.lower() }}">
+                <div class="flex items-start justify-between mb-4">
+                    <div class="w-16 h-16 bg-gradient-to-br from-green-400 to-emerald-500 rounded-xl flex items-center justify-center shadow-lg">
+                        <i class="fas fa-capsules text-white text-2xl"></i>
+                    </div>
+                    <span class="px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm font-semibold">
+                        <i class="fas fa-check-circle mr-1"></i>Available
+                    </span>
+                </div>
+                
+                <h3 class="text-2xl font-bold text-gray-800 mb-2">{{ medicine.name }}</h3>
+                
+                <div class="space-y-2 mb-4">
+                    <div class="flex items-center text-gray-600">
+                        <i class="fas fa-box w-5 text-deep-blue"></i>
+                        <span class="font-semibold">Stock:</span>
+                        <span class="ml-2 font-bold text-deep-blue">{{ medicine.quantity }} units</span>
+                    </div>
+                    
+                    {% if medicine.batch_number %}
+                    <div class="flex items-center text-gray-600 text-sm">
+                        <i class="fas fa-barcode w-5 text-gray-400"></i>
+                        <span>Batch: {{ medicine.batch_number }}</span>
+                    </div>
+                    {% endif %}
+                    
+                    {% if medicine.expiry_date %}
+                    <div class="flex items-center text-gray-600 text-sm">
+                        <i class="fas fa-calendar w-5 text-gray-400"></i>
+                        <span>Expires: {{ medicine.expiry_date.strftime('%B %d, %Y') }}</span>
+                    </div>
+                    {% endif %}
+                </div>
+                
+                {% if current_user.is_authenticated and current_user.role == 'student' %}
+                <form method="POST" action="/reservations/reserve/{{ medicine.id }}" class="mt-4">
+                    <div class="flex items-center space-x-3 mb-3">
+                        <label class="text-sm font-semibold text-gray-700">Quantity:</label>
+                        <input type="number" name="quantity" value="1" min="1" max="{{ min(medicine.quantity, 10) }}" 
+                               class="w-20 px-3 py-2 border-2 border-gray-200 rounded-lg focus:border-deep-blue focus:outline-none text-center font-bold">
+                    </div>
+                    <button type="submit" class="w-full bg-gradient-to-r from-deep-blue to-blue-600 text-white py-3 rounded-xl font-bold hover:shadow-xl hover:scale-105 transition-all duration-200">
+                        <i class="fas fa-hand-holding-medical mr-2"></i>
+                        Reserve for FREE
+                    </button>
+                </form>
+                {% else %}
+                <div class="mt-4 p-3 bg-blue-50 rounded-lg text-center">
+                    <i class="fas fa-info-circle text-deep-blue mr-2"></i>
+                    <a href="/auth/login" class="text-deep-blue font-semibold hover:underline">Login to reserve</a>
+                </div>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="text-center py-16 slide-up">
+            <div class="inline-block mb-6">
+                <div class="w-32 h-32 bg-gray-100 rounded-3xl flex items-center justify-center">
+                    <i class="fas fa-pills text-gray-400 text-5xl"></i>
+                </div>
+            </div>
+            <h2 class="text-3xl font-bold text-gray-600 mb-4">No Medicines Available</h2>
+            <p class="text-gray-500">Please check back later for updates.</p>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-deep-blue text-white mt-16 py-8">
+        <div class="max-w-7xl mx-auto px-4 text-center">
+            <div class="mb-4">
+                <i class="fas fa-heartbeat text-4xl text-blue-300"></i>
+            </div>
+            <p class="text-lg font-semibold mb-2">ISUFST CareHub</p>
+            <p class="text-blue-200 text-sm">Your health, our priority</p>
+            <p class="text-blue-300 text-xs mt-4">
+                Clinic Hours: Monday - Friday, 9:00 AM - 5:00 PM
+            </p>
+        </div>
+    </footer>
+
+    <script>
+        // Search functionality
+        const searchInput = document.getElementById('searchInput');
+        const medicineCards = document.querySelectorAll('.medicine-card');
+        
+        searchInput.addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase();
+            
+            medicineCards.forEach(card => {
+                const medicineName = card.getAttribute('data-name');
+                if (medicineName.includes(searchTerm)) {
+                    card.style.display = 'block';
+                    setTimeout(() => {
+                        card.classList.add('slide-up');
+                    }, 10);
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        });
+        
+        // Smooth scroll
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+        });
+    </script>
+</body>
+</html>

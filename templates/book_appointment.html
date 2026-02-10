@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book Appointment - ISUFST CareHub</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/animations.css') }}">
+    <style>
+        * { font-family: 'Inter', sans-serif; }
+        
+        .calendar-day {
+            @apply w-10 h-10 flex items-center justify-center rounded-lg cursor-pointer transition-all duration-200;
+        }
+        
+        .calendar-day:not(.disabled):hover {
+            @apply bg-blue-100 transform scale-110;
+        }
+        
+        .calendar-day.selected {
+            @apply bg-blue-600 text-white font-bold shadow-lg transform scale-110;
+        }
+        
+        .calendar-day.fully-booked {
+            @apply bg-red-500 text-white font-bold;
+        }
+        
+        .calendar-day.disabled {
+            @apply text-gray-300 cursor-not-allowed;
+        }
+        
+        .time-slot {
+            @apply px-4 py-3 border-2 border-gray-200 rounded-lg cursor-pointer transition-all duration-200 text-center;
+        }
+        
+        .time-slot:hover:not(.unavailable) {
+            @apply border-blue-500 bg-blue-50 transform scale-105;
+        }
+        
+        .time-slot.selected {
+            @apply bg-blue-600 text-white border-blue-600 font-bold shadow-lg;
+        }
+        
+        .time-slot.unavailable {
+            @apply bg-gray-100 text-gray-400 cursor-not-allowed opacity-50;
+        }
+    </style>
+    <script>
+        tailwind.config = { theme: { extend: { colors: { 'deep-blue': '#0047AB', 'gold': '#FFD700' } } } }
+    </script>
+</head>
+
+<body class="bg-gradient-to-br from-blue-50 via-white to-blue-50 min-h-screen">
+    <!-- Header with ISUFST Logo -->
+    <nav class="bg-deep-blue text-white shadow-2xl">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-4">
+                    <div class="w-16 h-16 bg-white rounded-xl flex items-center justify-center shadow-lg pulse">
+                        <i class="fas fa-heartbeat text-deep-blue text-3xl"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-2xl font-bold">ISUFST CareHub</h1>
+                        <p class="text-sm text-blue-200">Iloilo State University of Fisheries Science and Technology</p>
+                    </div>
+                </div>
+                <a href="/"class="bg-white text-deep-blue px-6 py-2 rounded-lg hover:bg-blue-50 transition-all duration-200 font-semibold">
+                    <i class="fas fa-home mr-2"></i>Home
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
+        <!-- Header -->
+        <div class="text-center mb-12 fade-in">
+            <div class="inline-block mb-6">
+                <div class="w-24 h-24 bg-gradient-to-br from-deep-blue to-blue-600 rounded-2xl flex items-center justify-center shadow-2xl heartbeat">
+                    <i class="fas fa-calendar-check text-white text-4xl"></i>
+                </div>
+            </div>
+            <h1 class="text-6xl font-bold text-deep-blue mb-4">Book Your Appointment</h1>
+            <p class="text-xl text-gray-600">Schedule your dental or medical check-up with ease</p>
+        </div>
+
+        <!-- Flash Messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        {% for category, message in messages %}
+        <div class="mb-6 px-6 py-4 rounded-xl shadow-lg {% if category == 'error' %}bg-red-50 border-l-4 border-red-500 text-red-700{% else %}bg-green-50 border-l-4 border-green-500 text-green-700{% endif %} bounce">
+            <i class="fas {% if category == 'error' %}fa-exclamation-circle{% else %}fa-check-circle{% endif %} mr-2"></i>
+            {{ message }}
+        </div>
+        {% endfor %}
+        {% endif %}
+        {% endwith %}
+
+        <form method="POST" id="appointmentForm" class="space-y-8">
+            <!-- Service Type Selection -->
+            <div class="bg-white rounded-2xl shadow-xl p-8 slide-up">
+                <h2 class="text-2xl font-bold text-deep-blue mb-6">
+                    <i class="fas fa-clipboard-list mr-3"></i>
+                    Select Service Type
+                </h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <label class="service-option">
+                        <input type="radio" name="service_type" value="Medical" checked class="peer hidden" required>
+                        <div class="p-6 bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl cursor-pointer transition-all duration-300 border-2 border-transparent peer-checked:border-deep-blue peer-checked:shadow-2xl peer-checked:transform peer-checked:scale-105">
+                            <i class="fas fa-stethoscope text-5xl text-deep-blue mb-3"></i>
+                            <h3 class="text-xl font-bold text-deep-blue">Medical Check-up</h3>
+                            <p class="text-gray-600 text-sm mt-2">General health consultation and treatment</p>
+                        </div>
+                    </label>
+                    <label class="service-option">
+                        <input type="radio" name="service_type" value="Dental" class="peer hidden" required>
+                        <div class="p-6 bg-gradient-to-br from-green-50 to-green-100 rounded-xl cursor-pointer transition-all duration-300 border-2 border-transparent peer-checked:border-green-600 peer-checked:shadow-2xl peer-checked:transform peer-checked:scale-105">
+                            <i class="fas fa-tooth text-5xl text-green-600 mb-3"></i>
+                            <h3 class="text-xl font-bold text-green-600">Dental Care</h3>
+                            <p class="text-gray-600 text-sm mt-2">Dental consultation and oral health services</p>
+                        </div>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Calendar -->
+            <div class="bg-white rounded-2xl shadow-xl p-8 slide-up" style="animation-delay: 0.1s">
+                <h2 class="text-2xl font-bold text-deep-blue mb-6">
+                    <i class="fas fa-calendar-alt mr-3"></i>
+                    Choose a Date
+                </h2>
+                <div id="calendar" class="mb-4"></div>
+                <input type="hidden" name="appointment_date" id="selected_date" required>
+                <div class="flex items-center justify-center space-x-6 text-sm mt-6">
+                    <div class="flex items-center space-x-2">
+                        <div class="w-4 h-4 bg-blue-600 rounded"></div>
+                        <span>Selected</span>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <div class="w-4 h-4 bg-red-500 rounded"></div>
+                        <span>Fully Booked</span>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <div class="w-4 h-4 bg-gray-300 rounded"></div>
+                        <span>Past Date</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Time Slots -->
+            <div id="timeSlotsContainer" class="bg-white rounded-2xl shadow-xl p-8 slide-up hidden" style="animation-delay: 0.2s">
+                <h2 class="text-2xl font-bold text-deep-blue mb-6">
+                    <i class="fas fa-clock mr-3"></i>
+                    Select Time Slot
+                </h2>
+                <div id="timeSlots" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3"></div>
+                <input type="hidden" name="time_slot" id="selected_time" required>
+                <p class="text-sm text-gray-500 mt-4 text-center">
+                    <i class="fas fa-info-circle mr-1"></i>
+                    Clinic hours: 9:00 AM - 5:00 PM (30-minute slots)
+                </p>
+            </div>
+
+            <!-- Submit Button -->
+            <div class="text-center slide-up" style="animation-delay: 0.3s">
+                <button type="submit" id="submitBtn" disabled class="bg-gradient-to-r from-deep-blue to-blue-600 text-white px-12 py-4 rounded-xl text-xl font-bold shadow-2xl hover:shadow-3xl hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none">
+                    <i class="fas fa-check-circle mr-3"></i>
+                    Confirm Appointment
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        let selectedDate = null;
+        let selectedTime = null;
+        let currentMonth = new Date().getMonth();
+        let currentYear = new Date().getFullYear();
+        let serviceType = 'Medical';
+        let fullyBookedDates = [];
+        
+        document.querySelectorAll('input[name="service_type"]').forEach(radio => {
+            radio.addEventListener('change', function() {
+                serviceType = this.value;
+                selectedDate = null;
+                selectedTime = null;
+                document.getElementById('selected_date').value = '';
+                document.getElementById('selected_time').value = '';
+                document.getElementById('timeSlotsContainer').classList.add('hidden');
+                document.getElementById('submitBtn').disabled = true;
+                renderCalendar();
+            });
+        });
+        
+        function renderCalendar() {
+            const calendar = document.getElementById('calendar');
+            const firstDay = new Date(currentYear, currentMonth, 1);
+            const lastDay = new Date(currentYear, currentMonth + 1, 0);
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            
+            const monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
+                'July', 'August', 'September', 'October', 'November', 'December'];
+            
+            let html = `
+                <div class="flex items-center justify-between mb-6">
+                    <button type="button" onclick="changeMonth(-1)" class="px-4 py-2 bg-deep-blue text-white rounded-lg hover:bg-blue-700 transition-colors">
+                        <i class="fas fa-chevron-left"></i>
+                    </button>
+                    <h3 class="text-2xl font-bold text-deep-blue">${monthNames[currentMonth]} ${currentYear}</h3>
+                    <button type="button" onclick="changeMonth(1)" class="px-4 py-2 bg-deep-blue text-white rounded-lg hover:bg-blue-700 transition-colors">
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
+                </div>
+                <div class="grid grid-cols-7 gap-2 mb-2">
+                    <div class="text-center font-bold text-gray-600">Sun</div>
+                    <div class="text-center font-bold text-gray-600">Mon</div>
+                    <div class="text-center font-bold text-gray-600">Tue</div>
+                    <div class="text-center font-bold text-gray-600">Wed</div>
+                    <div class="text-center font-bold text-gray-600">Thu</div>
+                    <div class="text-center font-bold text-gray-600">Fri</div>
+                    <div class="text-center font-bold text-gray-600">Sat</div>
+                </div>
+                <div class="grid grid-cols-7 gap-2">
+            `;
+            
+            for (let i = 0; i < firstDay.getDay(); i++) {
+                html += '<div></div>';
+            }
+            
+            for (let day = 1; day <= lastDay.getDate(); day++) {
+                const currentDate = new Date(currentYear, currentMonth, day);
+                const dateStr = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                const isPast = currentDate < today;
+                const isSelected = selectedDate === dateStr;
+                const isFullyBooked = fullyBookedDates.includes(dateStr);
+                
+                let classes = 'calendar-day';
+                if (isPast) classes += ' disabled';
+                else if (isFullyBooked) classes += ' fully-booked';
+                else if (isSelected) classes += ' selected';
+                
+                html += `<div class="${classes}" onclick="${!isPast ? `selectDate('${dateStr}')` : ''}">${day}</div>`;
+            }
+            
+            html += '</div>';
+            calendar.innerHTML = html;
+            checkFullyBookedDates();
+        }
+        
+        async function checkFullyBookedDates() {
+            const firstDay = new Date(currentYear, currentMonth, 1);
+            const lastDay = new Date(currentYear, currentMonth + 1, 0);
+            fullyBookedDates = [];
+            
+            for (let day = 1; day <= lastDay.getDate(); day++) {
+                const dateStr = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                const currentDate = new Date(currentYear, currentMonth, day);
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+                
+                if (currentDate >= today) {
+                    try {
+                        const response = await fetch(`/appointments/check-date-availability?date=${dateStr}&service=${serviceType}`);
+                        const data = await response.json();
+                        if (data.fully_booked) {
+                            fullyBookedDates.push(dateStr);
+                        }
+                    } catch (error) {
+                        console.error('Error:', error);
+                    }
+                }
+            }
+            renderCalendar();
+        }
+        
+        function changeMonth(delta) {
+            currentMonth += delta;
+            if (currentMonth < 0) {
+                currentMonth = 11;
+                currentYear--;
+            } else if (currentMonth > 11) {
+                currentMonth = 0;
+                currentYear++;
+            }
+            renderCalendar();
+        }
+        
+        async function selectDate(dateStr) {
+            if (fullyBookedDates.includes(dateStr)) {
+                alert('This date is fully booked. Please select another date.');
+                return;
+            }
+            
+            selectedDate = dateStr;
+            selectedTime = null;
+            document.getElementById('selected_date').value = dateStr;
+            document.getElementById('selected_time').value = '';
+            document.getElementById('submitBtn').disabled = true;
+            renderCalendar();
+            await loadTimeSlots(dateStr);
+            document.getElementById('timeSlotsContainer').classList.remove('hidden');
+        }
+        
+        async function loadTimeSlots(dateStr) {
+            try {
+                const response = await fetch(`/appointments/check-availability?date=${dateStr}&service=${serviceType}`);
+                const data = await response.json();
+                
+                const container = document.getElementById('timeSlots');
+                container.innerHTML = '';
+                
+                data.slots.forEach(slot => {
+                    const div = document.createElement('div');
+                    div.className = `time-slot ${!slot.available ? 'unavailable' : ''} ${selectedTime === slot.time ? 'selected' : ''}`;
+                    if (slot.available) {
+                        div.onclick = () => selectTime(slot.time);
+                    }
+                    div.innerHTML = `
+                        <div class="font-bold">${formatTime(slot.time)}</div>
+                        <div class="text-xs mt-1">${slot.available ? `${slot.remaining} left` : 'Full'}</div>
+                    `;
+                    container.appendChild(div);
+                });
+            } catch (error) {
+                console.error('Error loading slots:', error);
+            }
+        }
+        
+        function selectTime(timeStr) {
+            selectedTime = timeStr;
+            document.getElementById('selected_time').value = timeStr;
+            document.getElementById('submitBtn').disabled = false;
+            document.querySelectorAll('.time-slot').forEach(slot => slot.classList.remove('selected'));
+            event.target.closest('.time-slot').classList.add('selected');
+        }
+        
+        function formatTime(time24) {
+            const [hours, minutes] = time24.split(':');
+            const hour = parseInt(hours);
+            const ampm = hour >= 12 ? 'PM' : 'AM';
+            const hour12 = hour % 12 || 12;
+            return `${hour12}:${minutes} ${ampm}`;
+        }
+        
+        renderCalendar();
+        
+        document.getElementById('appointmentForm').addEventListener('submit', function(e) {
+            if (!selectedDate || !selectedTime) {
+                e.preventDefault();
+                alert('Please select both a date and time slot.');
+            }
+        });
+    </script>
+</body>
+</html>

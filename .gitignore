@@ -1,0 +1,30 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environment
+venv/
+.venv/
+env/
+
+# Environment variables
+.env
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Database (local dev)
+*.db
+*.sqlite3
+instance/
+
+# Migrations (keep folder but ignore pycache)
+migrations/__pycache__/
+
+# OS
+.DS_Store
+Thumbs.db
