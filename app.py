@@ -1,7 +1,7 @@
 import os
 from flask import Flask
 from flask_migrate import Migrate
-from flask_login import LoginManager
+from flask_login import LoginManager, login_required, current_user
 from flask_cors import CORS
 from flask_wtf.csrf import CSRFProtect
 
@@ -63,12 +63,16 @@ def create_app(config_name=None):
         return render_template('index.html')
 
     @app.route('/admin')
+    @login_required
     def admin():
         """Admin dashboard with real data"""
-        from flask import render_template
-        from models import Queue, Inventory, Appointment, ClinicVisit
+        from flask import render_template, abort
+        from models import Queue, Inventory, Appointment, ClinicVisit, MedicineReservation, User
         from utils import get_next_patient
         from datetime import date
+
+        if current_user.role not in ['admin', 'nurse']:
+            abort(403)
 
         next_patient = get_next_patient()
         queue_count = Queue.query.filter_by(status='Waiting').count()
@@ -92,6 +96,19 @@ def create_app(config_name=None):
             Inventory.quantity < 10
         ).count()
 
+        # Appointments for today
+        todays_appts = Appointment.query.filter(
+            Appointment.appointment_date == date.today()
+        ).order_by(Appointment.start_time.asc()).all()
+
+        # Pending reservations
+        pending_reservations = MedicineReservation.query.filter_by(
+            status='Reserved'
+        ).order_by(MedicineReservation.reserved_at.desc()).limit(10).all()
+
+        # Total students
+        total_students = User.query.filter_by(role='student').count()
+
         return render_template(
             'admin.html',
             next_patient=next_patient,
@@ -99,7 +116,10 @@ def create_app(config_name=None):
             today_patients=today_patients,
             today_appointments=today_appointments,
             expiring_items=expiring_items[:5],
-            low_stock_count=low_stock_count
+            low_stock_count=low_stock_count,
+            todays_appts=todays_appts,
+            pending_reservations=pending_reservations,
+            total_students=total_students
         )
 
     @app.route('/health')

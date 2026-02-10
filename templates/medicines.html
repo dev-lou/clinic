@@ -194,6 +194,7 @@
                     {% if medicine.quantity > 0 %}
                     <form method="POST"
                         action="{{ url_for('reservations.reserve_medicine', medicine_id=medicine.id) }}">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                         <div class="flex gap-2">
                             <input type="number" name="quantity" min="1" max="{{ medicine.quantity }}" value="1"
                                 class="w-20 px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:border-primary-600 focus:outline-none focus:ring-2 focus:ring-primary-600/10">
