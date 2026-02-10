@@ -193,14 +193,6 @@
                 <div class="flex items-center space-x-3">
                     {% if current_user.is_authenticated %}
                     <!-- Logged in view -->
-                    <a href="{{ url_for('appointments.my_appointments') }}"
-                        class="hidden lg:inline-flex items-center px-4 py-2 text-sm font-medium text-gray-600 hover:text-primary-700 rounded-lg hover:bg-primary-50 transition-all">
-                        <i class="fas fa-calendar-alt mr-1.5"></i>My Appointments
-                    </a>
-                    <a href="{{ url_for('reservations.my_reservations') }}"
-                        class="hidden md:inline-flex items-center px-4 py-2 text-sm font-medium text-gray-600 hover:text-primary-700 rounded-lg hover:bg-primary-50 transition-all">
-                        <i class="fas fa-capsules mr-1.5"></i>My Reservations
-                    </a>
                     <div class="relative group">
                         <button
                             class="flex items-center space-x-2 px-3 py-2 rounded-lg hover:bg-gray-50 transition-all">
@@ -222,16 +214,16 @@
                             </div>
                             <div class="py-2">
                                 <a href="{{ url_for('appointments.my_appointments') }}"
-                                    class="flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors lg:hidden">
-                                    <i class="fas fa-calendar-alt w-5 text-gray-400"></i>My Appointments
+                                    class="flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
+                                    <i class="fas fa-calendar-alt w-5 text-gray-400 mr-2"></i>My Appointments
                                 </a>
                                 <a href="{{ url_for('reservations.my_reservations') }}"
-                                    class="flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors md:hidden">
-                                    <i class="fas fa-capsules w-5 text-gray-400"></i>My Reservations
+                                    class="flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
+                                    <i class="fas fa-capsules w-5 text-gray-400 mr-2"></i>My Reservations
                                 </a>
                                 <a href="{{ url_for('auth.logout') }}"
                                     class="flex items-center px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors">
-                                    <i class="fas fa-sign-out-alt w-5 text-red-400"></i>Sign Out
+                                    <i class="fas fa-sign-out-alt w-5 text-red-400 mr-2"></i>Sign Out
                                 </a>
                             </div>
                         </div>
