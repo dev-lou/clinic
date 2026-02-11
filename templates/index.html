@@ -62,7 +62,7 @@
             content: '';
             position: absolute;
             inset: 0;
-            background: url('https://images.unsplash.com/photo-1631217868264-e5b90bb7e133?w=1920&q=80') center/cover no-repeat;
+            background: url('https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?w=1920&q=80') center/cover no-repeat;
             opacity: 0.12;
         }
 
@@ -327,10 +327,11 @@
                         <div class="glass rounded-3xl p-8 space-y-6 shimmer">
                             <!-- Doctor header -->
                             <div class="flex items-center space-x-4">
-                                <img src="https://randomuser.me/api/portraits/women/65.jpg"
-                                    class="w-14 h-14 rounded-2xl object-cover shadow-lg" alt="Doctor">
+                                <img src="{{ url_for('static', filename='images/jm.png') }}"
+                                    class="w-14 h-14 rounded-2xl object-cover shadow-lg" 
+                                    style="object-position: center 30%;" alt="Doctor">
                                 <div>
-                                    <h4 class="text-white font-bold">Dr. Maria Santos</h4>
+                                    <h4 class="text-white font-bold">Dr. Jun Michael Hechanova</h4>
                                     <p class="text-blue-300 text-sm">University Physician</p>
                                 </div>
                                 <span
@@ -570,7 +571,7 @@
                 <div
                     class="doctor-card bg-white rounded-3xl overflow-hidden shadow-sm border border-gray-100 group reveal">
                     <div class="aspect-[3/4] overflow-hidden bg-gradient-to-b from-primary-100 to-primary-50">
-                        <img src="https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80"
+                        <img src="{{ url_for('static', filename='images/lou.png') }}"
                             alt="Dr. Lou Vincent Baroro" class="w-full h-full object-cover">
                     </div>
                     <div class="p-6">
@@ -584,7 +585,7 @@
                 <div
                     class="doctor-card bg-white rounded-3xl overflow-hidden shadow-sm border border-gray-100 group reveal">
                     <div class="aspect-[3/4] overflow-hidden bg-gradient-to-b from-emerald-100 to-emerald-50">
-                        <img src="https://images.unsplash.com/photo-1594824476967-48c8b964273f?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80"
+                        <img src="{{ url_for('static', filename='images/kath.png') }}"
                             alt="Dr. Katherine Bicodo" class="w-full h-full object-cover">
                     </div>
                     <div class="p-6">
@@ -598,7 +599,7 @@
                 <div
                     class="doctor-card bg-white rounded-3xl overflow-hidden shadow-sm border border-gray-100 group reveal">
                     <div class="aspect-[3/4] overflow-hidden bg-gradient-to-b from-blue-100 to-blue-50">
-                        <img src="https://images.unsplash.com/photo-1622253692010-333f2da6031d?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80"
+                        <img src="{{ url_for('static', filename='images/jm.png') }}"
                             alt="Dr. Jun Michael Hechanova" class="w-full h-full object-cover">
                     </div>
                     <div class="p-6">
@@ -612,7 +613,7 @@
                 <div
                     class="doctor-card bg-white rounded-3xl overflow-hidden shadow-sm border border-gray-100 group reveal">
                     <div class="aspect-[3/4] overflow-hidden bg-gradient-to-b from-cyan-100 to-cyan-50">
-                        <img src="https://images.unsplash.com/photo-1629909613654-28e377c37b09?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80"
+                        <img src="{{ url_for('static', filename='images/jerolle.png') }}"
                             alt="Dr. Jerolle Cobrador" class="w-full h-full object-cover">
                     </div>
                     <div class="p-6">
@@ -626,7 +627,7 @@
                 <div
                     class="doctor-card bg-white rounded-3xl overflow-hidden shadow-sm border border-gray-100 group reveal">
                     <div class="aspect-[3/4] overflow-hidden bg-gradient-to-b from-violet-100 to-violet-50">
-                        <img src="https://images.unsplash.com/photo-1666214280557-f1b5022eb634?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80"
+                        <img src="{{ url_for('static', filename='images/lynden.png') }}"
                             alt="Nurse Lynden Falalimpa" class="w-full h-full object-cover">
                     </div>
                     <div class="p-6">
@@ -640,7 +641,7 @@
                 <div
                     class="doctor-card bg-white rounded-3xl overflow-hidden shadow-sm border border-gray-100 group reveal">
                     <div class="aspect-[3/4] overflow-hidden bg-gradient-to-b from-rose-100 to-rose-50">
-                        <img src="https://images.unsplash.com/photo-1559839734-2b71ea197ec2?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80"
+                        <img src="{{ url_for('static', filename='images/kyla.png') }}"
                             alt="Nurse Kyla Perez" class="w-full h-full object-cover">
                     </div>
                     <div class="p-6">

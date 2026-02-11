@@ -11,7 +11,9 @@ class Config:
     @staticmethod
     def _get_database_uri():
         """Get database URI - Turso with local SQLAlchemy bridge."""
-        uri = os.environ.get('DATABASE_URL', 'sqlite:///instance/carehub_dev.db')
+        basedir = os.path.abspath(os.path.dirname(__file__))
+        default_db = f'sqlite:///{os.path.join(basedir, "instance", "carehub_dev.db")}'
+        uri = os.environ.get('DATABASE_URL', default_db)
         
         # Use Turso remote database
         if uri.startswith('libsql://'):
@@ -19,11 +21,12 @@ class Config:
             print(f"🚀 Using Turso Cloud Database: {uri.split('//')[1]}")
             print("   (Local SQLAlchemy cache for ORM compatibility)")
             # Use absolute path for Windows compatibility
-            basedir = os.path.abspath(os.path.dirname(__file__))
             os.makedirs(os.path.join(basedir, 'instance'), exist_ok=True)
             db_path = os.path.join(basedir, 'instance', 'carehub_turso_local.db')
             return f'sqlite:///{db_path}'
         
+        # Ensure instance directory exists for local SQLite
+        os.makedirs(os.path.join(basedir, 'instance'), exist_ok=True)
         return uri
     
     SQLALCHEMY_DATABASE_URI = _get_database_uri.__func__()
