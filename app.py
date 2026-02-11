@@ -73,6 +73,7 @@ def create_app(config_name=None):
     from search import search
     from symptom_screening import symptom_screening
     from chatbot import chatbot
+    from certificates import certificates
     
     app.register_blueprint(auth)
     app.register_blueprint(appointments)
@@ -88,6 +89,7 @@ def create_app(config_name=None):
     app.register_blueprint(search)
     app.register_blueprint(symptom_screening)
     app.register_blueprint(chatbot)
+    app.register_blueprint(certificates)
     
     # Initialize SocketIO
     queue_socketio.init_app(app, cors_allowed_origins="*")

@@ -225,9 +225,11 @@
                         </div>
                         <div class="flex-1 min-w-0">
                             <p class="font-semibold text-gray-900 text-xs">#{{ cert.certificate_number }}</p>
-                            <p class="text-[10px] text-gray-500">{{ cert.issued_at.strftime('%b %d, %Y') }}</p>
+                            <p class="text-[10px] text-gray-500">{{ cert.issued_at.strftime('%b %d, %Y') }} - {{ cert.purpose }}</p>
                         </div>
-                        <a href="#" class="text-xs text-primary-600 hover:text-primary-700 font-medium transition">PDF</a>
+                        <a href="{{ url_for('certificates.download_certificate', cert_id=cert.id) }}" class="text-xs text-primary-600 hover:text-primary-700 font-medium transition">
+                            <i class="fas fa-download mr-1"></i>PDF
+                        </a>
                     </div>
                     {% endfor %}
                 </div>

@@ -159,6 +159,11 @@
                     class="fas fa-book w-5 text-center {% if active_page == 'logbook' %}text-blue-300{% else %}text-blue-300/60{% endif %}"></i><span>Clinic
                     Logbook</span>
             </a>
+            <a href="{{ url_for('certificates.admin_certificates') }}"
+                class="sidebar-link {% if active_page == 'certificates' %}active{% endif %} flex items-center space-x-3 px-3 py-2.5 rounded-xl text-sm font-medium {% if active_page != 'certificates' %}text-blue-200/80{% endif %}">
+                <i
+                    class="fas fa-file-medical w-5 text-center {% if active_page == 'certificates' %}text-blue-300{% else %}text-blue-300/60{% endif %}"></i><span>Certificates</span>
+            </a>
             <a href="{{ url_for('auth.list_users') }}"
                 class="sidebar-link {% if active_page == 'users' %}active{% endif %} flex items-center space-x-3 px-3 py-2.5 rounded-xl text-sm font-medium {% if active_page != 'users' %}text-blue-200/80{% endif %}">
                 <i
@@ -264,6 +269,11 @@
                     <i
                         class="fas fa-book w-5 text-center {% if active_page == 'logbook' %}text-blue-300{% else %}text-blue-300/60{% endif %}"></i><span>Clinic
                         Logbook</span>
+                </a>
+                <a href="{{ url_for('certificates.admin_certificates') }}"
+                    class="sidebar-link {% if active_page == 'certificates' %}active{% endif %} flex items-center space-x-3 px-3 py-2.5 rounded-xl text-sm font-medium {% if active_page != 'certificates' %}text-blue-200/80{% endif %}">
+                    <i
+                        class="fas fa-file-medical w-5 text-center {% if active_page == 'certificates' %}text-blue-300{% else %}text-blue-300/60{% endif %}"></i><span>Certificates</span>
                 </a>
                 <a href="{{ url_for('auth.list_users') }}"
                     class="sidebar-link {% if active_page == 'users' %}active{% endif %} flex items-center space-x-3 px-3 py-2.5 rounded-xl text-sm font-medium {% if active_page != 'users' %}text-blue-200/80{% endif %}">
