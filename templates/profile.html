@@ -285,15 +285,21 @@ document.getElementById('saveSignature').addEventListener('click', async () => {
     const signatureData = canvas.toDataURL('image/png');
     
     try {
-        const formData = new FormData();
-        formData.append('action', 'save_signature');
-        formData.append('signature_data', signatureData);
-        formData.append('csrf_token', '{{ csrf_token() }}');
-        
         const response = await fetch('{{ url_for("auth.profile") }}', {
             method: 'POST',
-            body: formData
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token() }}'
+            },
+            body: JSON.stringify({
+                action: 'save_signature',
+                signature_data: signatureData
+            })
         });
+        
+        if (!response.ok) {
+            throw new Error('Server error: ' + response.status);
+        }
         
         const result = await response.json();
         

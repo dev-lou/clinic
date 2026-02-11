@@ -162,12 +162,21 @@ def profile():
                 return redirect(url_for('auth.profile'))
         
         elif action == 'save_signature':
-            signature_data = request.form.get('signature_data')
-            if signature_data:
-                current_user.signature_data = signature_data
-                db.session.commit()
-                return jsonify({'success': True, 'message': 'Signature saved successfully'})
-            return jsonify({'success': False, 'message': 'No signature data provided'}), 400
+            try:
+                # Handle JSON request
+                if request.is_json:
+                    data = request.get_json()
+                    signature_data = data.get('signature_data')
+                else:
+                    signature_data = request.form.get('signature_data')
+                
+                if signature_data:
+                    current_user.signature_data = signature_data
+                    db.session.commit()
+                    return jsonify({'success': True, 'message': 'Signature saved successfully'})
+                return jsonify({'success': False, 'message': 'No signature data provided'}), 400
+            except Exception as e:
+                return jsonify({'success': False, 'message': str(e)}), 500
     
     return render_template('profile.html')
 
