@@ -204,21 +204,61 @@ def download_certificate(cert_id):
         fontName='Helvetica-Bold'
     )
     
-    # Logo and Header (skip if logo not found or invalid)
-    logo_path = os.path.join('static', 'images', 'isufst-logo.png')
-    if os.path.exists(logo_path):
-        try:
-            logo = Image(logo_path, width=1.2*inch, height=0.8*inch)
-            logo.hAlign = 'CENTER'
-            elements.append(logo)
-            elements.append(Spacer(1, 0.1*inch))
-        except Exception as e:
-            # Skip logo if it can't be loaded (placeholder file or invalid format)
-            pass
+    # Professional Header with Logos
+    header_elements = []
     
-    # Header
-    elements.append(Paragraph("ILOILO STATE UNIVERSITY OF FISHERIES SCIENCE AND TECHNOLOGY", title_style))
-    elements.append(Paragraph("Dingle Campus - Health Services", subtitle_style))
+    # ISUFST Logo (left)
+    isufst_logo_path = os.path.join('static', 'images', 'isufst-logo.png')
+    isufst_logo = None
+    if os.path.exists(isufst_logo_path):
+        try:
+            isufst_logo = Image(isufst_logo_path, width=0.8*inch, height=0.8*inch)
+        except:
+            isufst_logo = ''
+    else:
+        isufst_logo = ''
+    
+    # Center Text
+    header_text = Paragraph(
+        "<b>ILOILO STATE UNIVERSITY OF FISHERIES SCIENCE AND TECHNOLOGY</b><br/>"
+        "<font size=9>COLLEGE OF INFORMATION AND COMMUNICATION TECHNOLOGY</font><br/>"
+        "<font size=8>Dingle, Iloilo / Email: ictc_dingle@isufst.edu.ph<br/>"
+        "Website: https://isufst.edu.ph / Telephone No: (033) 5940274</font>",
+        ParagraphStyle(
+            'HeaderCenter',
+            parent=styles['Normal'],
+            fontSize=10,
+            alignment=TA_CENTER,
+            textColor=colors.HexColor('#1e293b'),
+            leading=12
+        )
+    )
+    
+    # Bagong Pilipinas Logo (right)
+    bayan_logo_path = os.path.join('static', 'images', 'bayan.png')
+    bayan_logo = None
+    if os.path.exists(bayan_logo_path):
+        try:
+            bayan_logo = Image(bayan_logo_path, width=0.8*inch, height=0.8*inch)
+        except:
+            bayan_logo = ''
+    else:
+        bayan_logo = ''
+    
+    # Create header table
+    header_data = [[isufst_logo, header_text, bayan_logo]]
+    header_table = Table(header_data, colWidths=[1.2*inch, 5*inch, 1.2*inch])
+    header_table.setStyle(TableStyle([
+        ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+        ('ALIGN', (0, 0), (0, 0), 'LEFT'),
+        ('ALIGN', (1, 0), (1, 0), 'CENTER'),
+        ('ALIGN', (2, 0), (2, 0), 'RIGHT'),
+    ]))
+    elements.append(header_table)
+    elements.append(Spacer(1, 0.15*inch))
+    
+    # CareHub Title
+    elements.append(Paragraph("CareHub", title_style))
     elements.append(Paragraph("HEALTH CERTIFICATE", title_style))
     elements.append(Spacer(1, 0.2*inch))
     
@@ -321,12 +361,49 @@ def download_certificate(cert_id):
     ]))
     elements.append(sig_table)
     
-    # Footer
+    # Footer with Core Values and Accreditation Logo
     elements.append(Spacer(1, 0.3*inch))
+    
+    # Core values text
+    core_values_text = Paragraph(
+        "<b>Integrity</b> . <b>Social Justice</b> . <b>Discipline</b> . <b>Academic Excellence</b>",
+        ParagraphStyle(
+            'CoreValues',
+            parent=styles['Normal'],
+            fontSize=9,
+            textColor=colors.HexColor('#1e293b'),
+            alignment=TA_LEFT,
+            fontName='Helvetica-Bold'
+        )
+    )
+    
+    # Accreditation logo
+    gcl_logo_path = os.path.join('static', 'images', 'gcl.png')
+    gcl_logo = None
+    if os.path.exists(gcl_logo_path):
+        try:
+            gcl_logo = Image(gcl_logo_path, width=1.5*inch, height=0.5*inch)
+        except:
+            gcl_logo = ''
+    else:
+        gcl_logo = ''
+    
+    # Create footer table
+    footer_data = [[core_values_text, gcl_logo]]
+    footer_table = Table(footer_data, colWidths=[4.5*inch, 2*inch])
+    footer_table.setStyle(TableStyle([
+        ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+        ('ALIGN', (0, 0), (0, 0), 'LEFT'),
+        ('ALIGN', (1, 0), (1, 0), 'RIGHT'),
+    ]))
+    elements.append(footer_table)
+    
+    # Additional footer info
+    elements.append(Spacer(1, 0.1*inch))
     footer_style = ParagraphStyle(
         'Footer',
         parent=styles['Normal'],
-        fontSize=8,
+        fontSize=7,
         textColor=colors.HexColor('#94a3b8'),
         alignment=TA_CENTER
     )
