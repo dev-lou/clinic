@@ -362,10 +362,17 @@
             }
         }
 
+
         // Initialize
-        const reveals = document.querySelectorAll('.reveal');
-        reveals.forEach((el, i) => {
-            setTimeout(() => el.classList.add('visible'), i * 100);
+        document.addEventListener('DOMContentLoaded', () => {
+            // Render calendar immediately
+            renderCalendar();
+
+            // Add reveal animations
+            const reveals = document.querySelectorAll('.reveal');
+            reveals.forEach((el, i) => {
+                setTimeout(() => el.classList.add('visible'), i * 100);
+            });
         });
     </script>
 </body>
