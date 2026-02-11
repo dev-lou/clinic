@@ -125,7 +125,7 @@
                 </label>
                 <input type="date" name="appointment_date"
                     class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 outline-none transition-all"
-                    min="{{ (datetime.now() + timedelta(days=1)).strftime('%Y-%m-%d') }}" required>
+                    min="{{ min_date }}" required>
             </div>
 
             <!-- Time Slot -->

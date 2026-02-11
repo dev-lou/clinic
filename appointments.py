@@ -172,7 +172,9 @@ def book():
         flash(f'✅ Appointment booked successfully for {appointment_date.strftime("%B %d, %Y")} at {start_time.strftime("%I:%M %p")}!', 'success')
         return redirect(url_for('appointments.my_appointments'))
     
-    return render_template('book_appointment.html', time_slots=generate_time_slots())
+    return render_template('book_appointment.html', 
+                         time_slots=generate_time_slots(),
+                         min_date=(date.today() + timedelta(days=1)).strftime('%Y-%m-%d'))
 
 
 @appointments.route('/my')
