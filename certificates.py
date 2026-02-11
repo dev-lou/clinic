@@ -355,8 +355,8 @@ def download_certificate(cert_id):
     ]))
     elements.append(sig_table)
     
-    # Push footer to bottom of page
-    elements.append(Spacer(1, 3.5*inch))
+    # Push footer toward bottom
+    elements.append(Spacer(1, 0.8*inch))
     
     # Footer with Core Values and Accreditation Logo
     
