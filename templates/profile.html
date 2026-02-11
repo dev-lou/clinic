@@ -350,6 +350,8 @@ if (updateSignatureBtn) {
     updateSignatureBtn.addEventListener('click', () => {
         document.getElementById('savedSignatureView').classList.add('hidden');
         document.getElementById('signatureCanvasContainer').classList.remove('hidden');
+        // Resize canvas after it becomes visible so dimensions are correct
+        setTimeout(resizeCanvas, 50);
     });
 }
 
