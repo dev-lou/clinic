@@ -296,12 +296,15 @@ document.getElementById('saveSignature').addEventListener('click', async () => {
     
     const signatureData = canvas.toDataURL('image/png');
     
+    // Get CSRF token from the form
+    const csrfToken = document.querySelector('input[name="csrf_token"]').value;
+    
     try {
         const response = await fetch('{{ url_for("auth.profile") }}', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'X-CSRF-Token': '{{ csrf_token() }}'
+                'X-CSRF-Token': csrfToken
             },
             body: JSON.stringify({
                 action: 'save_signature',
@@ -309,24 +312,28 @@ document.getElementById('saveSignature').addEventListener('click', async () => {
             })
         });
         
-        if (!response.ok) {
-            throw new Error('Server error: ' + response.status);
+        // Check content type before parsing
+        const contentType = response.headers.get('content-type');
+        if (!contentType || !contentType.includes('application/json')) {
+            const errorText = await response.text();
+            console.error('Non-JSON response:', errorText);
+            throw new Error('Server returned an error. Please refresh the page and try again.');
         }
         
         const result = await response.json();
         
-        if (result.success) {
-            Swal.fire({
-                icon: 'success',
-                title: 'Saved!',
-                text: result.message,
-                customClass: {popup: 'rounded-2xl'}
-            }).then(() => {
-                location.reload();
-            });
-        } else {
-            throw new Error(result.message);
+        if (!response.ok || !result.success) {
+            throw new Error(result.message || 'Failed to save signature');
         }
+        
+        Swal.fire({
+            icon: 'success',
+            title: 'Saved!',
+            text: result.message,
+            customClass: {popup: 'rounded-2xl'}
+        }).then(() => {
+            location.reload();
+        });
     } catch (error) {
         Swal.fire({
             icon: 'error',

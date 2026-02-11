@@ -32,6 +32,11 @@ def create_app(config_name=None):
     db.init_app(app)
     migrate.init_app(app, db)
     login_manager.init_app(app)
+    
+    # Configure CSRF to accept headers from AJAX requests
+    app.config['WTF_CSRF_HEADERS'] = ['X-CSRFToken', 'X-CSRF-Token']
+    app.config['WTF_CSRF_TIME_LIMIT'] = None  # Disable CSRF token expiration
+    
     csrf.init_app(app)
     CORS(app)
     init_rbac(app)  # Initialize RBAC system
