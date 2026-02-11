@@ -1,167 +1,63 @@
 {% extends "student_base.html" %}
-
-{% block title %}Symptom Checker - ISUFST CareHub{% endblock %}
+{% block title %}Symptom Checker &mdash; ISUFST CareHub{% endblock %}
 
 {% block content %}
-<div class="max-w-4xl mx-auto">
-    <div class="card">
-        <div class="mb-6">
-            <h1 class="text-3xl font-bold text-gray-800 mb-2">Symptom Checker</h1>
-            <p class="text-gray-600">Tell us what you're experiencing, and we'll help recommend the right service.</p>
+<div class="max-w-4xl mx-auto space-y-6 fade-in">
+    <!-- Header -->
+    <div class="relative bg-gradient-to-br from-violet-800 via-violet-700 to-indigo-800 rounded-3xl p-8 sm:p-10 overflow-hidden">
+        <div class="absolute top-0 right-0 w-72 h-72 bg-white/[0.04] rounded-full -translate-y-1/3 translate-x-1/4"></div>
+        <div class="relative z-10">
+            <h1 class="text-3xl sm:text-4xl font-extrabold text-white mb-2">Symptom Checker</h1>
+            <p class="text-violet-200/50 text-sm">Tell us what you're experiencing, and we'll recommend the right service.</p>
         </div>
+    </div>
 
+    <!-- Form -->
+    <div class="bg-white rounded-2xl border border-gray-100 p-6 sm:p-8">
         <form id="symptomForm" class="space-y-6">
-            <!-- Symptom Categories -->
-            <div id="symptomCategories" class="space-y-4">
-                <!-- Categories will be loaded via JavaScript -->
-            </div>
+            <div id="symptomCategories" class="space-y-5"></div>
 
-            <!-- Additional Information -->
             <div>
-                <label class="block font-semibold text-gray-700 mb-2">
-                    Additional Information (Optional)
-                </label>
-                <textarea
-                    id="additionalInfo"
-                    rows="4"
-                    class="input-field"
-                    placeholder="Describe your symptoms in more detail, when they started, severity, etc."
-                ></textarea>
+                <label class="block text-sm font-bold text-gray-700 mb-2">Additional Information <span class="text-gray-400 font-normal">(optional)</span></label>
+                <textarea id="additionalInfo" rows="3" class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-primary-600 focus:ring-2 focus:ring-primary-600/10 outline-none transition text-sm" placeholder="Describe when symptoms started, severity, etc."></textarea>
             </div>
 
-            <!-- Submit Button -->
-            <button type="submit" class="btn-primary w-full">
-                <i class="fas fa-search"></i> Analyze Symptoms
+            <button type="submit" class="w-full py-3.5 bg-primary-700 text-white font-bold rounded-xl hover:bg-primary-800 transition-all shadow-sm text-sm">
+                <i class="fas fa-search mr-2"></i>Analyze Symptoms
             </button>
         </form>
 
-        <!-- Results Section (hidden initially) -->
-        <div id="resultsSection" class="hidden mt-8 p-6 bg-gray-50 rounded-lg">
-            <h2 class="text-2xl font-bold mb-4">Analysis Results</h2>
-            
-            <!-- Severity Badge -->
-            <div class="mb-4">
-                <span id="severityBadge" class="badge text-lg"></span>
+        <!-- Results -->
+        <div id="resultsSection" class="hidden mt-8 p-6 bg-gray-50 rounded-2xl border border-gray-100">
+            <h2 class="text-xl font-bold text-gray-900 mb-4">Analysis Results</h2>
+            <div class="mb-4"><span id="severityBadge" class="px-4 py-1.5 rounded-full text-sm font-bold"></span></div>
+            <div class="bg-white p-5 rounded-xl border border-gray-100 mb-4">
+                <h3 class="font-bold text-sm text-gray-900 mb-1"><i class="fas fa-lightbulb text-amber-500 mr-1.5"></i>Recommendation</h3>
+                <p id="recommendedService" class="text-primary-700 font-semibold text-sm"></p>
+                <p id="suggestions" class="text-gray-600 text-sm mt-1.5"></p>
             </div>
-
-            <!-- Recommendations -->
-            <div class="bg-white p-4 rounded-lg mb-4">
-                <h3 class="font-bold mb-2">
-                    <i class="fas fa-lightbulb text-yellow-500"></i> Recommendation
-                </h3>
-                <p id="recommendedService" class="text-lg font-semibold text-blue-600"></p>
-                <p id="suggestions" class="text-gray-700 mt-2"></p>
-            </div>
-
-            <!-- Action Buttons -->
-            <div class="flex space-x-4">
-                <a id="bookButton" href="#" class="btn-primary flex-1 text-center">
-                    <i class="fas fa-calendar-plus"></i> Book Appointment
+            <div class="flex gap-3">
+                <a id="bookButton" href="#" class="flex-1 py-3 bg-primary-700 text-white text-sm font-bold rounded-xl text-center hover:bg-primary-800 transition">
+                    <i class="fas fa-calendar-plus mr-1.5"></i>Book Appointment
                 </a>
-                <button onclick="location.reload()" class="btn-secondary flex-1">
-                    <i class="fas fa-redo"></i> Check Again
+                <button onclick="location.reload()" class="flex-1 py-3 bg-gray-100 text-gray-700 text-sm font-bold rounded-xl hover:bg-gray-200 transition">
+                    <i class="fas fa-redo mr-1.5"></i>Check Again
                 </button>
             </div>
         </div>
     </div>
 
     <!-- Disclaimer -->
-    <div class="mt-6 p-4 bg-yellow-50 border-l-4 border-yellow-500 rounded">
-        <p class="text-sm text-yellow-800">
-            <i class="fas fa-exclamation-triangle"></i>
-            <strong>Disclaimer:</strong> This symptom checker is for informational purposes only and is not a substitute for professional medical advice. If you're experiencing a medical emergency, please call emergency services or go to the nearest hospital immediately.
-        </p>
+    <div class="p-4 bg-amber-50 border border-amber-100 rounded-xl text-sm text-amber-800 flex items-start gap-2">
+        <i class="fas fa-exclamation-triangle mt-0.5 text-amber-500 flex-shrink-0"></i>
+        <span><strong>Disclaimer:</strong> This is for informational purposes only. Not a substitute for professional medical advice. For emergencies, call emergency services immediately.</span>
     </div>
 </div>
+{% endblock %}
 
+{% block extra_js %}
 <script>
-    // Load symptom categories
-    fetch('{{ url_for("symptom_screening.get_symptom_categories") }}')
-        .then(r => r.json())
-        .then(categories => {
-            const container = document.getElementById('symptomCategories');
-            
-            for (const [category, symptoms] of Object.entries(categories)) {
-                const categoryDiv = document.createElement('div');
-                categoryDiv.innerHTML = `
-                    <h3 class="font-bold text-gray-700 mb-2">${category}</h3>
-                    <div class="grid grid-cols-2 md:grid-cols-3 gap-2">
-                        ${symptoms.map(symptom => `
-                            <label class="flex items-center space-x-2 p-2 hover:bg-gray-100 rounded cursor-pointer">
-                                <input type="checkbox" name="symptoms" value="${symptom}" class="form-checkbox text-blue-600">
-                                <span class="text-sm">${symptom}</span>
-                            </label>
-                        `).join('')}
-                    </div>
-                `;
-                container.appendChild(categoryDiv);
-            }
-        });
-
-    // Handle form submission
-    document.getElementById('symptomForm').addEventListener('submit', function(e) {
-        e.preventDefault();
-        
-        const checkedSymptoms = Array.from(document.querySelectorName('symptoms'))
-            .filter(cb => cb.checked)
-            .map(cb => cb.value);
-        
-        if (checkedSymptoms.length === 0) {
-            alert('Please select at least one symptom');
-            return;
-        }
-        
-        const additionalInfo = document.getElementById('additionalInfo').value;
-        
-        fetch('{{ url_for("symptom_screening.analyze") }}', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': '{{ csrf_token() }}'
-            },
-            body: JSON.stringify({
-                symptoms: checkedSymptoms,
-                additional_info: additionalInfo
-            })
-        })
-        .then(r => r.json())
-        .then(data => {
-            // Show results
-            document.getElementById('resultsSection').classList.remove('hidden');
-            
-            // Set severity badge
-            const badge = document.getElementById('severityBadge');
-            badge.textContent = data.severity_label;
-            badge.className = 'badge text-lg ';
-            if (data.severity === 1) {
-                badge.classList.add('badge-danger');
-            } else if (data.severity === 2) {
-                badge.classList.add('badge-warning');
-            } else {
-                badge.classList.add('badge-success');
-            }
-            
-            // Set recommendations
-            document.getElementById('recommendedService').textContent = `Recommended: ${data.recommended_service} Service`;
-            document.getElementById('suggestions').textContent = data.suggestions;
-            
-            // Update book button
-            const bookBtn = document.getElementById('bookButton');
-            if (data.severity === 1) {
-                bookBtn.textContent = 'Go to Emergency Room';
-                bookBtn.classList.add('btn-danger');
-                bookBtn.classList.remove('btn-primary');
-            } else {
-                bookBtn.href = '{{ url_for("appointments.book") }}?service=' + encodeURIComponent(data.recommended_service);
-            }
-            
-            // Scroll to results
-            document.getElementById('resultsSection').scrollIntoView({ behavior: 'smooth' });
-        })
-        .catch(err => {
-            alert('Error analyzing symptoms. Please try again.');
-            console.error(err);
-        });
-    });
+fetch('{{ url_for("symptom_screening.get_symptom_categories") }}').then(r=>r.json()).then(cats=>{const c=document.getElementById('symptomCategories');for(const[cat,symptoms]of Object.entries(cats)){const d=document.createElement('div');d.innerHTML=`<h3 class="font-bold text-sm text-gray-900 mb-2">${cat}</h3><div class="grid grid-cols-2 md:grid-cols-3 gap-2">${symptoms.map(s=>`<label class="flex items-center space-x-2 p-2.5 hover:bg-primary-50 rounded-xl cursor-pointer transition text-sm"><input type="checkbox" name="symptoms" value="${s}" class="rounded border-gray-300 text-primary-600 focus:ring-primary-500"><span class="text-gray-700">${s}</span></label>`).join('')}</div>`;c.appendChild(d)}});
+document.getElementById('symptomForm').addEventListener('submit',function(e){e.preventDefault();const checked=Array.from(document.querySelectorAll('input[name="symptoms"]:checked')).map(c=>c.value);if(checked.length===0){alert('Please select at least one symptom');return}fetch('{{ url_for("symptom_screening.analyze") }}',{method:'POST',headers:{'Content-Type':'application/json','X-CSRFToken':'{{ csrf_token() }}'},body:JSON.stringify({symptoms:checked,additional_info:document.getElementById('additionalInfo').value})}).then(r=>r.json()).then(d=>{document.getElementById('resultsSection').classList.remove('hidden');const b=document.getElementById('severityBadge');b.textContent=d.severity_label;b.className='px-4 py-1.5 rounded-full text-sm font-bold ';if(d.severity===1)b.classList.add('bg-red-100','text-red-700');else if(d.severity===2)b.classList.add('bg-amber-100','text-amber-700');else b.classList.add('bg-emerald-100','text-emerald-700');document.getElementById('recommendedService').textContent=`Recommended: ${d.recommended_service} Service`;document.getElementById('suggestions').textContent=d.suggestions;const bb=document.getElementById('bookButton');if(d.severity===1){bb.textContent='Go to Emergency Room';bb.className='flex-1 py-3 bg-red-600 text-white text-sm font-bold rounded-xl text-center hover:bg-red-700 transition'}else{bb.href='{{ url_for("appointments.book") }}?service='+encodeURIComponent(d.recommended_service)}document.getElementById('resultsSection').scrollIntoView({behavior:'smooth'})}).catch(()=>{alert('Error analyzing symptoms. Try again.')})});
 </script>
 {% endblock %}

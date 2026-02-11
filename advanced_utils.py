@@ -342,26 +342,4 @@ def save_certificate_pdf(certificate, output_path):
     return None
 
 
-# ──────────────────────────────────────────────
-#  Audit Logging Helpers
-# ──────────────────────────────────────────────
 
-def log_audit(user_id, action, resource_type, resource_id, old_value=None, new_value=None, request_obj=None):
-    """Create an audit log entry."""
-    from models_extended import AuditLog
-    from models import db
-    import json as json_lib
-    
-    log = AuditLog(
-        user_id=user_id,
-        action=action,
-        resource_type=resource_type,
-        resource_id=resource_id,
-        old_value=json_lib.dumps(old_value) if old_value else None,
-        new_value=json_lib.dumps(new_value) if new_value else None,
-        ip_address=request_obj.remote_addr if request_obj else None,
-        user_agent=request_obj.userAgent.string if request_obj and hasattr(request_obj, 'user_agent') else None
-    )
-    
-    db.session.add(log)
-    db.session.commit()

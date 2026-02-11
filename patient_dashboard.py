@@ -2,10 +2,10 @@
 Patient Dashboard Blueprint for ISUFST CareHub.
 Health timeline, unified view of all patient data.
 """
-from flask import Blueprint, render_template, jsonify
+from flask import Blueprint, render_template, jsonify, redirect, url_for, flash
 from flask_login import login_required, current_user
 from models import db, Appointment, ClinicVisit, MedicineReservation, Notification
-from models_extended import VisitFeedback, HealthCertificate, Prescription
+from models_extended import VisitFeedback, HealthCertificate
 from datetime import datetime, timedelta
 from sqlalchemy import desc
 
@@ -17,7 +17,8 @@ patient_dashboard = Blueprint('patient_dashboard', __name__, url_prefix='/dashbo
 def index():
     """Main patient dashboard with health timeline."""
     if current_user.role != 'student':
-        return jsonify({'error': 'Students only'}), 403
+        flash('That page is for students only.', 'error')
+        return redirect(url_for('admin') if current_user.role in ['admin', 'nurse'] else url_for('auth.login'))
     
     # Upcoming appointments
     upcoming_appointments = Appointment.query.filter(
@@ -71,7 +72,8 @@ def index():
 def timeline():
     """Health timeline view with all events chronologically."""
     if current_user.role != 'student':
-        return jsonify({'error': 'Students only'}), 403
+        flash('That page is for students only.', 'error')
+        return redirect(url_for('admin') if current_user.role in ['admin', 'nurse'] else url_for('auth.login'))
     
     # Combine all events into timeline
     timeline_events = []
@@ -135,7 +137,8 @@ def timeline():
 def health_stats():
     """Health statistics and trends."""
     if current_user.role != 'student':
-        return jsonify({'error': 'Students only'}), 403
+        flash('That page is for students only.', 'error')
+        return redirect(url_for('admin') if current_user.role in ['admin', 'nurse'] else url_for('auth.login'))
     
     # Count statistics
     total_visits = ClinicVisit.query.filter(

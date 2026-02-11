@@ -4,96 +4,86 @@
 {% block title %}Analytics Dashboard{% endblock %}
 
 {% block content %}
-<div class="p-8">
-    <div class="mb-8">
-        <h1 class="text-3xl font-bold text-gray-900 mb-2">Analytics Dashboard</h1>
-        <p class="text-gray-600">Comprehensive clinic performance metrics and insights</p>
+<div class="space-y-6 fade-in">
+    <!-- Header -->
+    <div class="relative bg-gradient-to-br from-violet-800 via-violet-700 to-indigo-800 rounded-3xl p-8 sm:p-10 overflow-hidden">
+        <div class="absolute top-0 right-0 w-72 h-72 bg-white/[0.04] rounded-full -translate-y-1/3 translate-x-1/4"></div>
+        <div class="relative z-10">
+            <h1 class="text-3xl sm:text-4xl font-extrabold text-white mb-1">Analytics Dashboard</h1>
+            <p class="text-violet-200/50 text-sm">Comprehensive clinic performance metrics and insights</p>
+        </div>
     </div>
 
-    <!-- Quick Stats Overview -->
-    <div id="statsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        <!-- Stats will be loaded here via JS -->
+    <!-- Quick Stats -->
+    <div id="statsGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div class="bg-white rounded-2xl border border-gray-100 p-5 animate-pulse"><div class="h-20 bg-gray-100 rounded-xl"></div></div>
+        <div class="bg-white rounded-2xl border border-gray-100 p-5 animate-pulse"><div class="h-20 bg-gray-100 rounded-xl"></div></div>
+        <div class="bg-white rounded-2xl border border-gray-100 p-5 animate-pulse"><div class="h-20 bg-gray-100 rounded-xl"></div></div>
+        <div class="bg-white rounded-2xl border border-gray-100 p-5 animate-pulse"><div class="h-20 bg-gray-100 rounded-xl"></div></div>
     </div>
 
-    <!-- Charts Grid -->
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-        <!-- Appointments Trend -->
-        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-            <h3 class="text-lg font-bold text-gray-900 mb-4">
-                <i class="fas fa-chart-line text-blue-500 mr-2"></i>
+    <!-- Charts Row 1 -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
+        <div class="bg-white rounded-2xl border border-gray-100 p-6">
+            <h3 class="flex items-center gap-2 text-sm font-bold text-gray-900 mb-4">
+                <div class="w-7 h-7 bg-blue-50 rounded-lg flex items-center justify-center"><i class="fas fa-chart-line text-blue-500 text-xs"></i></div>
                 Appointments Trend
             </h3>
-            <div style="position: relative; height: 250px;">
-                <canvas id="appointmentsTrendChart"></canvas>
-            </div>
+            <div style="position:relative;height:250px"><canvas id="appointmentsTrendChart"></canvas></div>
         </div>
 
-        <!-- Service Distribution -->
-        <div id="serviceChartContainer" class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-            <h3 class="text-lg font-bold text-gray-900 mb-4">
-                <i class="fas fa-chart-pie text-green-500 mr-2"></i>
+        <div id="serviceChartContainer" class="bg-white rounded-2xl border border-gray-100 p-6">
+            <h3 class="flex items-center gap-2 text-sm font-bold text-gray-900 mb-4">
+                <div class="w-7 h-7 bg-emerald-50 rounded-lg flex items-center justify-center"><i class="fas fa-chart-pie text-emerald-500 text-xs"></i></div>
                 Service Distribution
             </h3>
-            <div style="position: relative; height: 250px;">
-                <canvas id="serviceDistributionChart"></canvas>
-            </div>
+            <div style="position:relative;height:250px"><canvas id="serviceDistributionChart"></canvas></div>
         </div>
 
-        <!-- Peak Hours Heatmap -->
-        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-            <h3 class="text-lg font-bold text-gray-900 mb-4">
-                <i class="fas fa-clock text-purple-500 mr-2"></i>
+        <div class="bg-white rounded-2xl border border-gray-100 p-6">
+            <h3 class="flex items-center gap-2 text-sm font-bold text-gray-900 mb-4">
+                <div class="w-7 h-7 bg-violet-50 rounded-lg flex items-center justify-center"><i class="fas fa-clock text-violet-500 text-xs"></i></div>
                 Peak Hours
             </h3>
-            <div style="position: relative; height: 250px;">
-                <canvas id="peakHoursChart"></canvas>
-            </div>
+            <div style="position:relative;height:250px"><canvas id="peakHoursChart"></canvas></div>
         </div>
 
-        <!-- Doctor Workload -->
-        <div id="doctorChartContainer" class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-            <h3 class="text-lg font-bold text-gray-900 mb-4">
-                <i class="fas fa-user-md text-indigo-500 mr-2"></i>
+        <div id="doctorChartContainer" class="bg-white rounded-2xl border border-gray-100 p-6">
+            <h3 class="flex items-center gap-2 text-sm font-bold text-gray-900 mb-4">
+                <div class="w-7 h-7 bg-indigo-50 rounded-lg flex items-center justify-center"><i class="fas fa-user-md text-indigo-500 text-xs"></i></div>
                 Doctor & Dentist Workload
             </h3>
-            <div style="position: relative; height: 250px;">
-                <canvas id="doctorWorkloadChart"></canvas>
-            </div>
+            <div style="position:relative;height:250px"><canvas id="doctorWorkloadChart"></canvas></div>
         </div>
 
-        <!-- Satisfaction Trend -->
-        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 lg:col-span-2">
-            <h3 class="text-lg font-bold text-gray-900 mb-4">
-                <i class="fas fa-star text-yellow-500 mr-2"></i>
+        <div class="bg-white rounded-2xl border border-gray-100 p-6 lg:col-span-2">
+            <h3 class="flex items-center gap-2 text-sm font-bold text-gray-900 mb-4">
+                <div class="w-7 h-7 bg-amber-50 rounded-lg flex items-center justify-center"><i class="fas fa-star text-amber-500 text-xs"></i></div>
                 Patient Satisfaction Trend
             </h3>
-            <div style="position: relative; height: 200px;">
-                <canvas id="satisfactionTrendChart"></canvas>
-            </div>
+            <div style="position:relative;height:200px"><canvas id="satisfactionTrendChart"></canvas></div>
         </div>
     </div>
 
     <!-- Additional Metrics -->
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <!-- No-Show Rate -->
-        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-            <h3 class="text-lg font-bold text-gray-900 mb-4">
-                <i class="fas fa-user-times text-red-500 mr-2"></i>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+        <div class="bg-white rounded-2xl border border-gray-100 p-6">
+            <h3 class="flex items-center gap-2 text-sm font-bold text-gray-900 mb-4">
+                <div class="w-7 h-7 bg-red-50 rounded-lg flex items-center justify-center"><i class="fas fa-user-times text-red-500 text-xs"></i></div>
                 No-Show Rate Analysis
             </h3>
             <div id="noShowStats">
-                <!-- Stats will be loaded here -->
+                <div class="space-y-3 animate-pulse"><div class="h-4 bg-gray-100 rounded w-3/4"></div><div class="h-4 bg-gray-100 rounded w-1/2"></div><div class="h-4 bg-gray-100 rounded w-2/3"></div></div>
             </div>
         </div>
 
-        <!-- Inventory Consumption -->
-        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-            <h3 class="text-lg font-bold text-gray-900 mb-4">
-                <i class="fas fa-pills text-green-500 mr-2"></i>
+        <div class="bg-white rounded-2xl border border-gray-100 p-6">
+            <h3 class="flex items-center gap-2 text-sm font-bold text-gray-900 mb-4">
+                <div class="w-7 h-7 bg-emerald-50 rounded-lg flex items-center justify-center"><i class="fas fa-pills text-emerald-500 text-xs"></i></div>
                 Top Medicine Usage
             </h3>
             <div id="inventoryConsumption">
-                <!-- Stats will be loaded here -->
+                <div class="space-y-3 animate-pulse"><div class="h-10 bg-gray-100 rounded-xl"></div><div class="h-10 bg-gray-100 rounded-xl"></div><div class="h-10 bg-gray-100 rounded-xl"></div></div>
             </div>
         </div>
     </div>
@@ -102,379 +92,140 @@
 <!-- Chart.js -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script>
-    // Chart instances to destroy on reload
     let charts = {};
+    const chartFont = { family: 'Inter, sans-serif' };
+    const chartDefaults = { responsive: true, maintainAspectRatio: false, plugins: { legend: { labels: { font: chartFont } } }, scales: {} };
 
-    // Load Overview Stats
     async function loadOverview() {
         try {
-            const response = await fetch('/analytics/api/overview');
-            const data = await response.json();
-            
-            const statsGrid = document.getElementById('statsGrid');
-            statsGrid.innerHTML = `
-                <div class="bg-gradient-to-br from-blue-500 to-blue-600 text-white rounded-xl p-6 shadow-lg">
-                    <div class="flex items-center justify-between mb-4">
-                        <div>
-                            <p class="text-blue-100 text-sm font-medium">Today's Appointments</p>
-                            <h2 class="text-3xl font-bold">${data.today_appointments || 0}</h2>
-                        </div>
-                        <i class="fas fa-calendar-day text-4xl text-blue-200"></i>
+            const r = await fetch('/analytics/api/overview');
+            const d = await r.json();
+            document.getElementById('statsGrid').innerHTML = `
+                <div class="bg-white rounded-2xl border border-gray-100 p-5 hover:shadow-lg hover:shadow-blue-500/5 transition-all duration-300">
+                    <div class="flex items-center justify-between mb-3">
+                        <div class="w-11 h-11 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center shadow-md shadow-blue-500/20"><i class="fas fa-calendar-day text-white"></i></div>
+                        <span class="text-xs font-bold text-blue-600 bg-blue-50 px-2.5 py-1 rounded-lg">${d.today_completed||0} done</span>
                     </div>
-                    <p class="text-sm text-blue-100">${data.today_completed || 0} completed</p>
+                    <p class="text-2xl font-extrabold text-gray-900">${d.today_appointments||0}</p>
+                    <p class="text-xs text-gray-400 mt-0.5">Today's Appointments</p>
                 </div>
-                
-                <div class="bg-gradient-to-br from-green-500 to-green-600 text-white rounded-xl p-6 shadow-lg">
-                    <div class="flex items-center justify-between mb-4">
-                        <div>
-                            <p class="text-green-100 text-sm font-medium">This Month</p>
-                            <h2 class="text-3xl font-bold">${data.monthly_appointments || 0}</h2>
-                        </div>
-                        <i class="fas fa-chart-line text-4xl text-green-200"></i>
+                <div class="bg-white rounded-2xl border border-gray-100 p-5 hover:shadow-lg hover:shadow-emerald-500/5 transition-all duration-300">
+                    <div class="flex items-center justify-between mb-3">
+                        <div class="w-11 h-11 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-xl flex items-center justify-center shadow-md shadow-emerald-500/20"><i class="fas fa-chart-line text-white"></i></div>
+                        <span class="text-xs font-bold text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-lg">${d.monthly_visits||0} visits</span>
                     </div>
-                    <p class="text-sm text-green-100">${data.monthly_visits || 0} visits completed</p>
+                    <p class="text-2xl font-extrabold text-gray-900">${d.monthly_appointments||0}</p>
+                    <p class="text-xs text-gray-400 mt-0.5">This Month</p>
                 </div>
-                
-                <div class="bg-gradient-to-br from-purple-500 to-purple-600 text-white rounded-xl p-6 shadow-lg">
-                    <div class="flex items-center justify-between mb-4">
-                        <div>
-                            <p class="text-purple-100 text-sm font-medium">Active Reservations</p>
-                            <h2 class="text-3xl font-bold">${data.active_reservations || 0}</h2>
-                        </div>
-                        <i class="fas fa-hand-holding-medical text-4xl text-purple-200"></i>
+                <div class="bg-white rounded-2xl border border-gray-100 p-5 hover:shadow-lg hover:shadow-violet-500/5 transition-all duration-300">
+                    <div class="flex items-center justify-between mb-3">
+                        <div class="w-11 h-11 bg-gradient-to-br from-violet-500 to-violet-600 rounded-xl flex items-center justify-center shadow-md shadow-violet-500/20"><i class="fas fa-hand-holding-medical text-white"></i></div>
+                        <span class="text-xs font-bold text-violet-600 bg-violet-50 px-2.5 py-1 rounded-lg">Active</span>
                     </div>
-                    <p class="text-sm text-purple-100">Medicine pickups</p>
+                    <p class="text-2xl font-extrabold text-gray-900">${d.active_reservations||0}</p>
+                    <p class="text-xs text-gray-400 mt-0.5">Active Reservations</p>
                 </div>
-                
-                <div class="bg-gradient-to-br from-red-500 to-red-600 text-white rounded-xl p-6 shadow-lg">
-                    <div class="flex items-center justify-between mb-4">
-                        <div>
-                            <p class="text-red-100 text-sm font-medium">Avg Satisfaction</p>
-                            <h2 class="text-3xl font-bold">${(data.avg_satisfaction || 0).toFixed(1)}/5.0</h2>
-                        </div>
-                        <i class="fas fa-star text-4xl text-red-200"></i>
+                <div class="bg-white rounded-2xl border border-gray-100 p-5 hover:shadow-lg hover:shadow-amber-500/5 transition-all duration-300">
+                    <div class="flex items-center justify-between mb-3">
+                        <div class="w-11 h-11 bg-gradient-to-br from-amber-500 to-amber-600 rounded-xl flex items-center justify-center shadow-md shadow-amber-500/20"><i class="fas fa-star text-white"></i></div>
+                        <span class="text-xs font-bold text-amber-600 bg-amber-50 px-2.5 py-1 rounded-lg">${d.feedback_count||0} reviews</span>
                     </div>
-                    <p class="text-sm text-red-100">From ${data.feedback_count || 0} reviews</p>
-                </div>
-            `;
-        } catch (error) {
-            console.error('Error loading overview:', error);
-            document.getElementById('statsGrid').innerHTML = '<p class="text-red-500">Error loading stats</p>';
-        }
+                    <p class="text-2xl font-extrabold text-gray-900">${(d.avg_satisfaction||0).toFixed(1)}<span class="text-sm text-gray-400 font-normal">/5.0</span></p>
+                    <p class="text-xs text-gray-400 mt-0.5">Avg Satisfaction</p>
+                </div>`;
+        } catch(e) { console.error(e); }
     }
 
-    // Load Appointments Trend Chart
     async function loadAppointmentsTrend() {
         try {
-            const response = await fetch('/analytics/api/appointments-trend?days=30');
-            const data = await response.json();
-            
-            if (charts.appointmentsTrend) charts.appointmentsTrend.destroy();
-            
-            const ctx = document.getElementById('appointmentsTrendChart');
-            charts.appointmentsTrend = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: data.labels || [],
-                    datasets: [{
-                        label: 'Appointments',
-                        data: data.values || [],
-                        borderColor: 'rgb(59, 130, 246)',
-                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                        tension: 0.4,
-                        fill: true
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: { display: false }
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            ticks: { stepSize: 1 }
-                        }
-                    }
-                }
+            const r = await fetch('/analytics/api/appointments-trend?days=30');
+            const d = await r.json();
+            if(charts.appointmentsTrend) charts.appointmentsTrend.destroy();
+            charts.appointmentsTrend = new Chart(document.getElementById('appointmentsTrendChart'), {
+                type:'line', data:{ labels:d.labels||[], datasets:[{ label:'Appointments', data:d.values||[], borderColor:'rgb(59,130,246)', backgroundColor:'rgba(59,130,246,0.08)', tension:.4, fill:true, pointRadius:3, pointHoverRadius:6 }] },
+                options:{ ...chartDefaults, plugins:{legend:{display:false}}, scales:{ y:{beginAtZero:true,ticks:{stepSize:1,font:chartFont},grid:{color:'rgba(0,0,0,.04)'}}, x:{grid:{display:false},ticks:{font:chartFont}} } }
             });
-        } catch (error) {
-            console.error('Error loading appointments trend:', error);
-        }
+        } catch(e) { console.error(e); }
     }
 
-    // Load Service Distribution Chart
     async function loadServiceDistribution() {
         try {
-            const response = await fetch('/analytics/api/service-distribution');
-            const data = await response.json();
-            
-            if (charts.serviceDistribution) charts.serviceDistribution.destroy();
-            
-            // Check if there's data
-            if (!data.labels || data.labels.length === 0) {
-                document.getElementById('serviceChartContainer').innerHTML = `
-                    <h3 class="text-lg font-bold text-gray-900 mb-4">
-                        <i class="fas fa-chart-pie text-green-500 mr-2"></i>
-                        Service Distribution
-                    </h3>
-                    <div style="position: relative; height: 250px;" class="flex items-center justify-center">
-                        <div class="text-center text-gray-400">
-                            <i class="fas fa-chart-pie text-5xl mb-3"></i>
-                            <p>No appointment data yet</p>
-                        </div>
-                    </div>
-                `;
-                return;
-            }
-            
-            const ctx = document.getElementById('serviceDistributionChart');
-            charts.serviceDistribution = new Chart(ctx, {
-                type: 'doughnut',
-                data: {
-                    labels: data.labels,
-                    datasets: [{
-                        data: data.values,
-                        backgroundColor: [
-                            'rgb(59, 130, 246)',
-                            'rgb(16, 185, 129)',
-                            'rgb(245, 158, 11)',
-                            'rgb(239, 68, 68)',
-                            'rgb(139, 92, 246)',
-                            'rgb(236, 72, 153)',
-                            'rgb(14, 165, 233)'
-                        ]
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            position: 'bottom',
-                            labels: {
-                                padding: 15,
-                                font: { size: 11 }
-                            }
-                        }
-                    }
-                }
+            const r = await fetch('/analytics/api/service-distribution');
+            const d = await r.json();
+            if(charts.serviceDistribution) charts.serviceDistribution.destroy();
+            if(!d.labels||d.labels.length===0){document.getElementById('serviceChartContainer').querySelector('div[style]').innerHTML='<div class="flex items-center justify-center h-full text-gray-400 text-sm"><div class="text-center"><i class="fas fa-chart-pie text-4xl mb-2 text-gray-200"></i><p>No data yet</p></div></div>';return}
+            charts.serviceDistribution = new Chart(document.getElementById('serviceDistributionChart'), {
+                type:'doughnut', data:{ labels:d.labels, datasets:[{ data:d.values, backgroundColor:['rgb(59,130,246)','rgb(16,185,129)','rgb(245,158,11)','rgb(239,68,68)','rgb(139,92,246)','rgb(236,72,153)','rgb(14,165,233)'], borderWidth:0 }] },
+                options:{ ...chartDefaults, plugins:{legend:{position:'bottom',labels:{padding:12,font:{...chartFont,size:11},usePointStyle:true,pointStyle:'circle'}}} }
             });
-        } catch (error) {
-            console.error('Error loading service distribution:', error);
-        }
+        } catch(e) { console.error(e); }
     }
 
-    // Load Peak Hours Chart
     async function loadPeakHours() {
         try {
-            const response = await fetch('/analytics/api/peak-hours');
-            const data = await response.json();
-            
-            if (charts.peakHours) charts.peakHours.destroy();
-            
-            const ctx = document.getElementById('peakHoursChart');
-            charts.peakHours = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: data.labels || [],
-                    datasets: [{
-                        label: 'Appointments',
-                        data: data.values || [],
-                        backgroundColor: 'rgb(139, 92, 246)'
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: { display: false }
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            ticks: { stepSize: 1 }
-                        }
-                    }
-                }
+            const r = await fetch('/analytics/api/peak-hours');
+            const d = await r.json();
+            if(charts.peakHours) charts.peakHours.destroy();
+            charts.peakHours = new Chart(document.getElementById('peakHoursChart'), {
+                type:'bar', data:{ labels:d.labels||[], datasets:[{ label:'Appointments', data:d.values||[], backgroundColor:'rgba(139,92,246,.8)', borderRadius:8, borderSkipped:false }] },
+                options:{ ...chartDefaults, plugins:{legend:{display:false}}, scales:{ y:{beginAtZero:true,ticks:{stepSize:1,font:chartFont},grid:{color:'rgba(0,0,0,.04)'}}, x:{grid:{display:false},ticks:{font:chartFont}} } }
             });
-        } catch (error) {
-            console.error('Error loading peak hours:', error);
-        }
+        } catch(e) { console.error(e); }
     }
 
-    // Load Doctor Workload Chart
     async function loadDoctorWorkload() {
         try {
-            const response = await fetch('/analytics/api/doctor-workload');
-            const data = await response.json();
-            
-            if (charts.doctorWorkload) charts.doctorWorkload.destroy();
-            
-            // Check if there's data
-            if (!data.labels || data.labels.length === 0) {
-                document.getElementById('doctorChartContainer').innerHTML = `
-                    <h3 class="text-lg font-bold text-gray-900 mb-4">
-                        <i class="fas fa-user-md text-indigo-500 mr-2"></i>
-                        Doctor & Dentist Workload
-                    </h3>
-                    <div style="position: relative; height: 250px;" class="flex items-center justify-center">
-                        <div class="text-center text-gray-400">
-                            <i class="fas fa-user-md text-5xl mb-3"></i>
-                            <p>No doctors/dentists assigned yet</p>
-                        </div>
-                    </div>
-                `;
-                return;
-            }
-            
-            const ctx = document.getElementById('doctorWorkloadChart');
-            charts.doctorWorkload = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: data.labels,
-                    datasets: [{
-                        label: 'Appointments',
-                        data: data.values,
-                        backgroundColor: 'rgb(99, 102, 241)'
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    indexAxis: 'y',
-                    plugins: {
-                        legend: { display: false }
-                    },
-                    scales: {
-                        x: {
-                            beginAtZero: true,
-                            ticks: { stepSize: 1 }
-                        }
-                    }
-                }
+            const r = await fetch('/analytics/api/doctor-workload');
+            const d = await r.json();
+            if(charts.doctorWorkload) charts.doctorWorkload.destroy();
+            if(!d.labels||d.labels.length===0){document.getElementById('doctorChartContainer').querySelector('div[style]').innerHTML='<div class="flex items-center justify-center h-full text-gray-400 text-sm"><div class="text-center"><i class="fas fa-user-md text-4xl mb-2 text-gray-200"></i><p>No data yet</p></div></div>';return}
+            charts.doctorWorkload = new Chart(document.getElementById('doctorWorkloadChart'), {
+                type:'bar', data:{ labels:d.labels, datasets:[{ label:'Appointments', data:d.values, backgroundColor:'rgba(99,102,241,.8)', borderRadius:8, borderSkipped:false }] },
+                options:{ ...chartDefaults, indexAxis:'y', plugins:{legend:{display:false}}, scales:{ x:{beginAtZero:true,ticks:{stepSize:1,font:chartFont},grid:{color:'rgba(0,0,0,.04)'}}, y:{grid:{display:false},ticks:{font:chartFont}} } }
             });
-        } catch (error) {
-            console.error('Error loading doctor workload:', error);
-        }
+        } catch(e) { console.error(e); }
     }
 
-    // Load Satisfaction Trend Chart
     async function loadSatisfactionTrend() {
         try {
-            const response = await fetch('/analytics/api/satisfaction-trend?days=30');
-            const data = await response.json();
-            
-            if (charts.satisfactionTrend) charts.satisfactionTrend.destroy();
-            
-            const ctx = document.getElementById('satisfactionTrendChart');
-            charts.satisfactionTrend = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: data.labels || [],
-                    datasets: [{
-                        label: 'Average Rating',
-                        data: data.values || [],
-                        borderColor: 'rgb(245, 158, 11)',
-                        backgroundColor: 'rgba(245, 158, 11, 0.1)',
-                        tension: 0.4,
-                        fill: true
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            max: 5,
-                            ticks: {
-                                stepSize: 0.5
-                            }
-                        }
-                    }
-                }
+            const r = await fetch('/analytics/api/satisfaction-trend?days=30');
+            const d = await r.json();
+            if(charts.satisfactionTrend) charts.satisfactionTrend.destroy();
+            charts.satisfactionTrend = new Chart(document.getElementById('satisfactionTrendChart'), {
+                type:'line', data:{ labels:d.labels||[], datasets:[{ label:'Avg Rating', data:d.values||[], borderColor:'rgb(245,158,11)', backgroundColor:'rgba(245,158,11,0.08)', tension:.4, fill:true, pointRadius:3 }] },
+                options:{ ...chartDefaults, scales:{ y:{beginAtZero:true,max:5,ticks:{stepSize:.5,font:chartFont},grid:{color:'rgba(0,0,0,.04)'}}, x:{grid:{display:false},ticks:{font:chartFont}} } }
             });
-        } catch (error) {
-            console.error('Error loading satisfaction trend:', error);
-        }
+        } catch(e) { console.error(e); }
     }
 
-    // Load No-Show Rate
     async function loadNoShowRate() {
         try {
-            const response = await fetch('/analytics/api/no-show-rate');
-            const data = await response.json();
-            
+            const r = await fetch('/analytics/api/no-show-rate');
+            const d = await r.json();
+            const rate = (d.rate||0).toFixed(1);
             document.getElementById('noShowStats').innerHTML = `
-                <div class="space-y-4">
-                    <div class="flex justify-between items-center">
-                        <span class="text-gray-600">Total Scheduled</span>
-                        <span class="font-bold text-gray-900">${data.total_scheduled || 0}</span>
-                    </div>
-                    <div class="flex justify-between items-center">
-                        <span class="text-gray-600">No-Shows</span>
-                        <span class="font-bold text-red-600">${data.no_shows || 0}</span>
-                    </div>
-                    <div class="flex justify-between items-center">
-                        <span class="text-gray-600">Rate</span>
-                        <span class="font-bold text-red-600">${(data.rate || 0).toFixed(1)}%</span>
-                    </div>
-                    <div class="mt-4 p-4 bg-red-50 rounded-lg">
-                        <p class="text-sm text-red-800">
-                            <i class="fas fa-info-circle mr-2"></i>
-                            ${data.no_shows || 0} appointments were missed in the past 30 days.
-                        </p>
-                    </div>
-                </div>
-            `;
-        } catch (error) {
-            console.error('Error loading no-show rate:', error);
-        }
+                <div class="space-y-3">
+                    <div class="flex justify-between items-center p-3 bg-gray-50 rounded-xl"><span class="text-sm text-gray-600">Total Scheduled</span><span class="font-bold text-gray-900">${d.total_scheduled||0}</span></div>
+                    <div class="flex justify-between items-center p-3 bg-red-50 rounded-xl"><span class="text-sm text-red-700">No-Shows</span><span class="font-bold text-red-600">${d.no_shows||0}</span></div>
+                    <div class="flex justify-between items-center p-3 rounded-xl ${parseFloat(rate)>10?'bg-red-50':'bg-emerald-50'}"><span class="text-sm ${parseFloat(rate)>10?'text-red-700':'text-emerald-700'}">Rate</span><span class="font-bold ${parseFloat(rate)>10?'text-red-600':'text-emerald-600'}">${rate}%</span></div>
+                    <p class="text-xs text-gray-400 mt-2 flex items-center gap-1"><i class="fas fa-info-circle"></i>${d.no_shows||0} missed appointments in the past 30 days</p>
+                </div>`;
+        } catch(e) { console.error(e); }
     }
 
-    // Load Inventory Consumption
     async function loadInventoryConsumption() {
         try {
-            const response = await fetch('/analytics/api/inventory-consumption?limit=5');
-            const data = await response.json();
-            
-            if (!data || data.length === 0) {
-                document.getElementById('inventoryConsumption').innerHTML = `
-                    <div class="text-center py-8 text-gray-400">
-                        <i class="fas fa-pills text-5xl mb-3"></i>
-                        <p>No medicine usage data yet</p>
-                    </div>
-                `;
-                return;
-            }
-            
-            let html = '<div class="space-y-3">';
-            data.forEach((item, index) => {
-                const colors = [
-                    { bg: 'bg-blue-50', text: 'text-blue-600' },
-                    { bg: 'bg-green-50', text: 'text-green-600' },
-                    { bg: 'bg-purple-50', text: 'text-purple-600' },
-                    { bg: 'bg-orange-50', text: 'text-orange-600' },
-                    { bg: 'bg-pink-50', text: 'text-pink-600' }
-                ];
-                const color = colors[index % colors.length];
-                html += `
-                    <div class="flex items-center justify-between p-3 ${color.bg} rounded-lg">
-                        <span class="font-medium text-gray-900">${item.medicine_name || 'Unknown'}</span>
-                        <span class="${color.text} font-bold">${item.count || 0} uses</span>
-                    </div>
-                `;
-            });
-            html += '</div>';
-            document.getElementById('inventoryConsumption').innerHTML = html;
-        } catch (error) {
-            console.error('Error loading inventory consumption:', error);
-        }
+            const r = await fetch('/analytics/api/inventory-consumption?limit=5');
+            const d = await r.json();
+            if(!d||d.length===0){document.getElementById('inventoryConsumption').innerHTML='<div class="text-center py-8 text-gray-400 text-sm"><i class="fas fa-pills text-3xl mb-2 text-gray-200"></i><p>No usage data yet</p></div>';return}
+            const colors=[{bg:'bg-blue-50',t:'text-blue-600'},{bg:'bg-emerald-50',t:'text-emerald-600'},{bg:'bg-violet-50',t:'text-violet-600'},{bg:'bg-amber-50',t:'text-amber-600'},{bg:'bg-pink-50',t:'text-pink-600'}];
+            let html='<div class="space-y-2.5">';
+            d.forEach((item,i)=>{const c=colors[i%colors.length];html+=`<div class="flex items-center justify-between p-3 ${c.bg} rounded-xl"><span class="font-medium text-sm text-gray-900">${item.medicine_name||'Unknown'}</span><span class="${c.t} font-bold text-sm">${item.count||0} uses</span></div>`});
+            html+='</div>';
+            document.getElementById('inventoryConsumption').innerHTML=html;
+        } catch(e) { console.error(e); }
     }
 
-    // Load all data on page load
     document.addEventListener('DOMContentLoaded', () => {
         loadOverview();
         loadAppointmentsTrend();

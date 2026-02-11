@@ -6,7 +6,7 @@ from flask import Blueprint, jsonify, request
 from flask_login import login_required, current_user
 from werkzeug.security import check_password_hash
 from models import db, User, Appointment, ClinicVisit, Inventory, MedicineReservation, Notification
-from models_extended import AppointmentWaitlist, VisitFeedback, HealthCertificate
+from models_extended import VisitFeedback, HealthCertificate
 from datetime import datetime, date, time
 from functools import wraps
 
@@ -32,7 +32,9 @@ def student_only(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
         if current_user.role != 'student':
-            return jsonify({'error': 'Students only'}), 403
+            from flask import flash, redirect, url_for as _url_for
+            flash('That page is for students only.', 'error')
+            return redirect(_url_for('admin') if current_user.role in ['admin', 'nurse'] else _url_for('auth.login'))
         return f(*args, **kwargs)
     return decorated_function
 
@@ -42,7 +44,9 @@ def staff_only(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
         if current_user.role not in ['nurse', 'doctor', 'admin']:
-            return jsonify({'error': 'Staff only'}), 403
+            from flask import flash, redirect, url_for as _url_for
+            flash('That page is for staff only.', 'error')
+            return redirect(_url_for('patient_dashboard.index') if current_user.role == 'student' else _url_for('auth.login'))
         return f(*args, **kwargs)
     return decorated_function
 

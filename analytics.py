@@ -6,7 +6,7 @@ from flask import Blueprint, render_template, jsonify, request
 from flask_login import login_required
 from rbac import require_permission, Permission
 from models import db, Appointment, ClinicVisit, Inventory, MedicineReservation, User, Queue, StudentProfile
-from models_extended import VisitFeedback, DoctorSchedule, AuditLog, AppointmentExtended
+from models_extended import VisitFeedback, AppointmentExtended
 from datetime import datetime, timedelta, date, timezone
 from sqlalchemy import func, desc, extract
 from collections import defaultdict

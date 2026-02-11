@@ -4,67 +4,71 @@
 {% block title %}Advanced Search{% endblock %}
 
 {% block content %}
-<div class="p-8">
-    <div class="mb-8">
-        <h1 class="text-3xl font-bold text-gray-900 mb-2">Advanced Search</h1>
-        <p class="text-gray-600">Search across all clinic records</p>
+<div class="space-y-6 fade-in">
+    <!-- Header -->
+    <div class="relative bg-gradient-to-br from-primary-800 via-primary-700 to-indigo-800 rounded-3xl p-8 sm:p-10 overflow-hidden">
+        <div class="absolute top-0 right-0 w-72 h-72 bg-white/[0.04] rounded-full -translate-y-1/3 translate-x-1/4"></div>
+        <div class="relative z-10">
+            <h1 class="text-3xl sm:text-4xl font-extrabold text-white mb-1">Advanced Search</h1>
+            <p class="text-blue-200/50 text-sm">Search across all clinic records</p>
+        </div>
     </div>
 
     <!-- Search Tabs -->
-    <div class="bg-white rounded-xl shadow-sm border border-gray-200 mb-6">
-        <div class="border-b border-gray-200">
-            <nav class="flex space-x-4 px-6" id="searchTabs">
-                <button class="tab-btn active py-4 px-4 font-medium text-sm border-b-2 border-blue-500 text-blue-600" data-tab="global">
-                    <i class="fas fa-globe mr-2"></i>Global Search
+    <div class="bg-white rounded-2xl border border-gray-100 overflow-hidden">
+        <div class="border-b border-gray-100 overflow-x-auto">
+            <nav class="flex space-x-1 px-5 py-2" id="searchTabs">
+                <button class="tab-btn active py-2.5 px-4 font-semibold text-sm rounded-xl bg-primary-50 text-primary-700 transition" data-tab="global">
+                    <i class="fas fa-globe mr-1.5"></i>Global
                 </button>
-                <button class="tab-btn py-4 px-4 font-medium text-sm border-b-2 border-transparent text-gray-500 hover:text-gray-700" data-tab="patients">
-                    <i class="fas fa-users mr-2"></i>Patients
+                <button class="tab-btn py-2.5 px-4 font-medium text-sm rounded-xl text-gray-500 hover:bg-gray-50 transition" data-tab="patients">
+                    <i class="fas fa-users mr-1.5"></i>Patients
                 </button>
-                <button class="tab-btn py-4 px-4 font-medium text-sm border-b-2 border-transparent text-gray-500 hover:text-gray-700" data-tab="appointments">
-                    <i class="fas fa-calendar-check mr-2"></i>Appointments
+                <button class="tab-btn py-2.5 px-4 font-medium text-sm rounded-xl text-gray-500 hover:bg-gray-50 transition" data-tab="appointments">
+                    <i class="fas fa-calendar-check mr-1.5"></i>Appointments
                 </button>
-                <button class="tab-btn py-4 px-4 font-medium text-sm border-b-2 border-transparent text-gray-500 hover:text-gray-700" data-tab="inventory">
-                    <i class="fas fa-pills mr-2"></i>Inventory
+                <button class="tab-btn py-2.5 px-4 font-medium text-sm rounded-xl text-gray-500 hover:bg-gray-50 transition" data-tab="inventory">
+                    <i class="fas fa-pills mr-1.5"></i>Inventory
                 </button>
-                <button class="tab-btn py-4 px-4 font-medium text-sm border-b-2 border-transparent text-gray-500 hover:text-gray-700" data-tab="visits">
-                    <i class="fas fa-heartbeat mr-2"></i>Visits
+                <button class="tab-btn py-2.5 px-4 font-medium text-sm rounded-xl text-gray-500 hover:bg-gray-50 transition" data-tab="visits">
+                    <i class="fas fa-heartbeat mr-1.5"></i>Visits
                 </button>
-                <button class="tab-btn py-4 px-4 font-medium text-sm border-b-2 border-transparent text-gray-500 hover:text-gray-700" data-tab="reservations">
-                    <i class="fas fa-hand-holding-medical mr-2"></i>Reservations
+                <button class="tab-btn py-2.5 px-4 font-medium text-sm rounded-xl text-gray-500 hover:bg-gray-50 transition" data-tab="reservations">
+                    <i class="fas fa-hand-holding-medical mr-1.5"></i>Reservations
                 </button>
             </nav>
         </div>
 
         <!-- Global Search Tab -->
-        <div class="tab-content p-6" id="global-tab">
-            <div class="mb-6">
-                <input type="text" id="globalSearchInput" placeholder="Search everything... (patient name, medicine, diagnosis, etc.)" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                <button onclick="performGlobalSearch()" class="mt-4 bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition">
-                    <i class="fas fa-search mr-2"></i>Search All
+        <div class="tab-content p-6 sm:p-8" id="global-tab">
+            <div class="flex gap-3 mb-6">
+                <input type="text" id="globalSearchInput" placeholder="Search everything... (patient name, medicine, diagnosis, etc.)" class="flex-1 px-4 py-3 border border-gray-200 rounded-xl focus:border-primary-600 focus:ring-2 focus:ring-primary-600/10 outline-none transition text-sm" onkeydown="if(event.key==='Enter')performGlobalSearch()">
+                <button onclick="performGlobalSearch()" class="px-5 py-3 bg-primary-700 text-white font-semibold rounded-xl hover:bg-primary-800 transition text-sm shadow-sm">
+                    <i class="fas fa-search mr-1.5"></i>Search
                 </button>
             </div>
             <div id="globalResults"></div>
         </div>
 
         <!-- Patients Search Tab -->
-        <div class="tab-content hidden p-6" id="patients-tab">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-                <input type="text" id="patientName" placeholder="Name" class="px-4 py-3 border border-gray-300 rounded-lg">
-                <input type="text" id="patientEmail" placeholder="Email" class="px-4 py-3 border border-gray-300 rounded-lg">
-                <input type="text" id="patientStudentId" placeholder="Student ID" class="px-4 py-3 border border-gray-300 rounded-lg">
+        <div class="tab-content hidden p-6 sm:p-8" id="patients-tab">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mb-5">
+                <input type="text" id="patientName" placeholder="Name" class="px-4 py-3 border border-gray-200 rounded-xl focus:border-primary-600 focus:ring-2 focus:ring-primary-600/10 outline-none transition text-sm">
+                <input type="text" id="patientEmail" placeholder="Email" class="px-4 py-3 border border-gray-200 rounded-xl focus:border-primary-600 focus:ring-2 focus:ring-primary-600/10 outline-none transition text-sm">
+                <input type="text" id="patientStudentId" placeholder="Student ID" class="px-4 py-3 border border-gray-200 rounded-xl focus:border-primary-600 focus:ring-2 focus:ring-primary-600/10 outline-none transition text-sm">
             </div>
-            <button onclick="searchPatients()" class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition">
-                <i class="fas fa-search mr-2"></i>Search Patients
+            <button onclick="searchPatients()" class="px-5 py-3 bg-primary-700 text-white font-semibold rounded-xl hover:bg-primary-800 transition text-sm shadow-sm">
+                <i class="fas fa-search mr-1.5"></i>Search Patients
             </button>
             <div id="patientsResults" class="mt-6"></div>
         </div>
 
         <!-- Appointments Search Tab -->
-        <div class="tab-content hidden p-6" id="appointments-tab">
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-                <input type="date" id="apptDateFrom" placeholder="Date From" class="px-4 py-3 border border-gray-300 rounded-lg">
-                <input type="date" id="apptDateTo" placeholder="Date To" class="px-4 py-3 border border-gray-300 rounded-lg">
-                <select id="apptStatus" class="px-4 py-3 border border-gray-300 rounded-lg">
+        <div class="tab-content hidden p-6 sm:p-8" id="appointments-tab">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-3 mb-5">
+                <input type="date" id="apptDateFrom" class="px-4 py-3 border border-gray-200 rounded-xl focus:border-primary-600 focus:ring-2 focus:ring-primary-600/10 outline-none transition text-sm">
+                <input type="date" id="apptDateTo" class="px-4 py-3 border border-gray-200 rounded-xl focus:border-primary-600 focus:ring-2 focus:ring-primary-600/10 outline-none transition text-sm">
+                <select id="apptStatus" class="px-4 py-3 border border-gray-200 rounded-xl focus:border-primary-600 focus:ring-2 focus:ring-primary-600/10 outline-none transition text-sm">
                     <option value="">All Statuses</option>
                     <option value="Pending">Pending</option>
                     <option value="Confirmed">Confirmed</option>
@@ -72,7 +76,7 @@
                     <option value="Cancelled">Cancelled</option>
                     <option value="No Show">No Show</option>
                 </select>
-                <select id="apptService" class="px-4 py-3 border border-gray-300 rounded-lg">
+                <select id="apptService" class="px-4 py-3 border border-gray-200 rounded-xl focus:border-primary-600 focus:ring-2 focus:ring-primary-600/10 outline-none transition text-sm">
                     <option value="">All Services</option>
                     <option value="Consultation">Consultation</option>
                     <option value="Check-up">Check-up</option>
@@ -83,49 +87,49 @@
                     <option value="Other">Other</option>
                 </select>
             </div>
-            <button onclick="searchAppointments()" class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition">
-                <i class="fas fa-search mr-2"></i>Search Appointments
+            <button onclick="searchAppointments()" class="px-5 py-3 bg-primary-700 text-white font-semibold rounded-xl hover:bg-primary-800 transition text-sm shadow-sm">
+                <i class="fas fa-search mr-1.5"></i>Search Appointments
             </button>
             <div id="appointmentsResults" class="mt-6"></div>
         </div>
 
         <!-- Inventory Search Tab -->
-        <div class="tab-content hidden p-6" id="inventory-tab">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-                <input type="text" id="medicineName" placeholder="Medicine Name" class="px-4 py-3 border border-gray-300 rounded-lg">
-                <label class="flex items-center space-x-2 px-4 py-3">
-                    <input type="checkbox" id="lowStock" class="rounded">
-                    <span>Low Stock Only</span>
+        <div class="tab-content hidden p-6 sm:p-8" id="inventory-tab">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mb-5">
+                <input type="text" id="medicineName" placeholder="Medicine Name" class="px-4 py-3 border border-gray-200 rounded-xl focus:border-primary-600 focus:ring-2 focus:ring-primary-600/10 outline-none transition text-sm">
+                <label class="flex items-center space-x-2.5 px-4 py-3 bg-gray-50 rounded-xl cursor-pointer">
+                    <input type="checkbox" id="lowStock" class="rounded border-gray-300 text-primary-600 focus:ring-primary-500">
+                    <span class="text-sm text-gray-700 font-medium">Low Stock Only</span>
                 </label>
-                <label class="flex items-center space-x-2 px-4 py-3">
-                    <input type="checkbox" id="expiring" class="rounded">
-                    <span>Expiring Soon</span>
+                <label class="flex items-center space-x-2.5 px-4 py-3 bg-gray-50 rounded-xl cursor-pointer">
+                    <input type="checkbox" id="expiring" class="rounded border-gray-300 text-primary-600 focus:ring-primary-500">
+                    <span class="text-sm text-gray-700 font-medium">Expiring Soon</span>
                 </label>
             </div>
-            <button onclick="searchInventory()" class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition">
-                <i class="fas fa-search mr-2"></i>Search Inventory
+            <button onclick="searchInventory()" class="px-5 py-3 bg-primary-700 text-white font-semibold rounded-xl hover:bg-primary-800 transition text-sm shadow-sm">
+                <i class="fas fa-search mr-1.5"></i>Search Inventory
             </button>
             <div id="inventoryResults" class="mt-6"></div>
         </div>
 
         <!-- Visits Search Tab -->
-        <div class="tab-content hidden p-6" id="visits-tab">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-                <input type="text" id="visitDiagnosis" placeholder="Diagnosis" class="px-4 py-3 border border-gray-300 rounded-lg">
-                <input type="date" id="visitDateFrom" placeholder="Date From" class="px-4 py-3 border border-gray-300 rounded-lg">
-                <input type="date" id="visitDateTo" placeholder="Date To" class="px-4 py-3 border border-gray-300 rounded-lg">
+        <div class="tab-content hidden p-6 sm:p-8" id="visits-tab">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mb-5">
+                <input type="text" id="visitDiagnosis" placeholder="Diagnosis" class="px-4 py-3 border border-gray-200 rounded-xl focus:border-primary-600 focus:ring-2 focus:ring-primary-600/10 outline-none transition text-sm">
+                <input type="date" id="visitDateFrom" class="px-4 py-3 border border-gray-200 rounded-xl focus:border-primary-600 focus:ring-2 focus:ring-primary-600/10 outline-none transition text-sm">
+                <input type="date" id="visitDateTo" class="px-4 py-3 border border-gray-200 rounded-xl focus:border-primary-600 focus:ring-2 focus:ring-primary-600/10 outline-none transition text-sm">
             </div>
-            <button onclick="searchVisits()" class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition">
-                <i class="fas fa-search mr-2"></i>Search Visits
+            <button onclick="searchVisits()" class="px-5 py-3 bg-primary-700 text-white font-semibold rounded-xl hover:bg-primary-800 transition text-sm shadow-sm">
+                <i class="fas fa-search mr-1.5"></i>Search Visits
             </button>
             <div id="visitsResults" class="mt-6"></div>
         </div>
 
         <!-- Reservations Search Tab -->
-        <div class="tab-content hidden p-6" id="reservations-tab">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-                <input type="text" id="reservationMedicine" placeholder="Medicine Name" class="px-4 py-3 border border-gray-300 rounded-lg">
-                <select id="reservationStatus" class="px-4 py-3 border border-gray-300 rounded-lg">
+        <div class="tab-content hidden p-6 sm:p-8" id="reservations-tab">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mb-5">
+                <input type="text" id="reservationMedicine" placeholder="Medicine Name" class="px-4 py-3 border border-gray-200 rounded-xl focus:border-primary-600 focus:ring-2 focus:ring-primary-600/10 outline-none transition text-sm">
+                <select id="reservationStatus" class="px-4 py-3 border border-gray-200 rounded-xl focus:border-primary-600 focus:ring-2 focus:ring-primary-600/10 outline-none transition text-sm">
                     <option value="">All Statuses</option>
                     <option value="Reserved">Reserved</option>
                     <option value="Ready">Ready</option>
@@ -133,10 +137,10 @@
                     <option value="Cancelled">Cancelled</option>
                     <option value="Expired">Expired</option>
                 </select>
-                <input type="date" id="reservationDate" class="px-4 py-3 border border-gray-300 rounded-lg">
+                <input type="date" id="reservationDate" class="px-4 py-3 border border-gray-200 rounded-xl focus:border-primary-600 focus:ring-2 focus:ring-primary-600/10 outline-none transition text-sm">
             </div>
-            <button onclick="searchReservations()" class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition">
-                <i class="fas fa-search mr-2"></i>Search Reservations
+            <button onclick="searchReservations()" class="px-5 py-3 bg-primary-700 text-white font-semibold rounded-xl hover:bg-primary-800 transition text-sm shadow-sm">
+                <i class="fas fa-search mr-1.5"></i>Search Reservations
             </button>
             <div id="reservationsResults" class="mt-6"></div>
         </div>
@@ -144,222 +148,100 @@
 </div>
 
 <script>
-    // Tab switching
     document.querySelectorAll('.tab-btn').forEach(btn => {
         btn.addEventListener('click', () => {
-            // Remove active from all tabs
             document.querySelectorAll('.tab-btn').forEach(b => {
-                b.classList.remove('active', 'border-blue-500', 'text-blue-600');
-                b.classList.add('border-transparent', 'text-gray-500');
+                b.classList.remove('active', 'bg-primary-50', 'text-primary-700', 'font-semibold');
+                b.classList.add('text-gray-500', 'font-medium');
             });
             document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
-            
-            // Add active to clicked tab
-            btn.classList.add('active', 'border-blue-500', 'text-blue-600');
-            btn.classList.remove('border-transparent', 'text-gray-500');
+            btn.classList.add('active', 'bg-primary-50', 'text-primary-700', 'font-semibold');
+            btn.classList.remove('text-gray-500', 'font-medium');
             document.getElementById(btn.dataset.tab + '-tab').classList.remove('hidden');
         });
     });
 
-    // Global Search
     async function performGlobalSearch() {
         const query = document.getElementById('globalSearchInput').value;
         if (!query.trim()) return;
-        
         const response = await fetch(`/search/api/global?q=${encodeURIComponent(query)}`);
         const data = await response.json();
-        
         let html = '<div class="space-y-6">';
-        
         if (data.patients?.length) {
-            html += '<div><h3 class="font-bold text-lg mb-3">Patients</h3><div class="space-y-2">';
-            data.patients.forEach(p => {
-                html += `<div class="p-4 bg-gray-50 rounded-lg">${p.first_name} ${p.last_name} - ${p.email}</div>`;
-            });
+            html += '<div><h3 class="font-bold text-sm text-gray-900 mb-3 flex items-center gap-2"><i class="fas fa-users text-primary-600"></i>Patients</h3><div class="space-y-2">';
+            data.patients.forEach(p => { html += `<div class="p-4 bg-gray-50 rounded-xl border border-gray-100 text-sm"><span class="font-semibold text-gray-900">${p.first_name} ${p.last_name}</span> <span class="text-gray-400 mx-1">&middot;</span> ${p.email}</div>`; });
             html += '</div></div>';
         }
-        
         if (data.appointments?.length) {
-            html += '<div><h3 class="font-bold text-lg mb-3">Appointments</h3><div class="space-y-2">';
-            data.appointments.forEach(a => {
-                html += `<div class="p-4 bg-gray-50 rounded-lg">${a.service_type} - ${a.appointment_date} (${a.status})</div>`;
-            });
+            html += '<div><h3 class="font-bold text-sm text-gray-900 mb-3 flex items-center gap-2"><i class="fas fa-calendar text-primary-600"></i>Appointments</h3><div class="space-y-2">';
+            data.appointments.forEach(a => { html += `<div class="p-4 bg-gray-50 rounded-xl border border-gray-100 text-sm"><span class="font-semibold text-gray-900">${a.service_type}</span> <span class="text-gray-400 mx-1">&middot;</span> ${a.appointment_date} <span class="px-2 py-0.5 rounded-full text-xs font-bold ${a.status==='Completed'?'bg-emerald-100 text-emerald-700':a.status==='Cancelled'?'bg-red-100 text-red-700':'bg-amber-100 text-amber-700'}">${a.status}</span></div>`; });
             html += '</div></div>';
         }
-        
         if (data.medicines?.length) {
-            html += '<div><h3 class="font-bold text-lg mb-3">Medicines</h3><div class="space-y-2">';
-            data.medicines.forEach(m => {
-                html += `<div class="p-4 bg-gray-50 rounded-lg">${m.medicine_name} - Stock: ${m.quantity}</div>`;
-            });
+            html += '<div><h3 class="font-bold text-sm text-gray-900 mb-3 flex items-center gap-2"><i class="fas fa-pills text-emerald-600"></i>Medicines</h3><div class="space-y-2">';
+            data.medicines.forEach(m => { html += `<div class="p-4 bg-gray-50 rounded-xl border border-gray-100 text-sm"><span class="font-semibold text-gray-900">${m.medicine_name}</span> <span class="text-gray-400 mx-1">&middot;</span> Stock: <span class="font-bold">${m.quantity}</span></div>`; });
             html += '</div></div>';
         }
-        
         html += '</div>';
-        document.getElementById('globalResults').innerHTML = html || '<p class="text-gray-500">No results found</p>';
+        document.getElementById('globalResults').innerHTML = (data.patients?.length||data.appointments?.length||data.medicines?.length) ? html : '<div class="text-center py-8 text-gray-400 text-sm"><i class="fas fa-search text-2xl mb-2 block"></i>No results found</div>';
     }
 
-    // Search Patients
     async function searchPatients() {
-        const params = new URLSearchParams({
-            name: document.getElementById('patientName').value,
-            email: document.getElementById('patientEmail').value,
-            student_id: document.getElementById('patientStudentId').value
-        });
-        
+        const params = new URLSearchParams({ name: document.getElementById('patientName').value, email: document.getElementById('patientEmail').value, student_id: document.getElementById('patientStudentId').value });
         const response = await fetch(`/search/api/patients?${params}`);
         const data = await response.json();
-        
-        let html = '<div class="grid grid-cols-1 md:grid-cols-2 gap-4">';
-        data.forEach(patient => {
-            html += `
-                <div class="bg-gray-50 rounded-lg p-4 border border-gray-200">
-                    <h4 class="font-bold text-gray-900">${patient.first_name} ${patient.last_name}</h4>
-                    <p class="text-sm text-gray-600">${patient.email}</p>
-                    <p class="text-sm text-gray-600">Student ID: ${patient.student_id || 'N/A'}</p>
-                    <p class="text-sm text-gray-600">Role: <span class="capitalize">${patient.role}</span></p>
-                </div>
-            `;
+        let html = '<div class="grid grid-cols-1 md:grid-cols-2 gap-3">';
+        data.forEach(p => {
+            html += `<div class="p-4 bg-gray-50 rounded-xl border border-gray-100"><div class="flex items-center gap-3 mb-2"><div class="w-9 h-9 bg-primary-100 rounded-lg flex items-center justify-center text-primary-700 font-bold text-xs">${(p.first_name||'')[0]||''}${(p.last_name||'')[0]||''}</div><div><h4 class="font-bold text-sm text-gray-900">${p.first_name} ${p.last_name}</h4><p class="text-xs text-gray-500">${p.email}</p></div></div><div class="flex gap-3 text-xs text-gray-500"><span>ID: ${p.student_id||'N/A'}</span><span class="capitalize">${p.role}</span></div></div>`;
         });
         html += '</div>';
-        document.getElementById('patientsResults').innerHTML = html || '<p class="text-gray-500">No patients found</p>';
+        document.getElementById('patientsResults').innerHTML = data.length ? html : '<div class="text-center py-8 text-gray-400 text-sm">No patients found</div>';
     }
 
-    // Search Appointments
     async function searchAppointments() {
-        const params = new URLSearchParams({
-            date_from: document.getElementById('apptDateFrom').value,
-            date_to: document.getElementById('apptDateTo').value,
-            status: document.getElementById('apptStatus').value,
-            service: document.getElementById('apptService').value
-        });
-        
+        const params = new URLSearchParams({ date_from: document.getElementById('apptDateFrom').value, date_to: document.getElementById('apptDateTo').value, status: document.getElementById('apptStatus').value, service: document.getElementById('apptService').value });
         const response = await fetch(`/search/api/appointments?${params}`);
         const data = await response.json();
-        
-        let html = '<div class="overflow-x-auto"><table class="min-w-full divide-y divide-gray-200">';
-        html += '<thead class="bg-gray-50"><tr>';
-        html += '<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th>';
-        html += '<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Patient</th>';
-        html += '<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Service</th>';
-        html += '<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>';
-        html += '</tr></thead><tbody class="bg-white divide-y divide-gray-200">';
-        
-        data.forEach(appt => {
-            const statusColors = {
-                'Pending': 'bg-yellow-100 text-yellow-800',
-                'Confirmed': 'bg-blue-100 text-blue-800',
-                'Completed': 'bg-green-100 text-green-800',
-                'Cancelled': 'bg-red-100 text-red-800',
-                'No Show': 'bg-gray-100 text-gray-800'
-            };
-            html += `
-                <tr>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm">${appt.appointment_date}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm">${appt.student?.first_name || ''} ${appt.student?.last_name || ''}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm">${appt.service_type}</td>
-                    <td class="px-6 py-4 whitespace-nowrap"><span class="px-2 py-1 text-xs rounded-full ${statusColors[appt.status] || ''}">${appt.status}</span></td>
-                </tr>
-            `;
-        });
-        
+        const sc = { 'Pending':'bg-amber-100 text-amber-700', 'Confirmed':'bg-blue-100 text-blue-700', 'Completed':'bg-emerald-100 text-emerald-700', 'Cancelled':'bg-red-100 text-red-700', 'No Show':'bg-gray-200 text-gray-600' };
+        let html = '<div class="overflow-x-auto"><table class="min-w-full"><thead><tr class="border-b border-gray-100"><th class="px-4 py-3 text-left text-xs font-bold text-gray-500 uppercase">Date</th><th class="px-4 py-3 text-left text-xs font-bold text-gray-500 uppercase">Patient</th><th class="px-4 py-3 text-left text-xs font-bold text-gray-500 uppercase">Service</th><th class="px-4 py-3 text-left text-xs font-bold text-gray-500 uppercase">Status</th></tr></thead><tbody class="divide-y divide-gray-50">';
+        data.forEach(a => { html += `<tr class="hover:bg-gray-50 transition"><td class="px-4 py-3.5 text-sm text-gray-900">${a.appointment_date}</td><td class="px-4 py-3.5 text-sm text-gray-700">${a.student?.first_name||''} ${a.student?.last_name||''}</td><td class="px-4 py-3.5 text-sm text-gray-700">${a.service_type}</td><td class="px-4 py-3.5"><span class="px-2.5 py-1 text-xs font-bold rounded-full ${sc[a.status]||''}">${a.status}</span></td></tr>`; });
         html += '</tbody></table></div>';
-        document.getElementById('appointmentsResults').innerHTML = html || '<p class="text-gray-500">No appointments found</p>';
+        document.getElementById('appointmentsResults').innerHTML = data.length ? html : '<div class="text-center py-8 text-gray-400 text-sm">No appointments found</div>';
     }
 
-    // Search Inventory
     async function searchInventory() {
-        const params = new URLSearchParams({
-            medicine_name: document.getElementById('medicineName').value,
-            low_stock: document.getElementById('lowStock').checked,
-            expiring: document.getElementById('expiring').checked
-        });
-        
+        const params = new URLSearchParams({ medicine_name: document.getElementById('medicineName').value, low_stock: document.getElementById('lowStock').checked, expiring: document.getElementById('expiring').checked });
         const response = await fetch(`/search/api/inventory?${params}`);
         const data = await response.json();
-        
-        let html = '<div class="grid grid-cols-1 md:grid-cols-3 gap-4">';
+        let html = '<div class="grid grid-cols-1 md:grid-cols-3 gap-3">';
         data.forEach(item => {
-            const isLowStock = item.quantity <= (item.reorder_level || 10);
-            html += `
-                <div class="bg-white rounded-lg p-4 border ${isLowStock ? 'border-red-300' : 'border-gray-200'}">
-                    <h4 class="font-bold text-gray-900">${item.medicine_name}</h4>
-                    <p class="text-sm text-gray-600">Quantity: <span class="${isLowStock ? 'text-red-600 font-bold' : ''}">${item.quantity}</span></p>
-                    <p class="text-sm text-gray-600">Category: ${item.category}</p>
-                    ${item.expiry_date ? `<p class="text-sm text-gray-600">Expires: ${item.expiry_date}</p>` : ''}
-                    ${isLowStock ? '<p class="text-xs text-red-600 mt-2"><i class="fas fa-exclamation-triangle mr-1"></i>Low Stock</p>' : ''}
-                </div>
-            `;
+            const low = item.quantity <= (item.reorder_level || 10);
+            html += `<div class="p-4 rounded-xl border ${low ? 'border-red-200 bg-red-50/50' : 'border-gray-100 bg-gray-50'}"><h4 class="font-bold text-sm text-gray-900 mb-2">${item.medicine_name}</h4><div class="space-y-1 text-xs"><div class="flex justify-between"><span class="text-gray-500">Quantity</span><span class="${low ? 'text-red-600 font-bold' : 'text-gray-900 font-semibold'}">${item.quantity}</span></div><div class="flex justify-between"><span class="text-gray-500">Category</span><span class="text-gray-700">${item.category}</span></div>${item.expiry_date ? `<div class="flex justify-between"><span class="text-gray-500">Expires</span><span class="text-gray-700">${item.expiry_date}</span></div>` : ''}${low ? '<p class="text-red-600 font-bold mt-2"><i class="fas fa-exclamation-triangle mr-1"></i>Low Stock</p>' : ''}</div></div>`;
         });
         html += '</div>';
-        document.getElementById('inventoryResults').innerHTML = html || '<p class="text-gray-500">No medicines found</p>';
+        document.getElementById('inventoryResults').innerHTML = data.length ? html : '<div class="text-center py-8 text-gray-400 text-sm">No medicines found</div>';
     }
 
-    // Search Visits
     async function searchVisits() {
-        const params = new URLSearchParams({
-            diagnosis: document.getElementById('visitDiagnosis').value,
-            date_from: document.getElementById('visitDateFrom').value,
-            date_to: document.getElementById('visitDateTo').value
-        });
-        
+        const params = new URLSearchParams({ diagnosis: document.getElementById('visitDiagnosis').value, date_from: document.getElementById('visitDateFrom').value, date_to: document.getElementById('visitDateTo').value });
         const response = await fetch(`/search/api/visits?${params}`);
         const data = await response.json();
-        
-        let html = '<div class="space-y-4">';
-        data.forEach(visit => {
-            html += `
-                <div class="bg-gray-50 rounded-lg p-4 border border-gray-200">
-                    <div class="flex justify-between items-start">
-                        <div>
-                            <h4 class="font-bold text-gray-900">${visit.student?.first_name || ''} ${visit.student?.last_name || ''}</h4>
-                            <p class="text-sm text-gray-600">Date: ${visit.visit_date}</p>
-                            <p class="text-sm text-gray-600">Complaint: ${visit.chief_complaint || 'N/A'}</p>
-                            <p class="text-sm text-gray-600">Diagnosis: ${visit.diagnosis || 'N/A'}</p>
-                        </div>
-                        <span class="px-3 py-1 text-xs rounded-full ${visit.status === 'completed' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}">${visit.status}</span>
-                    </div>
-                </div>
-            `;
+        let html = '<div class="space-y-3">';
+        data.forEach(v => {
+            html += `<div class="p-4 bg-gray-50 rounded-xl border border-gray-100"><div class="flex justify-between items-start"><div><h4 class="font-bold text-sm text-gray-900">${v.student?.first_name||''} ${v.student?.last_name||''}</h4><div class="mt-1 space-y-0.5 text-xs text-gray-500"><p><i class="fas fa-calendar mr-1.5 text-gray-400"></i>${v.visit_date}</p><p><i class="fas fa-stethoscope mr-1.5 text-gray-400"></i>${v.chief_complaint||'N/A'}</p><p><i class="fas fa-notes-medical mr-1.5 text-gray-400"></i>${v.diagnosis||'N/A'}</p></div></div><span class="px-2.5 py-1 text-xs font-bold rounded-full ${v.status==='completed'?'bg-emerald-100 text-emerald-700':'bg-amber-100 text-amber-700'}">${v.status}</span></div></div>`;
         });
         html += '</div>';
-        document.getElementById('visitsResults').innerHTML = html || '<p class="text-gray-500">No visits found</p>';
+        document.getElementById('visitsResults').innerHTML = data.length ? html : '<div class="text-center py-8 text-gray-400 text-sm">No visits found</div>';
     }
 
-    // Search Reservations
     async function searchReservations() {
-        const params = new URLSearchParams({
-            medicine_name: document.getElementById('reservationMedicine').value,
-            status: document.getElementById('reservationStatus').value,
-            date: document.getElementById('reservationDate').value
-        });
-        
+        const params = new URLSearchParams({ medicine_name: document.getElementById('reservationMedicine').value, status: document.getElementById('reservationStatus').value, date: document.getElementById('reservationDate').value });
         const response = await fetch(`/search/api/reservations?${params}`);
         const data = await response.json();
-        
-        let html = '<div class="overflow-x-auto"><table class="min-w-full divide-y divide-gray-200">';
-        html += '<thead class="bg-gray-50"><tr>';
-        html += '<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th>';
-        html += '<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Patient</th>';
-        html += '<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Medicine</th>';
-        html += '<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Quantity</th>';
-        html += '<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>';
-        html += '</tr></thead><tbody class="bg-white divide-y divide-gray-200">';
-        
-        data.forEach(res => {
-            html += `
-                <tr>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm">${res.reserved_at}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm">${res.student?.first_name || ''} ${res.student?.last_name || ''}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm">${res.medicine_name}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm">${res.quantity}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm">${res.status}</td>
-                </tr>
-            `;
-        });
-        
+        let html = '<div class="overflow-x-auto"><table class="min-w-full"><thead><tr class="border-b border-gray-100"><th class="px-4 py-3 text-left text-xs font-bold text-gray-500 uppercase">Date</th><th class="px-4 py-3 text-left text-xs font-bold text-gray-500 uppercase">Patient</th><th class="px-4 py-3 text-left text-xs font-bold text-gray-500 uppercase">Medicine</th><th class="px-4 py-3 text-left text-xs font-bold text-gray-500 uppercase">Qty</th><th class="px-4 py-3 text-left text-xs font-bold text-gray-500 uppercase">Status</th></tr></thead><tbody class="divide-y divide-gray-50">';
+        data.forEach(r => { html += `<tr class="hover:bg-gray-50 transition"><td class="px-4 py-3.5 text-sm">${r.reserved_at}</td><td class="px-4 py-3.5 text-sm">${r.student?.first_name||''} ${r.student?.last_name||''}</td><td class="px-4 py-3.5 text-sm font-medium">${r.medicine_name}</td><td class="px-4 py-3.5 text-sm">${r.quantity}</td><td class="px-4 py-3.5 text-sm">${r.status}</td></tr>`; });
         html += '</tbody></table></div>';
-        document.getElementById('reservationsResults').innerHTML = html || '<p class="text-gray-500">No reservations found</p>';
+        document.getElementById('reservationsResults').innerHTML = data.length ? html : '<div class="text-center py-8 text-gray-400 text-sm">No reservations found</div>';
     }
 </script>
 {% endblock %}

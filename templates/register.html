@@ -1,16 +1,13 @@
 <!DOCTYPE html>
-<html lang="en">
-
+<html lang="en" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
     <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Create Account — ISUFST CareHub</title>
+    <title>Create Account &mdash; ISUFST CareHub</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/fontawesome.min.css') }}">
-    <link
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap"
-        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/animations.css') }}">
     <script>
         tailwind.config = {
@@ -18,7 +15,7 @@
                 extend: {
                     fontFamily: { 'display': ['"Plus Jakarta Sans"', 'sans-serif'], 'body': ['Inter', 'sans-serif'] },
                     colors: {
-                        'primary': { 50: '#eff6ff', 100: '#dbeafe', 200: '#bfdbfe', 600: '#2563eb', 700: '#1d4ed8', 800: '#1e3a5f', 900: '#0f1d30' },
+                        'primary': { 50:'#eff6ff',100:'#dbeafe',200:'#bfdbfe',300:'#93c5fd',600:'#2563eb',700:'#1d4ed8',800:'#1e3a5f',900:'#0f1d30',950:'#080d1a' },
                         'accent': '#10b981',
                     }
                 }
@@ -26,67 +23,31 @@
         }
     </script>
     <style>
-        * {
-            font-family: 'Inter', sans-serif;
-        }
-
-        h1,
-        h2,
-        h3 {
-            font-family: 'Plus Jakarta Sans', sans-serif;
-        }
-
-        .split-bg {
-            background: linear-gradient(135deg, #0f1d30 0%, #1e3a5f 50%, #2563eb 100%);
-            position: relative;
-        }
-
-        .split-bg::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: url('https://images.unsplash.com/photo-1579684385127-1ef15d508118?w=1920&q=80') center/cover no-repeat;
-            opacity: 0.10;
-        }
-
-        .glass-card {
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(24px) saturate(180%);
-            border: 1px solid rgba(255, 255, 255, 0.12);
-        }
-
-        .input-modern {
-            transition: all 0.3s ease;
-        }
-
-        .input-modern:focus {
-            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.15);
-        }
-
-        /* Custom scrollbar for form area */
-        .form-scroll::-webkit-scrollbar {
-            width: 4px;
-        }
-
-        .form-scroll::-webkit-scrollbar-track {
-            background: transparent;
-        }
-
-        .form-scroll::-webkit-scrollbar-thumb {
-            background: #d1d5db;
-            border-radius: 100px;
-        }
+        *{font-family:'Inter',sans-serif}
+        h1,h2,h3{font-family:'Plus Jakarta Sans',sans-serif}
+        .auth-bg{position:relative;overflow:hidden;background:url('https://images.unsplash.com/photo-1586773860418-d37222d8fce3?auto=format&fit=crop&w=1200&q=80') center/cover no-repeat}
+        .auth-bg::before{content:'';position:absolute;inset:0;background:linear-gradient(180deg,rgba(8,13,26,.82) 0%,rgba(15,29,48,.78) 50%,rgba(8,13,26,.85) 100%);z-index:1}
+        .grid-lines{background-image:linear-gradient(rgba(255,255,255,.02) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.02) 1px,transparent 1px);background-size:64px 64px}
+        .grain{position:absolute;inset:0;opacity:.04;pointer-events:none;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E")}
+        .input-premium{transition:all .3s cubic-bezier(.16,1,.3,1)}
+        .input-premium:focus{box-shadow:0 0 0 4px rgba(37,99,235,.1);border-color:#2563eb}
+        .btn-premium{position:relative;overflow:hidden;transition:all .3s}
+        .btn-premium::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.1),transparent);opacity:0;transition:opacity .3s}
+        .btn-premium:hover::before{opacity:1}
+        .form-scroll::-webkit-scrollbar{width:4px}
+        .form-scroll::-webkit-scrollbar-track{background:transparent}
+        .form-scroll::-webkit-scrollbar-thumb{background:#d1d5db;border-radius:100px}
     </style>
 </head>
-
 <body class="min-h-screen flex">
-    <!-- Left Panel: Branding -->
-    <div class="hidden lg:flex lg:w-[45%] split-bg flex-col justify-between p-12 relative">
+    <!-- Left Panel -->
+    <div class="hidden lg:flex lg:w-[42%] auth-bg flex-col justify-between p-12 relative">
+        <div class="absolute inset-0 grid-lines" style="z-index:2"></div>
+        <div class="grain" style="z-index:2"></div>
+
         <div class="relative z-10">
-            <!-- Logo -->
             <a href="/" class="flex items-center space-x-3 group">
-                <div
-                    class="w-10 h-10 bg-gradient-to-br from-primary-600 to-accent rounded-xl flex items-center justify-center shadow-lg">
+                <div class="w-10 h-10 bg-gradient-to-br from-primary-600 to-accent rounded-xl flex items-center justify-center shadow-lg group-hover:scale-105 transition-transform">
                     <i class="fas fa-heartbeat text-white text-lg"></i>
                 </div>
                 <span class="text-xl font-bold text-white">ISUFST CareHub</span>
@@ -95,77 +56,66 @@
 
         <div class="relative z-10 space-y-8 fade-in">
             <h2 class="text-5xl font-extrabold text-white leading-tight">
-                Join the
-                <br>
-                <span class="bg-gradient-to-r from-blue-400 to-emerald-400 bg-clip-text text-transparent">
-                    CareHub.
-                </span>
+                Join the<br>
+                <span class="bg-gradient-to-r from-blue-400 via-cyan-300 to-emerald-400 bg-clip-text text-transparent">CareHub.</span>
             </h2>
-            <p class="text-lg text-blue-200/80 max-w-md">
-                Create your account to book appointments, reserve medicines, and access university health services — all
-                for free.
-            </p>
+            <p class="text-lg text-blue-200/50 max-w-md leading-relaxed">Create your account to book appointments, reserve medicines, and access university health services &mdash; all for free.</p>
 
-            <!-- Features list -->
             <div class="space-y-4 max-w-sm">
                 <div class="flex items-center space-x-3">
-                    <div class="w-8 h-8 bg-white/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <div class="w-9 h-9 bg-white/[0.06] rounded-lg flex items-center justify-center flex-shrink-0 border border-white/[0.06]">
                         <i class="fas fa-calendar-check text-emerald-400 text-sm"></i>
                     </div>
-                    <span class="text-blue-200/80 text-sm">Book clinic appointments instantly</span>
+                    <span class="text-blue-200/50 text-sm">Book clinic appointments instantly</span>
                 </div>
                 <div class="flex items-center space-x-3">
-                    <div class="w-8 h-8 bg-white/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <div class="w-9 h-9 bg-white/[0.06] rounded-lg flex items-center justify-center flex-shrink-0 border border-white/[0.06]">
                         <i class="fas fa-pills text-emerald-400 text-sm"></i>
                     </div>
-                    <span class="text-blue-200/80 text-sm">Reserve medicines for free pickup</span>
+                    <span class="text-blue-200/50 text-sm">Reserve medicines for free pickup</span>
                 </div>
                 <div class="flex items-center space-x-3">
-                    <div class="w-8 h-8 bg-white/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <div class="w-9 h-9 bg-white/[0.06] rounded-lg flex items-center justify-center flex-shrink-0 border border-white/[0.06]">
+                        <i class="fas fa-robot text-emerald-400 text-sm"></i>
+                    </div>
+                    <span class="text-blue-200/50 text-sm">24/7 AI health assistant</span>
+                </div>
+                <div class="flex items-center space-x-3">
+                    <div class="w-9 h-9 bg-white/[0.06] rounded-lg flex items-center justify-center flex-shrink-0 border border-white/[0.06]">
                         <i class="fas fa-shield-alt text-emerald-400 text-sm"></i>
                     </div>
-                    <span class="text-blue-200/80 text-sm">Secure and HIPAA-compliant records</span>
+                    <span class="text-blue-200/50 text-sm">Secure and encrypted records</span>
                 </div>
             </div>
         </div>
 
-        <div class="relative z-10 text-sm text-blue-300/50">
-            &copy; 2026 ISUFST CareHub &middot; Dingle Campus
-        </div>
+        <div class="relative z-10 text-sm text-blue-300/30">&copy; 2026 ISUFST CareHub &middot; Dingle Campus</div>
     </div>
 
-    <!-- Right Panel: Registration Form -->
-    <div class="w-full lg:w-[55%] flex items-center justify-center bg-gray-50 p-6 sm:p-10">
+    <!-- Right Panel -->
+    <div class="w-full lg:w-[58%] flex items-center justify-center bg-gray-50 p-6 sm:p-10">
         <div class="w-full max-w-lg space-y-6 slide-in-right">
-            <!-- Mobile logo -->
             <div class="lg:hidden flex items-center space-x-3 mb-2">
-                <div
-                    class="w-10 h-10 bg-gradient-to-br from-primary-600 to-accent rounded-xl flex items-center justify-center shadow-lg">
+                <div class="w-10 h-10 bg-gradient-to-br from-primary-600 to-accent rounded-xl flex items-center justify-center shadow-lg">
                     <i class="fas fa-heartbeat text-white text-lg"></i>
                 </div>
                 <span class="text-xl font-bold text-primary-900">ISUFST CareHub</span>
             </div>
 
             <div>
-                <h1 class="text-3xl font-extrabold text-gray-900 font-display">Create account</h1>
-                <p class="mt-2 text-gray-500">
-                    Already have an account?
-                    <a href="{{ url_for('auth.login') }}"
-                        class="text-primary-700 font-semibold hover:text-primary-800">Sign in</a>
-                </p>
+                <h1 class="text-3xl font-extrabold text-gray-900">Create account</h1>
+                <p class="mt-2 text-gray-500">Already have an account? <a href="{{ url_for('auth.login') }}" class="text-primary-700 font-semibold hover:text-primary-800 transition-colors">Sign in</a></p>
             </div>
 
-            <!-- Flash Messages -->
             {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
             {% for category, message in messages %}
-            <div class="px-4 py-3 rounded-xl text-sm font-medium
-                        {% if category == 'error' %}bg-red-50 text-red-700 border border-red-200
-                        {% elif category == 'success' %}bg-emerald-50 text-emerald-700 border border-emerald-200
-                        {% else %}bg-blue-50 text-blue-700 border border-blue-200{% endif %}">
-                <i
-                    class="fas {% if category == 'error' %}fa-exclamation-circle{% elif category == 'success' %}fa-check-circle{% else %}fa-info-circle{% endif %} mr-2"></i>{{
-                message }}
+            <div class="px-4 py-3 rounded-xl text-sm font-medium flex items-center gap-2
+                {% if category == 'error' %}bg-red-50 text-red-700 border border-red-100
+                {% elif category == 'success' %}bg-emerald-50 text-emerald-700 border border-emerald-100
+                {% else %}bg-blue-50 text-blue-700 border border-blue-100{% endif %}">
+                <i class="fas {% if category == 'error' %}fa-exclamation-circle{% elif category == 'success' %}fa-check-circle{% else %}fa-info-circle{% endif %}"></i>
+                {{ message }}
             </div>
             {% endfor %}
             {% endif %}
@@ -173,47 +123,35 @@
 
             <form method="POST" action="{{ url_for('auth.register') }}" class="space-y-4">
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                <!-- Name row -->
+
                 <div class="grid grid-cols-2 gap-3">
                     <div>
-                        <label for="first_name" class="block text-sm font-semibold text-gray-700 mb-1.5">First
-                            name</label>
-                        <input type="text" name="first_name" id="first_name" required placeholder="Juan"
-                            class="input-modern w-full px-4 py-3 border border-gray-200 rounded-xl bg-white focus:border-primary-600 focus:outline-none text-sm">
+                        <label for="first_name" class="block text-sm font-semibold text-gray-700 mb-1.5">First name</label>
+                        <input type="text" name="first_name" id="first_name" required placeholder="Juan" class="input-premium w-full px-4 py-3 border border-gray-200 rounded-xl bg-white focus:outline-none text-sm">
                     </div>
                     <div>
-                        <label for="last_name" class="block text-sm font-semibold text-gray-700 mb-1.5">Last
-                            name</label>
-                        <input type="text" name="last_name" id="last_name" required placeholder="Dela Cruz"
-                            class="input-modern w-full px-4 py-3 border border-gray-200 rounded-xl bg-white focus:border-primary-600 focus:outline-none text-sm">
+                        <label for="last_name" class="block text-sm font-semibold text-gray-700 mb-1.5">Last name</label>
+                        <input type="text" name="last_name" id="last_name" required placeholder="Dela Cruz" class="input-premium w-full px-4 py-3 border border-gray-200 rounded-xl bg-white focus:outline-none text-sm">
                     </div>
                 </div>
 
-                <!-- Email -->
                 <div>
                     <label for="email" class="block text-sm font-semibold text-gray-700 mb-1.5">Email address</label>
                     <div class="relative">
-                        <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"><i
-                                class="fas fa-envelope"></i></span>
-                        <input type="email" name="email" id="email" required placeholder="you@isufst.edu.ph"
-                            class="input-modern w-full pl-11 pr-4 py-3 border border-gray-200 rounded-xl bg-white focus:border-primary-600 focus:outline-none text-sm">
+                        <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"><i class="fas fa-envelope text-sm"></i></span>
+                        <input type="email" name="email" id="email" required placeholder="you@isufst.edu.ph" class="input-premium w-full pl-11 pr-4 py-3 border border-gray-200 rounded-xl bg-white focus:outline-none text-sm">
                     </div>
                 </div>
 
-                <!-- Student ID & Course -->
                 <div class="grid grid-cols-2 gap-3">
                     <div>
-                        <label for="student_id_number" class="block text-sm font-semibold text-gray-700 mb-1.5">Student
-                            ID</label>
-                        <input type="text" name="student_id_number" id="student_id_number" required
-                            placeholder="2024-001234"
-                            class="input-modern w-full px-4 py-3 border border-gray-200 rounded-xl bg-white focus:border-primary-600 focus:outline-none text-sm">
+                        <label for="student_id_number" class="block text-sm font-semibold text-gray-700 mb-1.5">Student ID</label>
+                        <input type="text" name="student_id_number" id="student_id_number" required placeholder="2024-001234" class="input-premium w-full px-4 py-3 border border-gray-200 rounded-xl bg-white focus:outline-none text-sm">
                     </div>
                     <div>
                         <label for="course" class="block text-sm font-semibold text-gray-700 mb-1.5">College</label>
-                        <select name="course" id="course"
-                            class="input-modern w-full px-4 py-3 border border-gray-200 rounded-xl bg-white focus:border-primary-600 focus:outline-none text-sm text-gray-700">
-                            <option value="">Select college</option>
+                        <select name="course" id="course" class="input-premium w-full px-4 py-3 border border-gray-200 rounded-xl bg-white focus:outline-none text-sm text-gray-700">
+                            <option value="">Select</option>
                             <option value="CAgri">CAgri</option>
                             <option value="CHM">CHM</option>
                             <option value="COED">COED</option>
@@ -222,14 +160,11 @@
                     </div>
                 </div>
 
-                <!-- Year Level & Blood Type -->
                 <div class="grid grid-cols-2 gap-3">
                     <div>
-                        <label for="year_level" class="block text-sm font-semibold text-gray-700 mb-1.5">Year
-                            level</label>
-                        <select name="year_level" id="year_level"
-                            class="input-modern w-full px-4 py-3 border border-gray-200 rounded-xl bg-white focus:border-primary-600 focus:outline-none text-sm text-gray-700">
-                            <option value="">Select year</option>
+                        <label for="year_level" class="block text-sm font-semibold text-gray-700 mb-1.5">Year level</label>
+                        <select name="year_level" id="year_level" class="input-premium w-full px-4 py-3 border border-gray-200 rounded-xl bg-white focus:outline-none text-sm text-gray-700">
+                            <option value="">Select</option>
                             <option value="1">1st Year</option>
                             <option value="2">2nd Year</option>
                             <option value="3">3rd Year</option>
@@ -237,123 +172,81 @@
                         </select>
                     </div>
                     <div>
-                        <label for="blood_type" class="block text-sm font-semibold text-gray-700 mb-1.5">Blood
-                            type</label>
-                        <select name="blood_type" id="blood_type"
-                            class="input-modern w-full px-4 py-3 border border-gray-200 rounded-xl bg-white focus:border-primary-600 focus:outline-none text-sm text-gray-700">
-                            <option value="">Select type</option>
-                            <option value="A+">A+</option>
-                            <option value="A-">A-</option>
-                            <option value="B+">B+</option>
-                            <option value="B-">B-</option>
-                            <option value="AB+">AB+</option>
-                            <option value="AB-">AB-</option>
-                            <option value="O+">O+</option>
-                            <option value="O-">O-</option>
+                        <label for="blood_type" class="block text-sm font-semibold text-gray-700 mb-1.5">Blood type</label>
+                        <select name="blood_type" id="blood_type" class="input-premium w-full px-4 py-3 border border-gray-200 rounded-xl bg-white focus:outline-none text-sm text-gray-700">
+                            <option value="">Select</option>
+                            <option value="A+">A+</option><option value="A-">A-</option>
+                            <option value="B+">B+</option><option value="B-">B-</option>
+                            <option value="AB+">AB+</option><option value="AB-">AB-</option>
+                            <option value="O+">O+</option><option value="O-">O-</option>
                         </select>
                     </div>
                 </div>
 
-                <!-- Contact & Emergency Contact -->
                 <div class="grid grid-cols-2 gap-3">
                     <div>
-                        <label for="contact_number" class="block text-sm font-semibold text-gray-700 mb-1.5">Phone
-                            number</label>
-                        <input type="tel" name="contact_number" id="contact_number" placeholder="09123456789"
-                            class="input-modern w-full px-4 py-3 border border-gray-200 rounded-xl bg-white focus:border-primary-600 focus:outline-none text-sm">
+                        <label for="contact_number" class="block text-sm font-semibold text-gray-700 mb-1.5">Phone</label>
+                        <input type="tel" name="contact_number" id="contact_number" placeholder="09123456789" class="input-premium w-full px-4 py-3 border border-gray-200 rounded-xl bg-white focus:outline-none text-sm">
                     </div>
                     <div>
-                        <label for="emergency_contact_number"
-                            class="block text-sm font-semibold text-gray-700 mb-1.5">Emergency #</label>
-                        <input type="tel" name="emergency_contact_number" id="emergency_contact_number"
-                            placeholder="09123456789"
-                            class="input-modern w-full px-4 py-3 border border-gray-200 rounded-xl bg-white focus:border-primary-600 focus:outline-none text-sm">
+                        <label for="emergency_contact_number" class="block text-sm font-semibold text-gray-700 mb-1.5">Emergency #</label>
+                        <input type="tel" name="emergency_contact_number" id="emergency_contact_number" placeholder="09123456789" class="input-premium w-full px-4 py-3 border border-gray-200 rounded-xl bg-white focus:outline-none text-sm">
                     </div>
                 </div>
 
-                <!-- Emergency Contact Name -->
                 <div>
-                    <label for="emergency_contact_name"
-                        class="block text-sm font-semibold text-gray-700 mb-1.5">Emergency contact name</label>
-                    <input type="text" name="emergency_contact_name" id="emergency_contact_name"
-                        placeholder="Parent / Guardian name"
-                        class="input-modern w-full px-4 py-3 border border-gray-200 rounded-xl bg-white focus:border-primary-600 focus:outline-none text-sm">
+                    <label for="emergency_contact_name" class="block text-sm font-semibold text-gray-700 mb-1.5">Emergency contact name</label>
+                    <input type="text" name="emergency_contact_name" id="emergency_contact_name" placeholder="Parent / Guardian name" class="input-premium w-full px-4 py-3 border border-gray-200 rounded-xl bg-white focus:outline-none text-sm">
                 </div>
 
-                <!-- Medical Info (collapsible) -->
                 <details class="group">
-                    <summary
-                        class="flex items-center justify-between cursor-pointer text-sm font-semibold text-gray-600 py-2 hover:text-primary-700 transition-colors">
+                    <summary class="flex items-center justify-between cursor-pointer text-sm font-semibold text-gray-600 py-2 hover:text-primary-700 transition-colors">
                         <span><i class="fas fa-notes-medical mr-2 text-primary-600"></i>Medical info (optional)</span>
                         <i class="fas fa-chevron-down text-xs transition-transform group-open:rotate-180"></i>
                     </summary>
                     <div class="grid grid-cols-1 gap-3 pt-2">
-                        <input type="text" name="allergies" placeholder="Allergies (e.g., Penicillin, Peanuts)"
-                            class="input-modern w-full px-4 py-3 border border-gray-200 rounded-xl bg-white focus:border-primary-600 focus:outline-none text-sm">
-                        <input type="text" name="medical_conditions" placeholder="Conditions (e.g., Asthma, Diabetes)"
-                            class="input-modern w-full px-4 py-3 border border-gray-200 rounded-xl bg-white focus:border-primary-600 focus:outline-none text-sm">
+                        <input type="text" name="allergies" placeholder="Allergies (e.g., Penicillin)" class="input-premium w-full px-4 py-3 border border-gray-200 rounded-xl bg-white focus:outline-none text-sm">
+                        <input type="text" name="medical_conditions" placeholder="Conditions (e.g., Asthma)" class="input-premium w-full px-4 py-3 border border-gray-200 rounded-xl bg-white focus:outline-none text-sm">
                     </div>
                 </details>
 
-                <!-- Password row -->
                 <div class="grid grid-cols-2 gap-3">
                     <div>
                         <label for="password" class="block text-sm font-semibold text-gray-700 mb-1.5">Password</label>
                         <div class="relative">
-                            <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"><i
-                                    class="fas fa-lock"></i></span>
-                            <input type="password" name="password" id="password" required placeholder="••••••••"
-                                class="input-modern w-full pl-11 pr-4 py-3 border border-gray-200 rounded-xl bg-white focus:border-primary-600 focus:outline-none text-sm">
+                            <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"><i class="fas fa-lock text-sm"></i></span>
+                            <input type="password" name="password" id="password" required placeholder="Min 6 chars" class="input-premium w-full pl-11 pr-4 py-3 border border-gray-200 rounded-xl bg-white focus:outline-none text-sm">
                         </div>
                     </div>
                     <div>
-                        <label for="confirm_password" class="block text-sm font-semibold text-gray-700 mb-1.5">Confirm
-                            password</label>
+                        <label for="confirm_password" class="block text-sm font-semibold text-gray-700 mb-1.5">Confirm</label>
                         <div class="relative">
-                            <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"><i
-                                    class="fas fa-lock"></i></span>
-                            <input type="password" name="confirm_password" id="confirm_password" required
-                                placeholder="••••••••"
-                                class="input-modern w-full pl-11 pr-4 py-3 border border-gray-200 rounded-xl bg-white focus:border-primary-600 focus:outline-none text-sm">
+                            <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"><i class="fas fa-lock text-sm"></i></span>
+                            <input type="password" name="confirm_password" id="confirm_password" required placeholder="Re-enter" class="input-premium w-full pl-11 pr-4 py-3 border border-gray-200 rounded-xl bg-white focus:outline-none text-sm">
                         </div>
                     </div>
                 </div>
 
-                <!-- Submit -->
-                <button type="submit"
-                    class="w-full py-4 bg-primary-700 text-white font-bold rounded-xl hover:bg-primary-800 transition-all shadow-lg shadow-primary-700/25 hover:shadow-primary-700/40 text-sm">
+                <button type="submit" class="btn-premium w-full py-4 bg-primary-700 text-white font-bold rounded-xl hover:bg-primary-800 shadow-lg shadow-primary-700/20 hover:shadow-primary-700/30 text-sm">
                     Create Account
                 </button>
 
-                <!-- Divider -->
                 <div class="flex items-center gap-4">
                     <hr class="flex-1 border-gray-200">
-                    <span class="text-xs text-gray-400 uppercase tracking-wider">or</span>
+                    <span class="text-xs text-gray-400 uppercase tracking-wider font-medium">or</span>
                     <hr class="flex-1 border-gray-200">
                 </div>
 
-                <!-- Quick actions -->
                 <div class="grid grid-cols-2 gap-3">
-                    <a href="{{ url_for('reservations.view_medicines') }}"
-                        class="flex items-center justify-center px-4 py-3 border border-gray-200 rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-50 transition-all">
-                        <i class="fas fa-pills text-emerald-500 mr-2"></i>Browse Medicines
+                    <a href="{{ url_for('reservations.view_medicines') }}" class="flex items-center justify-center px-4 py-3 border border-gray-200 rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-50 hover:border-gray-300 transition-all">
+                        <i class="fas fa-pills text-emerald-500 mr-2"></i>Medicines
                     </a>
-                    <a href="/"
-                        class="flex items-center justify-center px-4 py-3 border border-gray-200 rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-50 transition-all">
-                        <i class="fas fa-home text-primary-500 mr-2"></i>Back to Home
+                    <a href="/" class="flex items-center justify-center px-4 py-3 border border-gray-200 rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-50 hover:border-gray-300 transition-all">
+                        <i class="fas fa-home text-primary-500 mr-2"></i>Home
                     </a>
                 </div>
             </form>
         </div>
     </div>
-
-    <script>
-        // Toggle password visibility
-        function togglePassword(inputId) {
-            const input = document.getElementById(inputId);
-            input.type = input.type === 'password' ? 'text' : 'password';
-        }
-    </script>
 </body>
-
 </html>

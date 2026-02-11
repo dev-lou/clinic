@@ -79,39 +79,6 @@ def auto_cancel_no_shows():
         print(f'[SCHEDULER] Marked {count} appointments as no-show')
 
 
-def cleanup_expired_inventory_locks():
-    """Remove expired inventory locks."""
-    with current_app.app_context():
-        from models_extended import InventoryLock
-        
-        expired = InventoryLock.query.filter(
-            InventoryLock.expires_at < datetime.now()
-        ).all()
-        
-        for lock in expired:
-            db.session.delete(lock)
-        
-        db.session.commit()
-        print(f'[SCHEDULER] Cleaned up {len(expired)} expired inventory locks')
-
-
-def expire_old_waitlist_entries():
-    """Remove waitlist entries for past dates."""
-    with current_app.app_context():
-        from models_extended import AppointmentWaitlist
-        
-        expired = AppointmentWaitlist.query.filter(
-            AppointmentWaitlist.preferred_date < date.today(),
-            AppointmentWaitlist.status == 'Waiting'
-        ).all()
-        
-        for entry in expired:
-            entry.status = 'Expired'
-        
-        db.session.commit()
-        print(f'[SCHEDULER] Expired {len(expired)} old waitlist entries')
-
-
 def init_scheduler(app):
     """Initialize and start the scheduler."""
     # Daily reminder check at 9:00 AM
@@ -142,25 +109,6 @@ def init_scheduler(app):
         hour=0,
         minute=15,
         id='no_show_check',
-        replace_existing=True
-    )
-    
-    # Hourly cleanup of expired locks
-    scheduler.add_job(
-        func=cleanup_expired_inventory_locks,
-        trigger='interval',
-        hours=1,
-        id='lock_cleanup',
-        replace_existing=True
-    )
-    
-    # Daily waitlist cleanup
-    scheduler.add_job(
-        func=expire_old_waitlist_entries,
-        trigger='cron',
-        hour=1,
-        minute=0,
-        id='waitlist_cleanup',
         replace_existing=True
     )
     

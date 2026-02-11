@@ -18,13 +18,22 @@ class Config:
         # Use Turso remote database via sqlalchemy-libsql driver
         if uri.startswith('libsql://'):
             auth_token = os.environ.get('TURSO_AUTH_TOKEN', '')
-            print(f"🚀 Using Turso Cloud Database: {uri.split('//')[1]}")
-            # sqlalchemy-libsql uses libsql:// scheme directly
-            if auth_token:
-                # Format: sqlite+libsql://host?authToken=xxx&secure=true
+            # Check if sqlalchemy-libsql driver is available
+            try:
+                import sqlalchemy_libsql  # noqa: F401
+                driver_available = True
+            except ImportError:
+                driver_available = False
+            
+            if driver_available and auth_token:
                 host = uri.replace('libsql://', '')
+                print(f"🚀 Using Turso Cloud Database: {host}")
                 return f'sqlite+libsql://{host}?authToken={auth_token}&secure=true'
-            return uri
+            else:
+                # Fallback to local SQLite for development (driver not installed)
+                print("⚠️  sqlalchemy-libsql not available — using local SQLite for development")
+                os.makedirs(os.path.join(basedir, 'instance'), exist_ok=True)
+                return default_db
         
         # Ensure instance directory exists for local SQLite
         os.makedirs(os.path.join(basedir, 'instance'), exist_ok=True)
