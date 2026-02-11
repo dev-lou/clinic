@@ -204,13 +204,17 @@ def download_certificate(cert_id):
         fontName='Helvetica-Bold'
     )
     
-    # Logo and Header
+    # Logo and Header (skip if logo not found or invalid)
     logo_path = os.path.join('static', 'images', 'isufst-logo.png')
     if os.path.exists(logo_path):
-        logo = Image(logo_path, width=1.2*inch, height=0.8*inch)
-        logo.hAlign = 'CENTER'
-        elements.append(logo)
-        elements.append(Spacer(1, 0.1*inch))
+        try:
+            logo = Image(logo_path, width=1.2*inch, height=0.8*inch)
+            logo.hAlign = 'CENTER'
+            elements.append(logo)
+            elements.append(Spacer(1, 0.1*inch))
+        except Exception as e:
+            # Skip logo if it can't be loaded (placeholder file or invalid format)
+            pass
     
     # Header
     elements.append(Paragraph("ILOILO STATE UNIVERSITY OF FISHERIES SCIENCE AND TECHNOLOGY", title_style))
