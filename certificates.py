@@ -212,7 +212,7 @@ def download_certificate(cert_id):
     isufst_logo = None
     if os.path.exists(isufst_logo_path):
         try:
-            isufst_logo = Image(isufst_logo_path, width=0.8*inch, height=0.8*inch)
+            isufst_logo = Image(isufst_logo_path, width=1.2*inch, height=0.8*inch)
         except:
             isufst_logo = ''
     else:
@@ -221,16 +221,15 @@ def download_certificate(cert_id):
     # Center Text
     header_text = Paragraph(
         "<b>ILOILO STATE UNIVERSITY OF FISHERIES SCIENCE AND TECHNOLOGY</b><br/>"
-        "<font size=9>COLLEGE OF INFORMATION AND COMMUNICATION TECHNOLOGY</font><br/>"
-        "<font size=8>Dingle, Iloilo / Email: ictc_dingle@isufst.edu.ph<br/>"
-        "Website: https://isufst.edu.ph / Telephone No: (033) 5940274</font>",
+        "<font size=10>CareHub</font><br/>"
+        "<font size=9>HEALTH CERTIFICATE</font>",
         ParagraphStyle(
             'HeaderCenter',
             parent=styles['Normal'],
             fontSize=10,
             alignment=TA_CENTER,
             textColor=colors.HexColor('#1e293b'),
-            leading=12
+            leading=14
         )
     )
     
@@ -255,12 +254,7 @@ def download_certificate(cert_id):
         ('ALIGN', (2, 0), (2, 0), 'RIGHT'),
     ]))
     elements.append(header_table)
-    elements.append(Spacer(1, 0.15*inch))
-    
-    # CareHub Title
-    elements.append(Paragraph("CareHub", title_style))
-    elements.append(Paragraph("HEALTH CERTIFICATE", title_style))
-    elements.append(Spacer(1, 0.2*inch))
+    elements.append(Spacer(1, 0.3*inch))
     
     # Certificate details table
     student = cert.student
@@ -377,20 +371,46 @@ def download_certificate(cert_id):
         )
     )
     
-    # Accreditation logo
+    # Accreditation logos (GCL and Heart)
     gcl_logo_path = os.path.join('static', 'images', 'gcl.png')
+    heart_logo_path = os.path.join('static', 'images', 'heart.png')
+    
     gcl_logo = None
     if os.path.exists(gcl_logo_path):
         try:
-            gcl_logo = Image(gcl_logo_path, width=1.5*inch, height=0.5*inch)
+            gcl_logo = Image(gcl_logo_path, width=1.2*inch, height=0.8*inch)
         except:
             gcl_logo = ''
     else:
         gcl_logo = ''
     
+    heart_logo = None
+    if os.path.exists(heart_logo_path):
+        try:
+            heart_logo = Image(heart_logo_path, width=1.2*inch, height=0.8*inch)
+        except:
+            heart_logo = ''
+    else:
+        heart_logo = ''
+    
+    # Combine logos in a nested table
+    if gcl_logo and heart_logo:
+        logos_table = Table([[gcl_logo, heart_logo]], colWidths=[1.3*inch, 1.3*inch])
+        logos_table.setStyle(TableStyle([
+            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+            ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+        ]))
+        logos_cell = logos_table
+    elif gcl_logo:
+        logos_cell = gcl_logo
+    elif heart_logo:
+        logos_cell = heart_logo
+    else:
+        logos_cell = ''
+    
     # Create footer table
-    footer_data = [[core_values_text, gcl_logo]]
-    footer_table = Table(footer_data, colWidths=[4.5*inch, 2*inch])
+    footer_data = [[core_values_text, logos_cell]]
+    footer_table = Table(footer_data, colWidths=[4*inch, 2.5*inch])
     footer_table.setStyle(TableStyle([
         ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
         ('ALIGN', (0, 0), (0, 0), 'LEFT'),
