@@ -21,13 +21,16 @@ MAX_APPOINTMENTS_PER_SLOT = {
 }
 
 def generate_time_slots():
-    """Generate all available time slots for a day."""
+    """Generate all available time slots for a day in 12-hour format."""
     slots = []
     current = datetime.strptime(f'{CLINIC_START_HOUR}:00', '%H:%M')
     end = datetime.strptime(f'{CLINIC_END_HOUR}:00', '%H:%M')
     
     while current < end:
-        slots.append(current.strftime('%H:%M'))
+        # Store both 24-hour value and 12-hour display
+        slot_24h = current.strftime('%H:%M')
+        slot_12h = current.strftime('%I:%M %p')
+        slots.append({'value': slot_24h, 'display': slot_12h})
         current += timedelta(minutes=SLOT_DURATION_MINUTES)
     
     return slots
@@ -85,34 +88,48 @@ def check_availability_api():
 @appointments.route('/check-date-availability')
 @login_required
 def check_date_availability():
-    """Check if a date is fully booked (for calendar coloring)."""
-    date_str = request.args.get('date')
+    """API endpoint to check which dates in a month are fully booked."""
+    year = int(request.args.get('year', date.today().year))
+    month = int(request.args.get('month', date.today().month))
     service_type = request.args.get('service', 'Medical')
     
-    if not date_str:
-        return jsonify({'error': 'Date required'}), 400
+    # Get all dates in the month
+    _, days_in_month = calendar.monthrange(year, month)
     
-    try:
-        check_date = datetime.strptime(date_str, '%Y-%m-%d').date()
-    except ValueError:
-        return jsonify({'error': 'Invalid date'}), 400
-    
-    # Count appointments
-    appointment_count = Appointment.query.filter(
-        Appointment.appointment_date == check_date,
-        Appointment.service_type == service_type,
-        Appointment.status.in_(['Pending', 'Confirmed'])
-    ).count()
-    
-    # Calculate total slots
+    fully_booked_dates = []
+    max_per_slot = MAX_APPOINTMENTS_PER_SLOT.get(service_type, 2)
     time_slots = generate_time_slots()
-    total_capacity = len(time_slots) * MAX_APPOINTMENTS_PER_SLOT.get(service_type, 2)
+    
+    for day in range(1, days_in_month + 1):
+        check_date = date(year, month, day)
+        
+        # Skip past dates
+        if check_date < date.today():
+            continue
+        
+        # Count available slots for this date
+        available_count = 0
+        for slot in time_slots:
+            slot_time = datetime.strptime(slot['value'], '%H:%M').time()
+            existing_count = Appointment.query.filter(
+                Appointment.appointment_date == check_date,
+                Appointment.start_time == slot_time,
+                Appointment.service_type == service_type,
+                Appointment.status.in_(['Pending', 'Confirmed'])
+            ).count()
+            
+            if existing_count < max_per_slot:
+                available_count += 1
+        
+        # If no slots available, mark as fully booked
+        if available_count == 0:
+            fully_booked_dates.append(check_date.strftime('%Y-%m-%d'))
     
     return jsonify({
-        'date': date_str,
-        'fully_booked': appointment_count >= total_capacity,
-        'appointments': appointment_count,
-        'capacity': total_capacity
+        'year': year,
+        'month': month,
+        'service': service_type,
+        'fullyBookedDates': fully_booked_dates
     })
 
 
