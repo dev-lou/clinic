@@ -11,11 +11,13 @@ from functools import wraps
 from reportlab.lib.pagesizes import letter
 from reportlab.lib import colors
 from reportlab.lib.units import inch
-from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer, Image
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib.enums import TA_CENTER, TA_LEFT
+from reportlab.lib.utils import ImageReader
 import os
 import io
+import base64
 
 certificates = Blueprint('certificates', __name__, url_prefix='/certificates')
 
@@ -202,6 +204,14 @@ def download_certificate(cert_id):
         fontName='Helvetica-Bold'
     )
     
+    # Logo and Header
+    logo_path = os.path.join('static', 'images', 'isufst-logo.png')
+    if os.path.exists(logo_path):
+        logo = Image(logo_path, width=1.2*inch, height=0.8*inch)
+        logo.hAlign = 'CENTER'
+        elements.append(logo)
+        elements.append(Spacer(1, 0.1*inch))
+    
     # Header
     elements.append(Paragraph("ILOILO STATE UNIVERSITY OF FISHERIES SCIENCE AND TECHNOLOGY", title_style))
     elements.append(Paragraph("Dingle Campus - Health Services", subtitle_style))
@@ -260,15 +270,42 @@ def download_certificate(cert_id):
     elements.append(Paragraph(cert.purpose or "General purpose", styles['Normal']))
     elements.append(Spacer(1, 0.3*inch))
     
-    # Signature
+    # Signature Section
     issuer = cert.issuer
-    sig_data = [
-        ['', ''],
-        ['_'*40, ''],
-        [f"{issuer.full_name}, RN", ''],
-        ['Issued by:', ''],
-        ['ISUFST Dingle Campus Health Services', ''],
-    ]
+    
+    # If issuer has a digital signature, use it
+    if issuer.signature_data and issuer.signature_data.startswith('data:image'):
+        try:
+            # Extract base64 data
+            sig_base64 = issuer.signature_data.split(',')[1]
+            sig_bytes = base64.b64decode(sig_base64)
+            sig_image = Image(io.BytesIO(sig_bytes), width=2*inch, height=0.8*inch)
+            
+            sig_data = [
+                ['', ''],
+                [sig_image, ''],
+                [f"{issuer.full_name}, RN", ''],
+                ['Issued by:', ''],
+                ['ISUFST Dingle Campus Health Services', ''],
+            ]
+        except:
+            # Fallback if signature parsing fails
+            sig_data = [
+                ['', ''],
+                ['_'*40, ''],
+                [f"{issuer.full_name}, RN", ''],
+                ['Issued by:', ''],
+                ['ISUFST Dingle Campus Health Services', ''],
+            ]
+    else:
+        # No signature - use line
+        sig_data = [
+            ['', ''],
+            ['_'*40, ''],
+            [f"{issuer.full_name}, RN", ''],
+            ['Issued by:', ''],
+            ['ISUFST Dingle Campus Health Services', ''],
+        ]
     
     sig_table = Table(sig_data, colWidths=[3*inch, 3*inch])
     sig_table.setStyle(TableStyle([

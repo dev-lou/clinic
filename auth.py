@@ -160,6 +160,16 @@ def profile():
                 db.session.commit()
                 flash('Password changed successfully.', 'success')
                 return redirect(url_for('auth.profile'))
+        
+        elif action == 'save_signature':
+            signature_data = request.form.get('signature_data')
+            if signature_data:
+                current_user.signature_data = signature_data
+                db.session.commit()
+                return jsonify({'success': True, 'message': 'Signature saved successfully'})
+            return jsonify({'success': False, 'message': 'No signature data provided'}), 400
+                flash('Password changed successfully.', 'success')
+                return redirect(url_for('auth.profile'))
     
     return render_template('profile.html')
 

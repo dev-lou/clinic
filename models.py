@@ -22,6 +22,7 @@ class User(UserMixin, db.Model):
         default='student',  # student | nurse | admin
     )
     is_active = db.Column(db.Boolean, default=True)
+    signature_data = db.Column(db.Text, nullable=True)  # Base64 encoded signature image
     created_at = db.Column(
         db.DateTime(timezone=True),
         default=lambda: datetime.now(timezone.utc),
