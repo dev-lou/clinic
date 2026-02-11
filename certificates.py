@@ -168,7 +168,7 @@ def download_certificate(cert_id):
     
     # Generate PDF
     buffer = io.BytesIO()
-    doc = SimpleDocTemplate(buffer, pagesize=letter, topMargin=0.5*inch, bottomMargin=0.5*inch)
+    doc = SimpleDocTemplate(buffer, pagesize=letter, topMargin=0.5*inch, bottomMargin=0.8*inch)
     
     # Container for elements
     elements = []
@@ -218,18 +218,18 @@ def download_certificate(cert_id):
     else:
         isufst_logo = ''
     
-    # Center Text
+    # Center Text - Modern Professional Style
     header_text = Paragraph(
         "<b>ILOILO STATE UNIVERSITY OF FISHERIES SCIENCE AND TECHNOLOGY</b><br/>"
-        "<font size=10>CareHub</font><br/>"
-        "<font size=9>HEALTH CERTIFICATE</font>",
+        "<font size=18 color='#2563eb'><b>CareHub</b></font><br/>"
+        "<font size=14><b>HEALTH CERTIFICATE</b></font>",
         ParagraphStyle(
             'HeaderCenter',
             parent=styles['Normal'],
             fontSize=10,
             alignment=TA_CENTER,
             textColor=colors.HexColor('#1e293b'),
-            leading=14
+            leading=16
         )
     )
     
@@ -355,8 +355,10 @@ def download_certificate(cert_id):
     ]))
     elements.append(sig_table)
     
+    # Push footer to bottom of page
+    elements.append(Spacer(1, 3.5*inch))
+    
     # Footer with Core Values and Accreditation Logo
-    elements.append(Spacer(1, 0.3*inch))
     
     # Core values text
     core_values_text = Paragraph(
@@ -393,18 +395,18 @@ def download_certificate(cert_id):
     else:
         heart_logo = ''
     
-    # Combine logos in a nested table
+    # Combine logos in a nested table (heart first, then GCL)
     if gcl_logo and heart_logo:
-        logos_table = Table([[gcl_logo, heart_logo]], colWidths=[1.3*inch, 1.3*inch])
+        logos_table = Table([[heart_logo, gcl_logo]], colWidths=[1.3*inch, 1.3*inch])
         logos_table.setStyle(TableStyle([
             ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
             ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
         ]))
         logos_cell = logos_table
-    elif gcl_logo:
-        logos_cell = gcl_logo
     elif heart_logo:
         logos_cell = heart_logo
+    elif gcl_logo:
+        logos_cell = gcl_logo
     else:
         logos_cell = ''
     
