@@ -1,7 +1,6 @@
 <!-- AI Chatbot Widget — ISUFST CareHub -->
 <!-- Include this partial before </body> in base templates -->
 
-{% if current_user.is_authenticated %}
 <style>
     /* Chatbot Floating Button */
     .chatbot-fab {
@@ -370,21 +369,23 @@
         <!-- Welcome screen -->
         <div id="chatbotWelcome" class="chatbot-welcome">
             <div class="welcome-icon">🏥</div>
-            <h4>Hi {{ current_user.first_name }}! 👋</h4>
-            <p>I'm CareHub AI, your health assistant. Ask me about symptoms, first aid, wellness tips, or clinic services.</p>
+            <h4>Hi {% if current_user.is_authenticated %}{{ current_user.first_name }}{% else %}there{% endif %}! 👋</h4>
+            <p>I'm CareHub AI, your health assistant. {% if current_user.is_authenticated %}Ask me about symptoms, first aid, wellness tips, or clinic services.{% else %}Please <a href="{{ url_for('auth.login') }}" style="color: #2563eb; font-weight: 600;">log in</a> to start chatting.{% endif %}</p>
+            {% if current_user.is_authenticated %}
             <div class="chatbot-suggestions">
                 <button class="chatbot-suggestion-btn" onclick="sendSuggestion('I have a headache, what should I do?')">🤕 Headache help</button>
                 <button class="chatbot-suggestion-btn" onclick="sendSuggestion('What services does the clinic offer?')">🏥 Clinic services</button>
                 <button class="chatbot-suggestion-btn" onclick="sendSuggestion('How do I book an appointment?')">📅 Book appointment</button>
                 <button class="chatbot-suggestion-btn" onclick="sendSuggestion('I feel sick, should I go to the clinic?')">🤒 Feeling sick</button>
             </div>
+            {% endif %}
         </div>
     </div>
 
     <!-- Input -->
     <div class="chatbot-input-area">
-        <textarea id="chatbotInput" class="chatbot-input" placeholder="Ask about symptoms, health tips..." rows="1" onkeydown="handleChatKeydown(event)" oninput="autoResizeInput(this)"></textarea>
-        <button id="chatbotSendBtn" class="chatbot-send-btn" onclick="sendChatMessage()" title="Send">
+        <textarea id="chatbotInput" class="chatbot-input" placeholder="{% if current_user.is_authenticated %}Ask about symptoms, health tips...{% else %}Please log in to chat{% endif %}" rows="1" onkeydown="handleChatKeydown(event)" oninput="autoResizeInput(this)" {% if not current_user.is_authenticated %}disabled{% endif %}></textarea>
+        <button id="chatbotSendBtn" class="chatbot-send-btn" onclick="sendChatMessage()" title="Send" {% if not current_user.is_authenticated %}disabled{% endif %}>
             <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
                 <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"></path>
             </svg>
@@ -437,6 +438,9 @@
     // ─── Send Message ────────────────────────────────────────────
     async function sendChatMessage() {
         const input = document.getElementById('chatbotInput');
+        if (input.disabled) {
+            return; // Not logged in
+        }
         const msg = input.value.trim();
         if (!msg) return;
 
@@ -582,4 +586,3 @@
         el.style.height = Math.min(el.scrollHeight, 80) + 'px';
     }
 </script>
-{% endif %}
