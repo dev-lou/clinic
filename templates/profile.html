@@ -301,7 +301,7 @@ document.getElementById('saveSignature').addEventListener('click', async () => {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'X-CSRFToken': '{{ csrf_token() }}'
+                'X-CSRF-Token': '{{ csrf_token() }}'
             },
             body: JSON.stringify({
                 action: 'save_signature',
