@@ -7,6 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Medicine Pharmacy — ISUFST CareHub</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/fontawesome.min.css') }}">
     <link
         href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap"
@@ -126,6 +127,18 @@
                                     class="flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
                                     <i class="fas fa-capsules w-5 text-gray-400 mr-2"></i>My Reservations
                                 </a>
+                                <a href="{{ url_for('auth.profile') }}"
+                                    class="flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
+                                    <i class="fas fa-user-circle w-5 text-gray-400 mr-2"></i>My Profile
+                                </a>
+                                {% if current_user.role in ['admin', 'staff'] %}
+                                <div class="border-t border-gray-100 my-1"></div>
+                                <a href="{{ url_for('admin') }}"
+                                    class="flex items-center px-4 py-2.5 text-sm text-primary-700 hover:bg-primary-50 transition-colors">
+                                    <i class="fas fa-user-shield w-5 text-primary-600 mr-2"></i>Admin Dashboard
+                                </a>
+                                {% endif %}
+                                <div class="border-t border-gray-100 my-1"></div>
                                 <a href="{{ url_for('auth.logout') }}"
                                     class="flex items-center px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors">
                                     <i class="fas fa-sign-out-alt w-5 text-red-400 mr-2"></i>Sign Out
@@ -150,7 +163,7 @@
     </nav>
 
     <!-- Header -->
-    <div class="max-w-7xl mx-auto px-6 lg:px-8 pt-12 pb-6">
+    <div class="max-w-7xl mx-auto px-6 lg:px-8 pt-28 pb-6">
         <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-6 reveal">
             <div>
                 <span
@@ -179,22 +192,16 @@
         </div>
     </div>
 
-    <!-- Flash Messages -->
-    <div class="max-w-7xl mx-auto px-6 lg:px-8">
-        {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-        {% for category, message in messages %}
-        <div class="mb-4 px-5 py-4 rounded-2xl text-sm font-medium bounce
-                {% if category == 'error' %}bg-red-50 text-red-700 border border-red-200
-                {% else %}bg-emerald-50 text-emerald-700 border border-emerald-200{% endif %}">
-            <i
-                class="fas {% if category == 'error' %}fa-exclamation-circle{% else %}fa-check-circle{% endif %} mr-2"></i>{{
-            message }}
-        </div>
-        {% endfor %}
-        {% endif %}
-        {% endwith %}
+    <!-- Flash Messages (Hidden - converted to SweetAlert) -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    <div id="flash-messages" style="display:none;">
+    {% for category, message in messages %}
+    <div data-category="{{ category }}" data-message="{{ message }}"></div>
+    {% endfor %}
     </div>
+    {% endif %}
+    {% endwith %}
 
     <!-- Medicines Grid -->
     <div class="max-w-7xl mx-auto px-6 lg:px-8 py-8">
@@ -251,11 +258,12 @@
                     <!-- Reserve form -->
                     {% if medicine.quantity > 0 %}
                     <form method="POST"
-                        action="{{ url_for('reservations.reserve_medicine', medicine_id=medicine.id) }}">
+                        action="{{ url_for('reservations.reserve_medicine', medicine_id=medicine.id) }}"
+                        onsubmit="return confirmReservation(event, '{{ medicine.name }}');">
                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                         <div class="flex gap-2">
                             <input type="number" name="quantity" min="1" max="{{ medicine.quantity }}" value="1"
-                                class="w-20 px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:border-primary-600 focus:outline-none focus:ring-2 focus:ring-primary-600/10">
+                                class="w-20 px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:border-primary-600 focus:outline-none focus:ring-2 focus:ring-primary-600/10 reservation-quantity">
                             <button type="submit"
                                 class="flex-1 py-2.5 bg-primary-700 text-white text-sm font-semibold rounded-xl hover:bg-primary-800 transition-all shadow-sm hover:shadow-lg">
                                 <i class="fas fa-hand-holding-heart mr-1.5"></i>Reserve
@@ -330,6 +338,62 @@
             entries.forEach(entry => { if (entry.isIntersecting) entry.target.classList.add('visible'); });
         }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
         document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+        // Convert flash messages to SweetAlert
+        document.addEventListener('DOMContentLoaded', () => {
+            const flashContainer = document.getElementById('flash-messages');
+            if (flashContainer) {
+                const messages = flashContainer.querySelectorAll('[data-category]');
+                messages.forEach(msg => {
+                    const category = msg.getAttribute('data-category');
+                    const message = msg.getAttribute('data-message');
+                    const icon = category === 'error' ? 'error' : 'success';
+                    
+                    Swal.fire({
+                        icon: icon,
+                        title: icon === 'error' ? 'Error' : 'Success',
+                        text: message,
+                        toast: true,
+                        position: 'top-end',
+                        showConfirmButton: false,
+                        timer: 4000,
+                        timerProgressBar: true,
+                        customClass: {
+                            popup: 'rounded-2xl shadow-2xl'
+                        }
+                    });
+                });
+            }
+        });
+
+        // Confirm reservation
+        function confirmReservation(e, medicineName) {
+            e.preventDefault();
+            const form = e.target;
+            const quantity = form.querySelector('.reservation-quantity').value;
+            
+            Swal.fire({
+                title: 'Reserve Medicine?',
+                html: `Reserve <strong>${quantity} unit(s)</strong> of <strong>${medicineName}</strong>?<br><br><small class="text-gray-500">You can pick it up at the clinic during office hours.</small>`,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'Yes, reserve it',
+                cancelButtonText: 'Cancel',
+                customClass: {
+                    popup: 'rounded-2xl',
+                    confirmButton: 'bg-primary-600 hover:bg-primary-700 text-white font-bold py-3 px-6 rounded-xl ml-2',
+                    cancelButton: 'bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-3 px-6 rounded-xl mr-2'
+                },
+                buttonsStyling: false,
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    form.submit();
+                }
+            });
+            
+            return false;
+        }
     </script>
 
 </body>

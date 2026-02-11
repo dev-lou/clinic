@@ -83,7 +83,7 @@
                         <td class="px-5 py-4">
                             <form method="POST"
                                 action="{{ url_for('appointments.admin_update_status', appointment_id=appt.id) }}"
-                                class="inline-flex items-center gap-2">
+                                class="inline-flex items-center gap-2" onsubmit="return confirmStatusUpdate(event);">
                                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                                 <select name="status"
                                     class="px-2 py-1 rounded-lg border border-gray-200 text-xs focus:border-primary-500 focus:ring-1 focus:ring-primary-500/20 outline-none bg-white">
@@ -119,4 +119,36 @@
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    function confirmStatusUpdate(e) {
+        e.preventDefault();
+        const form = e.target;
+        const newStatus = form.querySelector('select[name="status"]').value;
+        
+        Swal.fire({
+            title: 'Update Status?',
+            html: `Change appointment status to <strong>${newStatus}</strong>?`,
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'Yes, update it',
+            cancelButtonText: 'Cancel',
+            customClass: {
+                popup: 'rounded-2xl',
+                confirmButton: 'bg-primary-600 hover:bg-primary-700 text-white font-bold py-3 px-6 rounded-xl ml-2',
+                cancelButton: 'bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-3 px-6 rounded-xl mr-2'
+            },
+            buttonsStyling: false,
+            reverseButtons: true
+        }).then((result) => {
+            if (result.isConfirmed) {
+                form.submit();
+            }
+        });
+        
+        return false;
+    }
+</script>
 {% endblock %}

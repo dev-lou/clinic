@@ -92,6 +92,18 @@
                                     class="flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
                                     <i class="fas fa-capsules w-5 text-gray-400 mr-2"></i>My Reservations
                                 </a>
+                                <a href="{{ url_for('auth.profile') }}"
+                                    class="flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
+                                    <i class="fas fa-user-circle w-5 text-gray-400 mr-2"></i>My Profile
+                                </a>
+                                {% if current_user.role in ['admin', 'staff'] %}
+                                <div class="border-t border-gray-100 my-1"></div>
+                                <a href="{{ url_for('admin') }}"
+                                    class="flex items-center px-4 py-2.5 text-sm text-primary-700 hover:bg-primary-50 transition-colors">
+                                    <i class="fas fa-user-shield w-5 text-primary-600 mr-2"></i>Admin Dashboard
+                                </a>
+                                {% endif %}
+                                <div class="border-t border-gray-100 my-1"></div>
                                 <a href="#" onclick="confirmLogout(event)"
                                     class="flex items-center px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors">
                                     <i class="fas fa-sign-out-alt w-5 text-red-400 mr-2"></i>Sign Out
@@ -115,14 +127,11 @@
         <!-- Flash Messages -->
         {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
+        <div id="flash-messages" style="display:none;">
         {% for category, message in messages %}
-        <div
-            class="mb-6 px-5 py-4 rounded-xl {% if category == 'error' %}bg-red-50 border-l-4 border-red-500 text-red-700{% else %}bg-emerald-50 border-l-4 border-emerald-500 text-emerald-700{% endif %}">
-            <i
-                class="fas {% if category == 'error' %}fa-exclamation-circle{% else %}fa-check-circle{% endif %} mr-2"></i>
-            {{ message }}
-        </div>
+        <div data-category="{{ category }}" data-message="{{ message }}"></div>
         {% endfor %}
+        </div>
         {% endif %}
         {% endwith %}
 
@@ -288,7 +297,16 @@
         async function loadTimeSlots(date) {
             const serviceType = document.querySelector('input[name="service_type"]:checked')?.value;
             if (!serviceType) {
-                alert('Please select a service type first');
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Service Type Required',
+                    text: 'Please select a service type first',
+                    customClass: {
+                        popup: 'rounded-2xl',
+                        confirmButton: 'bg-primary-600 hover:bg-primary-700 text-white font-bold py-3 px-6 rounded-xl'
+                    },
+                    buttonsStyling: false
+                });
                 return;
             }
 
@@ -405,24 +423,29 @@
             renderCalendar();
 
             // Convert flash messages to SweetAlert
-            {% if messages %}
-            {% for category, message in messages %}
-            const icon = '{{ category }}' === 'error' ? 'error' : 'success';
-            Swal.fire({
-                icon: icon,
-                title: icon === 'error' ? 'Error' : 'Success',
-                text: '{{ message }}',
-                toast: true,
-                position: 'top-end',
-                showConfirmButton: false,
-                timer: 3000,
-                timerProgressBar: true,
-                customClass: {
-                    popup: 'rounded-2xl'
-                }
-            });
-            {% endfor %}
-            {% endif %}
+            const flashContainer = document.getElementById('flash-messages');
+            if (flashContainer) {
+                const messages = flashContainer.querySelectorAll('[data-category]');
+                messages.forEach(msg => {
+                    const category = msg.getAttribute('data-category');
+                    const message = msg.getAttribute('data-message');
+                    const icon = category === 'error' ? 'error' : 'success';
+                    
+                    Swal.fire({
+                        icon: icon,
+                        title: icon === 'error' ? 'Error' : 'Success',
+                        text: message,
+                        toast: true,
+                        position: 'top-end',
+                        showConfirmButton: false,
+                        timer: 4000,
+                        timerProgressBar: true,
+                        customClass: {
+                            popup: 'rounded-2xl shadow-2xl'
+                        }
+                    });
+                });
+            }
         });
 
         // Logout confirmation

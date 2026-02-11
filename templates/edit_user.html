@@ -1,0 +1,268 @@
+{% extends "admin_base.html" %}
+{% set active_page = 'users' %}
+
+{% block title %}Edit User{% endblock %}
+{% block page_title %}Edit User{% endblock %}
+{% block page_subtitle %}Manage user account and settings{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <!-- Back Button -->
+    <div>
+        <a href="{{ url_for('auth.list_users') }}"
+            class="inline-flex items-center px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors text-sm font-semibold">
+            <i class="fas fa-arrow-left mr-2"></i>Back to Users
+        </a>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- User Info -->
+        <div class="lg:col-span-2">
+            <div class="bg-white rounded-2xl border border-gray-100 p-8">
+                <h2 class="text-2xl font-bold text-gray-900 mb-6">
+                    <i class="fas fa-user-edit text-primary-600 mr-2"></i>User Information
+                </h2>
+                <form method="POST" id="infoForm">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <input type="hidden" name="action" value="update_info">
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">First Name</label>
+                            <input type="text" name="first_name" value="{{ user.first_name }}" required
+                                class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-primary-600 focus:ring-2 focus:ring-primary-600/10 outline-none transition">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Last Name</label>
+                            <input type="text" name="last_name" value="{{ user.last_name }}" required
+                                class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-primary-600 focus:ring-2 focus:ring-primary-600/10 outline-none transition">
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Email Address</label>
+                        <input type="email" name="email" value="{{ user.email }}" required
+                            class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-primary-600 focus:ring-2 focus:ring-primary-600/10 outline-none transition">
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Role</label>
+                            <select name="role" required
+                                class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-primary-600 focus:ring-2 focus:ring-primary-600/10 outline-none transition">
+                                <option value="student" {% if user.role == 'student' %}selected{% endif %}>Student</option>
+                                <option value="staff" {% if user.role == 'staff' %}selected{% endif %}>Staff</option>
+                                <option value="nurse" {% if user.role == 'nurse' %}selected{% endif %}>Nurse</option>
+                                <option value="admin" {% if user.role == 'admin' %}selected{% endif %}>Admin</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Status</label>
+                            <div class="flex items-center h-full">
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" name="is_active" class="sr-only peer" {% if user.is_active %}checked{% endif %}>
+                                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-600"></div>
+                                    <span class="ml-3 text-sm font-medium text-gray-700">Active</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    {% if user.role == 'student' and user.student_profile %}
+                    <div class="border-t border-gray-200 pt-6 mb-6">
+                        <h3 class="text-lg font-bold text-gray-900 mb-4">Student Details</h3>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-2">Student ID</label>
+                                <input type="text" name="student_id_number" value="{{ user.student_profile.student_id_number }}"
+                                    class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-primary-600 focus:ring-2 focus:ring-primary-600/10 outline-none transition">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-2">Contact Number</label>
+                                <input type="text" name="contact_number" value="{{ user.student_profile.contact_number or '' }}"
+                                    class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-primary-600 focus:ring-2 focus:ring-primary-600/10 outline-none transition">
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-2">Course</label>
+                                <input type="text" name="course" value="{{ user.student_profile.course or '' }}"
+                                    class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-primary-600 focus:ring-2 focus:ring-primary-600/10 outline-none transition">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-2">Year Level</label>
+                                <select name="year_level"
+                                    class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-primary-600 focus:ring-2 focus:ring-primary-600/10 outline-none transition">
+                                    <option value="">Select...</option>
+                                    {% for year in [1, 2, 3, 4, 5] %}
+                                    <option value="{{ year }}" {% if user.student_profile.year_level == year %}selected{% endif %}>{{ year }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Blood Type</label>
+                            <select name="blood_type"
+                                class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-primary-600 focus:ring-2 focus:ring-primary-600/10 outline-none transition">
+                                <option value="">Select...</option>
+                                {% for bt in ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'] %}
+                                <option value="{{ bt }}" {% if user.student_profile.blood_type == bt %}selected{% endif %}>{{ bt }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Allergies</label>
+                            <textarea name="allergies" rows="2"
+                                class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-primary-600 focus:ring-2 focus:ring-primary-600/10 outline-none transition">{{ user.student_profile.allergies or '' }}</textarea>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Medical Conditions</label>
+                            <textarea name="medical_conditions" rows="2"
+                                class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-primary-600 focus:ring-2 focus:ring-primary-600/10 outline-none transition">{{ user.student_profile.medical_conditions or '' }}</textarea>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-2">Emergency Contact Name</label>
+                                <input type="text" name="emergency_contact_name" value="{{ user.student_profile.emergency_contact_name or '' }}"
+                                    class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-primary-600 focus:ring-2 focus:ring-primary-600/10 outline-none transition">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-2">Emergency Contact Number</label>
+                                <input type="text" name="emergency_contact_number" value="{{ user.student_profile.emergency_contact_number or '' }}"
+                                    class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-primary-600 focus:ring-2 focus:ring-primary-600/10 outline-none transition">
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <button type="submit"
+                        class="w-full py-4 bg-primary-700 text-white font-bold rounded-xl hover:bg-primary-800 transition-all shadow-lg">
+                        <i class="fas fa-save mr-2"></i>Save Changes
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="space-y-6">
+            <!-- User Card -->
+            <div class="bg-white rounded-2xl border border-gray-100 p-6">
+                <div class="text-center mb-6">
+                    <div class="w-20 h-20 bg-primary-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                        <span class="text-3xl font-bold text-primary-700">{{ user.first_name[0] }}{{ user.last_name[0] }}</span>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900">{{ user.full_name }}</h3>
+                    <p class="text-sm text-gray-500">{{ user.email }}</p>
+                    <span class="inline-block mt-3 px-3 py-1 rounded-full text-xs font-bold
+                        {% if user.role == 'admin' %}bg-purple-100 text-purple-700
+                        {% elif user.role == 'staff' or user.role == 'nurse' %}bg-blue-100 text-blue-700
+                        {% else %}bg-gray-100 text-gray-700{% endif %}">
+                        {{ user.role|capitalize }}
+                    </span>
+                </div>
+                <div class="border-t border-gray-200 pt-4">
+                    <p class="text-xs text-gray-500 mb-1">Member since</p>
+                    <p class="text-sm font-bold text-gray-900">{{ user.created_at.strftime('%B %d, %Y') }}</p>
+                </div>
+            </div>
+
+            <!-- Reset Password -->
+            <div class="bg-white rounded-2xl border border-gray-100 p-6">
+                <h3 class="text-lg font-bold text-gray-900 mb-4">
+                    <i class="fas fa-key text-red-600 mr-2"></i>Reset Password
+                </h3>
+                <form method="POST" id="passwordForm">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <input type="hidden" name="action" value="reset_password">
+
+                    <div class="mb-3">
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">New Password</label>
+                        <input type="password" name="new_password" required minlength="6"
+                            class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-red-600 focus:ring-2 focus:ring-red-600/10 outline-none transition">
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Confirm Password</label>
+                        <input type="password" name="confirm_password" required minlength="6"
+                            class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-red-600 focus:ring-2 focus:ring-red-600/10 outline-none transition">
+                    </div>
+
+                    <button type="submit"
+                        class="w-full py-3 bg-red-600 text-white font-bold rounded-xl hover:bg-red-700 transition-all">
+                        <i class="fas fa-lock-open mr-2"></i>Reset Password
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    document.getElementById('infoForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        Swal.fire({
+            title: 'Update User?',
+            text: 'Save changes to this user account?',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'Yes, update',
+            cancelButtonText: 'Cancel',
+            customClass: {
+                popup: 'rounded-2xl',
+                confirmButton: 'bg-primary-600 hover:bg-primary-700 text-white font-bold py-3 px-6 rounded-xl ml-2',
+                cancelButton: 'bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-3 px-6 rounded-xl mr-2'
+            },
+            buttonsStyling: false,
+            reverseButtons: true
+        }).then((result) => {
+            if (result.isConfirmed) {
+                this.submit();
+            }
+        });
+    });
+
+    document.getElementById('passwordForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const newPass = this.querySelector('[name="new_password"]').value;
+        const confirmPass = this.querySelector('[name="confirm_password"]').value;
+        
+        if (newPass !== confirmPass) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Passwords do not match!',
+                customClass: { popup: 'rounded-2xl' }
+            });
+            return;
+        }
+        
+        Swal.fire({
+            title: 'Reset Password?',
+            text: 'This will change the user\'s password.',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Yes, reset',
+            cancelButtonText: 'Cancel',
+            customClass: {
+                popup: 'rounded-2xl',
+                confirmButton: 'bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-6 rounded-xl ml-2',
+                cancelButton: 'bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-3 px-6 rounded-xl mr-2'
+            },
+            buttonsStyling: false,
+            reverseButtons: true
+        }).then((result) => {
+            if (result.isConfirmed) {
+                this.submit();
+            }
+        });
+    });
+</script>
+{% endblock %}

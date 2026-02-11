@@ -221,6 +221,18 @@
                                     class="flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
                                     <i class="fas fa-capsules w-5 text-gray-400 mr-2"></i>My Reservations
                                 </a>
+                                <a href="{{ url_for('auth.profile') }}"
+                                    class="flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
+                                    <i class="fas fa-user-circle w-5 text-gray-400 mr-2"></i>My Profile
+                                </a>
+                                {% if current_user.role in ['admin', 'staff'] %}
+                                <div class="border-t border-gray-100 my-1"></div>
+                                <a href="{{ url_for('admin') }}"
+                                    class="flex items-center px-4 py-2.5 text-sm text-primary-700 hover:bg-primary-50 transition-colors">
+                                    <i class="fas fa-user-shield w-5 text-primary-600 mr-2"></i>Admin Dashboard
+                                </a>
+                                {% endif %}
+                                <div class="border-t border-gray-100 my-1"></div>
                                 <a href="{{ url_for('auth.logout') }}"
                                     class="flex items-center px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors">
                                     <i class="fas fa-sign-out-alt w-5 text-red-400 mr-2"></i>Sign Out
@@ -298,10 +310,10 @@
                                 class="w-10 h-10 rounded-full border-2 border-white/30 object-cover" alt="Student">
                             <div
                                 class="w-10 h-10 rounded-full border-2 border-white/30 bg-primary-700 flex items-center justify-center text-xs text-white font-bold">
-                                500+
+                                <span class="counter-hero" data-target="500">0</span>+
                             </div>
                         </div>
-                        <span class="text-sm text-blue-200/80">Trusted by 500+ ISUFST students</span>
+                        <span class="text-sm text-blue-200/80">Trusted by <span class="counter-hero" data-target="500">0</span>+ ISUFST students</span>
                     </div>
                 </div>
 
@@ -394,11 +406,15 @@
         <div class="max-w-5xl mx-auto px-6 lg:px-8">
             <div class="grid grid-cols-2 md:grid-cols-4 gap-6 reveal">
                 <div class="text-center stat-glow rounded-2xl p-6 bg-primary-50/50">
-                    <div class="text-3xl font-extrabold text-primary-700">500+</div>
+                    <div class="text-3xl font-extrabold text-primary-700">
+                        <span class="counter" data-target="500">0</span>+
+                    </div>
                     <div class="text-sm text-gray-500 mt-1">Students Served</div>
                 </div>
                 <div class="text-center stat-glow rounded-2xl p-6 bg-emerald-50/50">
-                    <div class="text-3xl font-extrabold text-accent">98%</div>
+                    <div class="text-3xl font-extrabold text-accent">
+                        <span class="counter" data-target="98">0</span>%
+                    </div>
                     <div class="text-sm text-gray-500 mt-1">Satisfaction Rate</div>
                 </div>
                 <div class="text-center stat-glow rounded-2xl p-6 bg-amber-50/50">
@@ -406,7 +422,9 @@
                     <div class="text-sm text-gray-500 mt-1">Online Access</div>
                 </div>
                 <div class="text-center stat-glow rounded-2xl p-6 bg-purple-50/50">
-                    <div class="text-3xl font-extrabold text-purple-600">5 min</div>
+                    <div class="text-3xl font-extrabold text-purple-600">
+                        <span class="counter" data-target="5">0</span> min
+                    </div>
                     <div class="text-sm text-gray-500 mt-1">Avg. Wait Time</div>
                 </div>
             </div>
@@ -686,12 +704,6 @@
                         <li><a href="{{ url_for('reservations.view_medicines') }}"
                                 class="text-blue-300/70 hover:text-white transition-colors text-sm">Reserve Medicine</a>
                         </li>
-                        <li><a href="{{ url_for('auth.login') }}"
-                                class="text-blue-300/70 hover:text-white transition-colors text-sm">Student Login</a>
-                        </li>
-                        <li><a href="{{ url_for('admin') }}"
-                                class="text-blue-300/70 hover:text-white transition-colors text-sm">Staff Portal</a>
-                        </li>
                     </ul>
                 </div>
 
@@ -719,16 +731,55 @@
      SCROLL REVEAL SCRIPT
      ═══════════════════════════════════════════════ -->
     <script>
+        // Counter animation
+        function animateCounter(element) {
+            const target = parseInt(element.getAttribute('data-target'));
+            const duration = 2000; // 2 seconds
+            const increment = target / (duration / 16); // 60fps
+            let current = 0;
+
+            const updateCounter = () => {
+                current += increment;
+                if (current < target) {
+                    element.textContent = Math.floor(current);
+                    requestAnimationFrame(updateCounter);
+                } else {
+                    element.textContent = target;
+                }
+            };
+
+            updateCounter();
+        }
+
         // Scroll reveal
         const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
                     entry.target.classList.add('visible');
+                    
+                    // Animate counters when stats section is visible
+                    if (entry.target.classList.contains('reveal')) {
+                        const counters = entry.target.querySelectorAll('.counter');
+                        counters.forEach(counter => {
+                            if (!counter.classList.contains('animated')) {
+                                counter.classList.add('animated');
+                                animateCounter(counter);
+                            }
+                        });
+                    }
                 }
             });
         }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
 
         document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+        // Animate hero counters on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            const heroCounters = document.querySelectorAll('.counter-hero');
+            heroCounters.forEach(counter => {
+                animateCounter(counter);
+            });
+        });
 
         // Smooth scroll for anchor links
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {

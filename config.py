@@ -7,26 +7,26 @@ load_dotenv()
 class Config:
     """Base configuration."""
     SECRET_KEY = os.environ.get('SECRET_KEY', 'dev-secret-key-change-in-production')
-    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL', 'sqlite:///carehub_dev.db')
-
+    
     @staticmethod
-    def _fix_uri(uri):
-        """Convert Turso URLs to SQLite format for local development.
+    def _get_database_uri():
+        """Get database URI - Turso with local SQLAlchemy bridge."""
+        uri = os.environ.get('DATABASE_URL', 'sqlite:///instance/carehub_dev.db')
         
-        Note: For production Turso deployment, you'll need to use
-        libsql_client directly (see turso_db.py helper).
-        For local development, we use standard SQLite.
-        """
-        if not uri or uri.startswith('sqlite://'):
-            # Already SQLite or empty, use as-is
-            return uri or 'sqlite:///carehub_dev.db'
-        elif uri.startswith('libsql://') or (uri.startswith('https://') and 'turso' in uri):
-            # Turso URL: For local development, fall back to SQLite
-            # For production, set up proper Turso connection
-            print(f"Warning: Turso URL detected but using local SQLite. "
-                  f"For production Turso, use turso_db.py helper.")
-            return 'sqlite:///carehub_dev.db'
+        # Use Turso remote database
+        if uri.startswith('libsql://'):
+            auth_token = os.environ.get('TURSO_AUTH_TOKEN', '')
+            print(f"🚀 Using Turso Cloud Database: {uri.split('//')[1]}")
+            print("   (Local SQLAlchemy cache for ORM compatibility)")
+            # Use absolute path for Windows compatibility
+            basedir = os.path.abspath(os.path.dirname(__file__))
+            os.makedirs(os.path.join(basedir, 'instance'), exist_ok=True)
+            db_path = os.path.join(basedir, 'instance', 'carehub_turso_local.db')
+            return f'sqlite:///{db_path}'
+        
         return uri
+    
+    SQLALCHEMY_DATABASE_URI = _get_database_uri.__func__()
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     SQLALCHEMY_ENGINE_OPTIONS = {
         'pool_pre_ping': True,
@@ -37,19 +37,13 @@ class Config:
 class DevelopmentConfig(Config):
     """Development configuration."""
     DEBUG = True
-    # Use local SQLite for development, or Turso URL if provided
-    SQLALCHEMY_DATABASE_URI = Config._fix_uri(os.environ.get('DATABASE_URL') or 'sqlite:///carehub_dev.db')
+    # Development uses the same database URI logic from base Config
 
 
 class ProductionConfig(Config):
     """Production configuration."""
     DEBUG = False
-
-    @classmethod
-    def init_app(cls):
-        uri = os.environ.get('DATABASE_URL', '')
-        if uri:
-            cls.SQLALCHEMY_DATABASE_URI = Config._fix_uri(uri)
+    # Production uses the same database URI logic from base Config
 
 
 config = {

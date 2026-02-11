@@ -7,6 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Admin{% endblock %} — ISUFST CareHub</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/fontawesome.min.css') }}">
     <link
         href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap"
@@ -150,9 +151,10 @@
                 <i
                     class="fas fa-hand-holding-heart w-5 text-center {% if active_page == 'reservations' %}text-blue-300{% else %}text-blue-300/60{% endif %}"></i><span>Reservations</span>
             </a>
-            <a href="/admin#queue-section"
-                class="sidebar-link flex items-center space-x-3 px-3 py-2.5 rounded-xl text-sm font-medium text-blue-200/80">
-                <i class="fas fa-users w-5 text-center text-blue-300/60"></i><span>Patient Queue</span>
+            <a href="{{ url_for('auth.list_users') }}"
+                class="sidebar-link {% if active_page == 'users' %}active{% endif %} flex items-center space-x-3 px-3 py-2.5 rounded-xl text-sm font-medium {% if active_page != 'users' %}text-blue-200/80{% endif %}">
+                <i
+                    class="fas fa-users w-5 text-center {% if active_page == 'users' %}text-blue-300{% else %}text-blue-300/60{% endif %}"></i><span>Users</span>
             </a>
 
             <p class="text-[10px] text-blue-300/40 font-bold uppercase tracking-widest px-3 pt-5 pb-2">Quick Links</p>
@@ -232,11 +234,12 @@
                     <i
                         class="fas fa-hand-holding-heart w-5 text-center {% if active_page == 'reservations' %}text-blue-300{% else %}text-blue-300/60{% endif %}"></i><span>Reservations</span>
                 </a>
-                <a href="/admin#queue-section"
-                    class="sidebar-link flex items-center space-x-3 px-3 py-2.5 rounded-xl text-sm font-medium text-blue-200/80">
-                    <i class="fas fa-users w-5 text-center text-blue-300/60"></i><span>Patient Queue</span>
+                <a href="{{ url_for('auth.list_users') }}"
+                    class="sidebar-link {% if active_page == 'users' %}active{% endif %} flex items-center space-x-3 px-3 py-2.5 rounded-xl text-sm font-medium {% if active_page != 'users' %}text-blue-200/80{% endif %}">
+                    <i
+                        class="fas fa-users w-5 text-center {% if active_page == 'users' %}text-blue-300{% else %}text-blue-300/60{% endif %}"></i><span>Users</span>
                 </a>
-
+                
                 <p class="text-[10px] text-blue-300/40 font-bold uppercase tracking-widest px-3 pt-6 pb-2">Quick Links
                 </p>
                 <a href="{{ url_for('reservations.view_medicines') }}"
@@ -299,19 +302,12 @@
             </header>
 
             <main class="p-4 lg:p-8">
-                <!-- Flash Messages -->
+                <!-- Flash Messages (Hidden - converted to SweetAlert) -->
                 {% with messages = get_flashed_messages(with_categories=true) %}
                 {% if messages %}
-                <div class="space-y-2 mb-6">
+                <div id="flash-messages" style="display:none;">
                     {% for category, message in messages %}
-                    <div class="px-4 py-3 rounded-xl text-sm font-medium
-                        {% if category == 'error' %}bg-red-50 text-red-700 border border-red-200
-                        {% elif category == 'success' %}bg-emerald-50 text-emerald-700 border border-emerald-200
-                        {% else %}bg-blue-50 text-blue-700 border border-blue-200{% endif %}">
-                        <i
-                            class="fas {% if category == 'error' %}fa-exclamation-circle{% elif category == 'success' %}fa-check-circle{% else %}fa-info-circle{% endif %} mr-2"></i>{{
-                        message }}
-                    </div>
+                    <div data-category="{{ category }}" data-message="{{ message }}"></div>
                     {% endfor %}
                 </div>
                 {% endif %}
@@ -328,6 +324,32 @@
             document.getElementById('sidebar-overlay').classList.toggle('active');
             document.body.classList.toggle('overflow-hidden');
         }
+
+        // Convert flash messages to SweetAlert toasts
+        document.addEventListener('DOMContentLoaded', () => {
+            const flashContainer = document.getElementById('flash-messages');
+            if (flashContainer) {
+                const messages = flashContainer.querySelectorAll('[data-category]');
+                messages.forEach(msg => {
+                    const category = msg.getAttribute('data-category');
+                    const message = msg.getAttribute('data-message');
+                    const icon = category === 'error' ? 'error' : category === 'success' ? 'success' : 'info';
+                    
+                    Swal.fire({
+                        icon: icon,
+                        title: message,
+                        toast: true,
+                        position: 'top-end',
+                        showConfirmButton: false,
+                        timer: 4000,
+                        timerProgressBar: true,
+                        customClass: {
+                            popup: 'rounded-2xl shadow-2xl'
+                        }
+                    });
+                });
+            }
+        });
     </script>
     {% block extra_scripts %}{% endblock %}
 </body>

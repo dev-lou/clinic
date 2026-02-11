@@ -73,7 +73,7 @@
                             {% if res.status == 'Reserved' %}
                             <form method="POST"
                                 action="{{ url_for('reservations.admin_mark_picked_up', reservation_id=res.id) }}"
-                                class="inline">
+                                class="inline" onsubmit="return confirmMarkPickedUp(event);">
                                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                                 <button type="submit"
                                     class="px-3 py-1.5 bg-emerald-600 text-white rounded-lg text-xs font-semibold hover:bg-emerald-700 transition-colors">
@@ -101,4 +101,35 @@
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    function confirmMarkPickedUp(e) {
+        e.preventDefault();
+        const form = e.target;
+        
+        Swal.fire({
+            title: 'Mark as Picked Up?',
+            text: 'Confirm that the student has picked up this medicine?',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'Yes, mark picked up',
+            cancelButtonText: 'Cancel',
+            customClass: {
+                popup: 'rounded-2xl',
+                confirmButton: 'bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-6 rounded-xl ml-2',
+                cancelButton: 'bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-3 px-6 rounded-xl mr-2'
+            },
+            buttonsStyling: false,
+            reverseButtons: true
+        }).then((result) => {
+            if (result.isConfirmed) {
+                form.submit();
+            }
+        });
+        
+        return false;
+    }
+</script>
 {% endblock %}
