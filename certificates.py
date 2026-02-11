@@ -40,7 +40,7 @@ def admin_certificates():
     """Admin page to manage certificates."""
     # Get all issued certificates
     certs = HealthCertificate.query.order_by(HealthCertificate.issued_at.desc()).all()
-    return render_template('admin_certificates.html', certificates=certs)
+    return render_template('admin_certificates.html', certificates=certs, today=date.today())
 
 
 @certificates.route('/admin/issue', methods=['GET', 'POST'])
