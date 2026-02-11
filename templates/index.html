@@ -3,6 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ISUFST CareHub — Your Health, Digitized</title>
@@ -193,6 +194,7 @@
                 <div class="flex items-center space-x-3">
                     {% if current_user.is_authenticated %}
                     <!-- Logged in view -->
+                    {% include 'partials/notification_bell.html' %}
                     <div class="relative group">
                         <button
                             class="flex items-center space-x-2 px-3 py-2 rounded-lg hover:bg-gray-50 transition-all">
@@ -313,7 +315,8 @@
                                 <span class="counter-hero" data-target="500">0</span>+
                             </div>
                         </div>
-                        <span class="text-sm text-blue-200/80">Trusted by <span class="counter-hero" data-target="500">0</span>+ ISUFST students</span>
+                        <span class="text-sm text-blue-200/80">Trusted by <span class="counter-hero"
+                                data-target="500">0</span>+ ISUFST students</span>
                     </div>
                 </div>
 
@@ -336,40 +339,27 @@
                                 </span>
                             </div>
 
-                            <!-- Mock appointment slots -->
+                            <!-- Dynamic appointment slots -->
                             <div class="space-y-3">
-                                <p class="text-sm text-blue-300 font-medium">Today's Slots</p>
+                                <p class="text-sm text-blue-300 font-medium">Today's Slots <span
+                                        class="text-blue-400/60 text-xs">({{ ph_time }} PHT)</span></p>
                                 <div class="grid grid-cols-4 gap-2">
-                                    <div
-                                        class="px-3 py-2 rounded-xl bg-white/10 text-center text-sm text-white font-medium">
-                                        9:00</div>
-                                    <div
-                                        class="px-3 py-2 rounded-xl bg-accent/30 text-center text-sm text-emerald-200 font-medium border border-accent/40">
-                                        9:30</div>
-                                    <div
-                                        class="px-3 py-2 rounded-xl bg-white/10 text-center text-sm text-white font-medium">
-                                        10:00</div>
-                                    <div
-                                        class="px-3 py-2 rounded-xl bg-white/5 text-center text-sm text-white/40 line-through">
-                                        10:30</div>
-                                    <div
-                                        class="px-3 py-2 rounded-xl bg-white/10 text-center text-sm text-white font-medium">
-                                        11:00</div>
-                                    <div
-                                        class="px-3 py-2 rounded-xl bg-white/5 text-center text-sm text-white/40 line-through">
-                                        11:30</div>
-                                    <div
-                                        class="px-3 py-2 rounded-xl bg-white/10 text-center text-sm text-white font-medium">
-                                        1:00</div>
-                                    <div
-                                        class="px-3 py-2 rounded-xl bg-white/10 text-center text-sm text-white font-medium">
-                                        1:30</div>
+                                    {% for slot in today_slots %}
+                                    <div class="px-3 py-2 rounded-xl text-center text-sm font-medium
+                                        {% if slot.is_past %}bg-white/5 text-white/40 line-through
+                                        {% elif slot.is_booked %}bg-red-500/20 text-red-300 line-through
+                                        {% else %}bg-white/10 text-white hover:bg-accent/30 hover:text-emerald-200 transition-colors
+                                        {% endif %}">
+                                        {{ slot.time }}
+                                    </div>
+                                    {% endfor %}
                                 </div>
                             </div>
 
                             <!-- Mini stats -->
                             <div class="flex justify-between text-sm pt-2 border-t border-white/10">
-                                <span class="text-blue-300"><i class="fas fa-check-circle text-accent mr-1"></i>12 slots
+                                <span class="text-blue-300"><i class="fas fa-check-circle text-accent mr-1"></i>{{
+                                    available_count }} slots
                                     left</span>
                                 <span class="text-blue-300"><i class="fas fa-clock text-gold mr-1"></i>30 min
                                     each</span>
@@ -580,8 +570,8 @@
                 <div
                     class="doctor-card bg-white rounded-3xl overflow-hidden shadow-sm border border-gray-100 group reveal">
                     <div class="aspect-[3/4] overflow-hidden bg-gradient-to-b from-primary-100 to-primary-50">
-                        <img src="https://randomuser.me/api/portraits/women/65.jpg" alt="Dr. Maria Santos"
-                            class="w-full h-full object-cover">
+                        <img src="https://images.unsplash.com/photo-1526256262350-7da7584cf5eb?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80"
+                            alt="Dr. Maria Santos" class="w-full h-full object-cover">
                     </div>
                     <div class="p-6">
                         <h4 class="text-lg font-bold text-gray-900">Dr. Maria Santos</h4>
@@ -594,8 +584,8 @@
                 <div
                     class="doctor-card bg-white rounded-3xl overflow-hidden shadow-sm border border-gray-100 group reveal">
                     <div class="aspect-[3/4] overflow-hidden bg-gradient-to-b from-emerald-100 to-emerald-50">
-                        <img src="https://randomuser.me/api/portraits/men/75.jpg" alt="Dr. Rafael Cruz"
-                            class="w-full h-full object-cover">
+                        <img src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80"
+                            alt="Dr. Rafael Cruz" class="w-full h-full object-cover">
                     </div>
                     <div class="p-6">
                         <h4 class="text-lg font-bold text-gray-900">Dr. Rafael Cruz</h4>
@@ -608,8 +598,8 @@
                 <div
                     class="doctor-card bg-white rounded-3xl overflow-hidden shadow-sm border border-gray-100 group reveal">
                     <div class="aspect-[3/4] overflow-hidden bg-gradient-to-b from-violet-100 to-violet-50">
-                        <img src="https://randomuser.me/api/portraits/women/47.jpg" alt="Nurse Ana Reyes"
-                            class="w-full h-full object-cover">
+                        <img src="https://images.unsplash.com/photo-1537368910025-700350fe46c7?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80"
+                            alt="Nurse Ana Reyes" class="w-full h-full object-cover">
                     </div>
                     <div class="p-6">
                         <h4 class="text-lg font-bold text-gray-900">Nurse Ana Reyes</h4>
@@ -622,8 +612,8 @@
                 <div
                     class="doctor-card bg-white rounded-3xl overflow-hidden shadow-sm border border-gray-100 group reveal">
                     <div class="aspect-[3/4] overflow-hidden bg-gradient-to-b from-rose-100 to-rose-50">
-                        <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Nurse Jun Torres"
-                            class="w-full h-full object-cover">
+                        <img src="https://images.unsplash.com/photo-1541233349642-6e425fe6190e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80"
+                            alt="Nurse Jun Torres" class="w-full h-full object-cover">
                     </div>
                     <div class="p-6">
                         <h4 class="text-lg font-bold text-gray-900">Nurse Jun Torres</h4>
@@ -756,7 +746,7 @@
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
                     entry.target.classList.add('visible');
-                    
+
                     // Animate counters when stats section is visible
                     if (entry.target.classList.contains('reveal')) {
                         const counters = entry.target.querySelectorAll('.counter');
@@ -791,6 +781,7 @@
         });
     </script>
 
+    {% include 'partials/chatbot_widget.html' %}
 </body>
 
 </html>

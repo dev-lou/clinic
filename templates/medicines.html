@@ -3,6 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Medicine Pharmacy — ISUFST CareHub</title>
@@ -98,6 +99,8 @@
                 <!-- CTA -->
                 <div class="flex items-center space-x-3">
                     {% if current_user.is_authenticated %}
+                    <!-- Notification Bell -->
+                    {% include 'partials/notification_bell.html' %}
                     <!-- Logged in view -->
                     <div class="relative group">
                         <button
@@ -196,9 +199,9 @@
     {% with messages = get_flashed_messages(with_categories=true) %}
     {% if messages %}
     <div id="flash-messages" style="display:none;">
-    {% for category, message in messages %}
-    <div data-category="{{ category }}" data-message="{{ message }}"></div>
-    {% endfor %}
+        {% for category, message in messages %}
+        <div data-category="{{ category }}" data-message="{{ message }}"></div>
+        {% endfor %}
     </div>
     {% endif %}
     {% endwith %}
@@ -257,8 +260,7 @@
 
                     <!-- Reserve form -->
                     {% if medicine.quantity > 0 %}
-                    <form method="POST"
-                        action="{{ url_for('reservations.reserve_medicine', medicine_id=medicine.id) }}"
+                    <form method="POST" action="{{ url_for('reservations.reserve_medicine', medicine_id=medicine.id) }}"
                         onsubmit="return confirmReservation(event, '{{ medicine.name }}');">
                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                         <div class="flex gap-2">
@@ -348,7 +350,7 @@
                     const category = msg.getAttribute('data-category');
                     const message = msg.getAttribute('data-message');
                     const icon = category === 'error' ? 'error' : 'success';
-                    
+
                     Swal.fire({
                         icon: icon,
                         title: icon === 'error' ? 'Error' : 'Success',
@@ -371,7 +373,7 @@
             e.preventDefault();
             const form = e.target;
             const quantity = form.querySelector('.reservation-quantity').value;
-            
+
             Swal.fire({
                 title: 'Reserve Medicine?',
                 html: `Reserve <strong>${quantity} unit(s)</strong> of <strong>${medicineName}</strong>?<br><br><small class="text-gray-500">You can pick it up at the clinic during office hours.</small>`,
@@ -391,11 +393,12 @@
                     form.submit();
                 }
             });
-            
+
             return false;
         }
     </script>
 
+    {% include 'partials/chatbot_widget.html' %}
 </body>
 
 </html>

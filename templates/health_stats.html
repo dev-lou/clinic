@@ -1,0 +1,287 @@
+{% extends "student_base.html" %}
+
+{% block title %}Health Statistics{% endblock %}
+
+{% block extra_css %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50 py-8">
+    <div class="container mx-auto px-4 max-w-6xl">
+        <!-- Header -->
+        <div class="mb-8">
+            <h1 class="text-3xl font-bold text-gray-900 mb-2">
+                <i class="fas fa-chart-bar text-blue-600 mr-3"></i>
+                My Health Statistics
+            </h1>
+            <p class="text-gray-600">Track your health journey with comprehensive statistics and insights</p>
+        </div>
+
+        <!-- Overview Stats -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <div class="bg-gradient-to-br from-blue-500 to-blue-600 text-white rounded-xl p-6 shadow-lg">
+                <div class="flex items-center justify-between mb-4">
+                    <div>
+                        <p class="text-blue-100 text-sm font-medium">Total Visits</p>
+                        <h2 class="text-3xl font-bold">{{ total_visits }}</h2>
+                    </div>
+                    <i class="fas fa-heartbeat text-4xl text-blue-200"></i>
+                </div>
+                <p class="text-sm text-blue-100">All-time clinic visits</p>
+            </div>
+            
+            <div class="bg-gradient-to-br from-green-500 to-green-600 text-white rounded-xl p-6 shadow-lg">
+                <div class="flex items-center justify-between mb-4">
+                    <div>
+                        <p class="text-green-100 text-sm font-medium">Completed Visits</p>
+                        <h2 class="text-3xl font-bold">{{ completed_visits }}</h2>
+                    </div>
+                    <i class="fas fa-check-circle text-4xl text-green-200"></i>
+                </div>
+                <p class="text-sm text-green-100">Successfully treated</p>
+            </div>
+            
+            <div class="bg-gradient-to-br from-purple-500 to-purple-600 text-white rounded-xl p-6 shadow-lg">
+                <div class="flex items-center justify-between mb-4">
+                    <div>
+                        <p class="text-purple-100 text-sm font-medium">Appointments</p>
+                        <h2 class="text-3xl font-bold">{{ total_appointments }}</h2>
+                    </div>
+                    <i class="fas fa-calendar-check text-4xl text-purple-200"></i>
+                </div>
+                <p class="text-sm text-purple-100">Total bookings</p>
+            </div>
+            
+            <div class="bg-gradient-to-br from-orange-500 to-orange-600 text-white rounded-xl p-6 shadow-lg">
+                <div class="flex items-center justify-between mb-4">
+                    <div>
+                        <p class="text-orange-100 text-sm font-medium">Completion Rate</p>
+                        <h2 class="text-3xl font-bold">
+                            {% if total_visits > 0 %}
+                                {{ ((completed_visits / total_visits) * 100)|round(1) }}%
+                            {% else %}
+                                0%
+                            {% endif %}
+                        </h2>
+                    </div>
+                    <i class="fas fa-percentage text-4xl text-orange-200"></i>
+                </div>
+                <p class="text-sm text-orange-100">Treatment success</p>
+            </div>
+        </div>
+
+        <!-- Chart Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+            <!-- Visit Frequency Chart -->
+            <div class="bg-white rounded-xl shadow-md border border-gray-200 p-6">
+                <h3 class="text-lg font-bold text-gray-900 mb-4">
+                    <i class="fas fa-chart-line text-blue-500 mr-2"></i>
+                    Visit Frequency (Last 6 Months)
+                </h3>
+                <canvas id="visitFrequencyChart" height="250"></canvas>
+            </div>
+
+            <!-- Common Complaints Chart -->
+            <div class="bg-white rounded-xl shadow-md border border-gray-200 p-6">
+                <h3 class="text-lg font-bold text-gray-900 mb-4">
+                    <i class="fas fa-chart-pie text-green-500 mr-2"></i>
+                    Most Common Complaints
+                </h3>
+                {% if top_complaints|length > 0 %}
+                <div class="space-y-4">
+                    {% for complaint, count in top_complaints %}
+                    <div>
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="text-sm text-gray-700 font-medium">{{ complaint.title() }}</span>
+                            <span class="text-sm text-gray-600 font-bold">{{ count }} visits</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-3">
+                            <div class="bg-gradient-to-r from-green-400 to-green-600 h-3 rounded-full" 
+                                 style="width: {{ (count / top_complaints[0][1] * 100)|round(0) }}%"></div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="text-center py-8">
+                    <i class="fas fa-notes-medical text-5xl text-gray-300 mb-3"></i>
+                    <p class="text-gray-500">No complaints recorded yet</p>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Health Score Card -->
+            <div class="bg-white rounded-xl shadow-md border border-gray-200 p-6">
+                <h3 class="text-lg font-bold text-gray-900 mb-4">
+                    <i class="fas fa-heart text-red-500 mr-2"></i>
+                    Health Engagement Score
+                </h3>
+                <div class="flex items-center justify-center mb-6">
+                    <div class="relative w-40 h-40">
+                        <svg class="transform -rotate-90 w-40 h-40">
+                            <circle cx="80" cy="80" r="70" stroke="#e5e7eb" stroke-width="12" fill="transparent" />
+                            <circle cx="80" cy="80" r="70" 
+                                    stroke="url(#healthGradient)" 
+                                    stroke-width="12" 
+                                    fill="transparent"
+                                    stroke-dasharray="{{ (completed_visits / (total_visits if total_visits > 0 else 1) * 439.6)|round(1) }} 439.6"
+                                    stroke-linecap="round" />
+                            <defs>
+                                <linearGradient id="healthGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                    <stop offset="0%" style="stop-color:#10b981;stop-opacity:1" />
+                                    <stop offset="100%" style="stop-color:#059669;stop-opacity:1" />
+                                </linearGradient>
+                            </defs>
+                        </svg>
+                        <div class="absolute inset-0 flex items-center justify-center flex-col">
+                            <span class="text-4xl font-bold text-gray-900">
+                                {% if total_visits > 0 %}
+                                    {{ ((completed_visits / total_visits) * 100)|round(0)|int }}
+                                {% else %}
+                                    0
+                                {% endif %}
+                            </span>
+                            <span class="text-sm text-gray-500">Score</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="space-y-3">
+                    <div class="flex items-center justify-between p-3 bg-green-50 rounded-lg">
+                        <span class="text-sm text-gray-700">
+                            <i class="fas fa-check text-green-600 mr-2"></i>
+                            Regular Check-ups
+                        </span>
+                        <span class="text-xs text-green-600 font-bold">
+                            {% if total_appointments > 5 %}EXCELLENT{% elif total_appointments > 2 %}GOOD{% else %}NEEDS IMPROVEMENT{% endif %}
+                        </span>
+                    </div>
+                    <div class="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
+                        <span class="text-sm text-gray-700">
+                            <i class="fas fa-calendar-check text-blue-600 mr-2"></i>
+                            Appointment Attendance
+                        </span>
+                        <span class="text-xs text-blue-600 font-bold">
+                            {% if total_visits > 0 %}{{ ((completed_visits / total_visits) * 100)|round(0)|int }}%{% else %}0%{% endif %}
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Monthly Activity -->
+            <div class="bg-white rounded-xl shadow-md border border-gray-200 p-6">
+                <h3 class="text-lg font-bold text-gray-900 mb-4">
+                    <i class="fas fa-calendar-alt text-purple-500 mr-2"></i>
+                    This Month's Activity
+                </h3>
+                <div class="space-y-4">
+                    <div class="flex items-center justify-between p-4 bg-gradient-to-r from-blue-50 to-blue-100 rounded-lg">
+                        <div class="flex items-center">
+                            <div class="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center mr-4">
+                                <i class="fas fa-calendar-day text-white text-xl"></i>
+                            </div>
+                            <div>
+                                <p class="font-bold text-gray-900">Appointments Booked</p>
+                                <p class="text-sm text-gray-600">This month</p>
+                            </div>
+                        </div>
+                        <span class="text-2xl font-bold text-blue-600">0</span>
+                    </div>
+
+                    <div class="flex items-center justify-between p-4 bg-gradient-to-r from-green-50 to-green-100 rounded-lg">
+                        <div class="flex items-center">
+                            <div class="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center mr-4">
+                                <i class="fas fa-stethoscope text-white text-xl"></i>
+                            </div>
+                            <div>
+                                <p class="font-bold text-gray-900">Visits Completed</p>
+                                <p class="text-sm text-gray-600">This month</p>
+                            </div>
+                        </div>
+                        <span class="text-2xl font-bold text-green-600">0</span>
+                    </div>
+
+                    <div class="flex items-center justify-between p-4 bg-gradient-to-r from-purple-50 to-purple-100 rounded-lg">
+                        <div class="flex items-center">
+                            <div class="w-12 h-12 bg-purple-500 rounded-full flex items-center justify-center mr-4">
+                                <i class="fas fa-pills text-white text-xl"></i>
+                            </div>
+                            <div>
+                                <p class="font-bold text-gray-900">Medicine Reservations</p>
+                                <p class="text-sm text-gray-600">This month</p>
+                            </div>
+                        </div>
+                        <span class="text-2xl font-bold text-purple-600">0</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Health Tips -->
+        <div class="bg-gradient-to-r from-blue-600 to-blue-700 rounded-xl shadow-lg p-8 text-white">
+            <div class="flex items-start">
+                <div class="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mr-6 flex-shrink-0">
+                    <i class="fas fa-lightbulb text-3xl"></i>
+                </div>
+                <div>
+                    <h3 class="text-2xl font-bold mb-3">Health Tips for Students</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="flex items-start">
+                            <i class="fas fa-check-circle text-blue-200 mr-3 mt-1"></i>
+                            <p class="text-blue-50">Schedule regular health check-ups every semester</p>
+                        </div>
+                        <div class="flex items-start">
+                            <i class="fas fa-check-circle text-blue-200 mr-3 mt-1"></i>
+                            <p class="text-blue-50">Keep your vaccination records up to date</p>
+                        </div>
+                        <div class="flex items-start">
+                            <i class="fas fa-check-circle text-blue-200 mr-3 mt-1"></i>
+                            <p class="text-blue-50">Don't ignore minor symptoms - seek early treatment</p>
+                        </div>
+                        <div class="flex items-start">
+                            <i class="fas fa-check-circle text-blue-200 mr-3 mt-1"></i>
+                            <p class="text-blue-50">Maintain a healthy lifestyle with proper sleep and nutrition</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Dummy data for visit frequency chart
+    const visitFrequencyCtx = document.getElementById('visitFrequencyChart');
+    new Chart(visitFrequencyCtx, {
+        type: 'line',
+        data: {
+            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+            datasets: [{
+                label: 'Clinic Visits',
+                data: [0, 0, 0, 0, 0, 0], // This would be populated from actual data
+                borderColor: 'rgb(59, 130, 246)',
+                backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                tension: 0.4,
+                fill: true
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        stepSize: 1
+                    }
+                }
+            }
+        }
+    });
+</script>
+{% endblock %}

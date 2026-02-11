@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}ISUFST CareHub{% endblock %}</title>
+    
+    <!-- Tailwind CSS - Use production build -->
+    <link href="{{ url_for('static', filename='css/output.css') }}" rel="stylesheet">
+    
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/fontawesome.min.css') }}">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/animations.css') }}">
+    
+    {% block extra_css %}{% endblock %}
+</head>
+<body class="bg-gray-50">
+    <!-- Navigation -->
+    <nav class="bg-isufst-primary text-white shadow-lg">
+        <div class="container mx-auto px-4">
+            <div class="flex justify-between items-center py-4">
+                <div class="flex items-center space-x-4">
+                    <a href="{{ url_for('index') }}" class="text-2xl font-bold">
+                        🏥 ISUFST CareHub
+                    </a>
+                </div>
+                
+                <div class="flex items-center space-x-6">
+                    {% if current_user.is_authenticated %}
+                        <a href="{{ url_for('patient_dashboard.index') }}" class="hover:text-blue-200 transition">
+                            <i class="fas fa-tachometer-alt"></i> Dashboard
+                        </a>
+                        <a href="{{ url_for('appointments.my_appointments') }}" class="hover:text-blue-200 transition">
+                            <i class="fas fa-calendar-check"></i> My Appointments
+                        </a>
+                        <a href="{{ url_for('reservations.my_reservations') }}" class="hover:text-blue-200 transition">
+                            <i class="fas fa-pills"></i> My Reservations
+                        </a>
+                        
+                        <!-- Notification Bell -->
+                        <div class="relative">
+                            <button id="notificationBell" class="hover:text-blue-200 transition relative">
+                                <i class="fas fa-bell text-xl"></i>
+                                <span id="notifBadge" class="hidden absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">0</span>
+                            </button>
+                            <div id="notificationDropdown" class="hidden absolute right-0 mt-2 w-80 bg-white rounded-lg shadow-xl z-50 text-gray-800">
+                                <div class="p-4 border-b">
+                                    <h3 class="font-bold">Notifications</h3>
+                                </div>
+                                <div id="notificationList" class="max-h-96 overflow-y-auto">
+                                    <!-- Notifications loaded via JS -->
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- User Menu -->
+                        <div class="relative group">
+                            <button class="flex items-center space-x-2 hover:text-blue-200 transition">
+                                <i class="fas fa-user-circle text-xl"></i>
+                                <span>{{ current_user.first_name }}</span>
+                                <i class="fas fa-chevron-down text-sm"></i>
+                            </button>
+                            <div class="hidden group-hover:block absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-xl z-50">
+                                <a href="{{ url_for('auth.profile') }}" class="block px-4 py-2 text-gray-800 hover:bg-gray-100">
+                                    <i class="fas fa-user"></i> Profile
+                                </a>
+                                <a href="{{ url_for('patient_dashboard.timeline') }}" class="block px-4 py-2 text-gray-800 hover:bg-gray-100">
+                                    <i class="fas fa-history"></i> Health Timeline
+                                </a>
+                                <a href="{{ url_for('symptom_screening.index') }}" class="block px-4 py-2 text-gray-800 hover:bg-gray-100">
+                                    <i class="fas fa-stethoscope"></i> Symptom Check
+                                </a>
+                                <hr class="my-2">
+                                <a href="{{ url_for('auth.logout') }}" class="block px-4 py-2 text-red-600 hover:bg-gray-100">
+                                    <i class="fas fa-sign-out-alt"></i> Logout
+                                </a>
+                            </div>
+                        </div>
+                    {% else %}
+                        <a href="{{ url_for('auth.login') }}" class="hover:text-blue-200 transition">
+                            <i class="fas fa-sign-in-alt"></i> Login
+                        </a>
+                        <a href="{{ url_for('auth.register') }}" class="btn-success">
+                            <i class="fas fa-user-plus"></i> Register
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="container mx-auto px-4 mt-4">
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} bg-{{ 'green' if category == 'success' else 'red' if category == 'error' else 'blue' }}-100 border-l-4 border-{{ 'green' if category == 'success' else 'red' if category == 'error' else 'blue' }}-500 text-{{ 'green' if category == 'success' else 'red' if category == 'error' else 'blue' }}-700 p-4 mb-4 rounded">
+                        <p class="font-bold">{{ message }}</p>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-8">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white mt-16">
+        <div class="container mx-auto px-4 py-8">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div>
+                    <h3 class="text-xl font-bold mb-4">ISUFST CareHub</h3>
+                    <p class="text-gray-400">Your health, our priority.</p>
+                </div>
+                <div>
+                    <h4 class="font-bold mb-4">Quick Links</h4>
+                    <ul class="space-y-2 text-gray-400">
+                        <li><a href="{{ url_for('appointments.book') }}" class="hover:text-white">Book Appointment</a></li>
+                        <li><a href="{{ url_for('reservations.medicines') }}" class="hover:text-white">Reserve Medicine</a></li>
+                        <li><a href="{{ url_for('symptom_screening.index') }}" class="hover:text-white">Symptom Checker</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-bold mb-4">Contact</h4>
+                    <p class="text-gray-400">
+                        Iloilo State University of Fisheries<br>
+                        Science and Technology<br>
+                        <i class="fas fa-envelope"></i> clinic@isufst.edu.ph
+                    </p>
+                </div>
+            </div>
+            <div class="border-t border-gray-700 mt-8 pt-8 text-center text-gray-400">
+                <p>&copy; 2026 ISUFST CareHub. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script>
+        // Notification system
+        document.addEventListener('DOMContentLoaded', function() {
+            const bell = document.getElementById('notificationBell');
+            const dropdown = document.getElementById('notificationDropdown');
+            const badge = document.getElementById('notifBadge');
+            
+            if (bell) {
+                // Toggle dropdown
+                bell.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    dropdown.classList.toggle('hidden');
+                    loadNotifications();
+                });
+                
+                // Close on outside click
+                document.addEventListener('click', function(e) {
+                    if (!dropdown.contains(e.target)) {
+                        dropdown.classList.add('hidden');
+                    }
+                });
+                
+                // Load unread count
+                updateNotificationCount();
+                setInterval(updateNotificationCount, 30000); // Update every 30s
+            }
+        });
+        
+        function updateNotificationCount() {
+            fetch('{{ url_for("patient_dashboard.unread_notification_count") }}')
+                .then(r => r.json())
+                .then(data => {
+                    const badge = document.getElementById('notifBadge');
+                    if (data.count > 0) {
+                        badge.textContent = data.count > 9 ? '9+' : data.count;
+                        badge.classList.remove('hidden');
+                    } else {
+                        badge.classList.add('hidden');
+                    }
+                });
+        }
+        
+        function loadNotifications() {
+            fetch('{{ url_for("api_v1.get_notifications") }}?unread_only=true')
+                .then(r => r.json())
+                .then(notifications => {
+                    const list = document.getElementById('notificationList');
+                    if (notifications.length === 0) {
+                        list.innerHTML = '<p class="p-4 text-gray-500 text-center">No new notifications</p>';
+                    } else {
+                        list.innerHTML = notifications.map(n => `
+                            <div class="p-4 border-b hover:bg-gray-50 cursor-pointer" onclick="markRead(${n.id})">
+                                <h4 class="font-semibold">${n.title}</h4>
+                                <p class="text-sm text-gray-600">${n.message}</p>
+                                <span class="text-xs text-gray-400">${new Date(n.created_at).toLocaleString()}</span>
+                            </div>
+                        `).join('');
+                    }
+                });
+        }
+        
+        function markRead(id) {
+            fetch(`{{ url_for("patient_dashboard.mark_notification_read", notification_id=0) }}`.replace('0', id), {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token() }}'
+                }
+            }).then(() => {
+                updateNotificationCount();
+                loadNotifications();
+            });
+        }
+    </script>
+    
+    {% block extra_js %}{% endblock %}
+
+    {% include 'partials/chatbot_widget.html' %}
+</body>
+</html>

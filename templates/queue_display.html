@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Queue Display - ISUFST CareHub</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/fontawesome.min.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { 'display': ['"Plus Jakarta Sans"', 'sans-serif'], 'body': ['Inter', 'sans-serif'] },
+                    colors: {
+                        'primary': { 50: '#eff6ff', 100: '#dbeafe', 200: '#bfdbfe', 300: '#93c5fd', 400: '#60a5fa', 500: '#3b82f6', 600: '#2563eb', 700: '#1d4ed8', 800: '#1e3a5f', 900: '#0f1d30' },
+                        'accent': '#10b981',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        * { font-family: 'Inter', sans-serif; }
+        h1, h2, h3, h4 { font-family: 'Plus Jakarta Sans', sans-serif; }
+        
+        body {
+            background: linear-gradient(135deg, #0f1d30 0%, #1e3a5f 40%, #2563eb 100%);
+            min-height: 100vh;
+        }
+        
+        .glass {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+        
+        .serving-card {
+            animation: serving-pulse 3s ease-in-out infinite;
+        }
+        
+        @keyframes serving-pulse {
+            0%, 100% { 
+                box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4),
+                           0 20px 40px rgba(0, 0, 0, 0.1);
+            }
+            50% { 
+                box-shadow: 0 0 0 20px rgba(16, 185, 129, 0),
+                           0 30px 60px rgba(0, 0, 0, 0.2);
+            }
+        }
+        
+        .queue-item {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .queue-item:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        
+        .slide-in {
+            animation: slideIn 0.5s ease-out;
+        }
+    </style>
+</head>
+<body class="p-8">
+    <div class="container mx-auto max-w-7xl">
+        <!-- Header -->
+        <div class="text-center mb-8">
+            <div class="inline-block glass rounded-3xl px-12 py-6 shadow-2xl mb-6">
+                <div class="flex items-center justify-center space-x-4 mb-2">
+                    <div class="w-16 h-16 bg-gradient-to-br from-primary-600 to-accent rounded-2xl flex items-center justify-center shadow-lg">
+                        <i class="fas fa-heartbeat text-white text-3xl"></i>
+                    </div>
+                    <div class="text-left">
+                        <h1 class="text-5xl font-bold text-gray-900">ISUFST CareHub</h1>
+                        <p class="text-xl text-primary-600 font-medium">Queue Management System</p>
+                    </div>
+                </div>
+            </div>
+            <div class="glass rounded-2xl px-8 py-4 shadow-lg inline-block">
+                <p class="text-2xl font-medium text-gray-700" id="currentTime"></p>
+            </div>
+        </div>
+
+        <!-- Now Serving -->
+        <div class="glass rounded-3xl shadow-2xl p-12 mb-8 serving-card">
+            <div class="text-center">
+                <div class="inline-flex items-center space-x-3 mb-6">
+                    <div class="w-3 h-3 bg-green-500 rounded-full animate-ping"></div>
+                    <p class="text-3xl font-bold text-gray-600 uppercase tracking-wider">Now Serving</p>
+                    <div class="w-3 h-3 bg-green-500 rounded-full animate-ping"></div>
+                </div>
+                <div id="servingSection" class="bg-gradient-to-br from-green-50 to-emerald-50 rounded-2xl p-8 border-4 border-green-200">
+                    <p class="text-9xl font-black text-transparent bg-clip-text bg-gradient-to-r from-green-600 to-emerald-600 mb-4" id="servingNumber">---</p>
+                    <p class="text-4xl text-gray-800 font-semibold" id="servingName">Waiting for patient...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Waiting Queue -->
+        <div class="glass rounded-3xl shadow-2xl p-8">
+            <div class="flex items-center justify-between mb-8 pb-6 border-b-2 border-gray-200">
+                <div class="flex items-center space-x-4">
+                    <div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center">
+                        <i class="fas fa-users text-white text-xl"></i>
+                    </div>
+                    <h2 class="text-4xl font-bold text-gray-900">Waiting Queue</h2>
+                </div>
+                <div class="flex items-center space-x-3">
+                    <span class="bg-gradient-to-r from-blue-500 to-blue-600 text-white px-8 py-4 rounded-2xl text-2xl font-bold shadow-lg">
+                        <i class="fas fa-user-clock mr-2"></i>
+                        <span id="totalWaiting">0</span> waiting
+                    </span>
+                </div>
+            </div>
+
+            <div id="waitingList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Queue items will be inserted here -->
+            </div>
+
+            <div id="emptyQueue" class="hidden text-center py-16">
+                <div class="inline-block p-8 bg-gray-50 rounded-3xl">
+                    <i class="fas fa-inbox text-6xl text-gray-300 mb-4"></i>
+                    <p class="text-3xl text-gray-400 font-semibold">No patients waiting</p>
+                    <p class="text-lg text-gray-400 mt-2">Queue is empty</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="text-center mt-8">
+            <div class="glass rounded-2xl px-8 py-6 shadow-lg inline-block">
+                <p class="text-2xl text-gray-800 font-semibold mb-2">
+                    <i class="fas fa-bell text-primary-600 mr-3"></i>
+                    Please wait for your number to be called
+                </p>
+                <p class="text-sm text-gray-500">
+                    <i class="fas fa-sync-alt mr-2"></i>
+                    Last updated: <span id="lastUpdate" class="font-semibold">---</span>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const socket = io('/queue-display');
+        
+        // Update clock
+        function updateTime() {
+            const now = new Date();
+            document.getElementById('currentTime').textContent = now.toLocaleString('en-PH', {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            });
+        }
+        setInterval(updateTime, 1000);
+        updateTime();
+
+        // Handle queue updates
+        socket.on('queue_update', function(data) {
+            console.log('Queue update received:', data);
+            
+            // Update serving
+            if (data.serving) {
+                document.getElementById('servingNumber').textContent = `#${data.serving.id}`;
+                document.getElementById('servingName').textContent = data.serving.name;
+            } else {
+                document.getElementById('servingNumber').textContent = '---';
+                document.getElementById('servingName').textContent = 'Waiting for patient...';
+            }
+            
+            // Update total
+            document.getElementById('totalWaiting').textContent = data.total_waiting;
+            
+            // Update waiting list
+            const waitingList = document.getElementById('waitingList');
+            const emptyQueue = document.getElementById('emptyQueue');
+            
+            if (data.waiting.length === 0) {
+                waitingList.classList.add('hidden');
+                emptyQueue.classList.remove('hidden');
+            } else {
+                waitingList.classList.remove('hidden');
+                emptyQueue.classList.add('hidden');
+                
+                waitingList.innerHTML = data.waiting.map((patient, idx) => {
+                    const priorityConfig = {
+                        'Emergency': {
+                            border: 'border-l-8 border-red-500',
+                            gradient: 'from-red-50 to-red-100',
+                            badge: 'bg-gradient-to-r from-red-500 to-red-600 text-white',
+                            icon: 'fa-exclamation-triangle',
+                            numberColor: 'text-red-600'
+                        },
+                        'Urgent': {
+                            border: 'border-l-8 border-yellow-500',
+                            gradient: 'from-yellow-50 to-yellow-100',
+                            badge: 'bg-gradient-to-r from-yellow-500 to-yellow-600 text-white',
+                            icon: 'fa-clock',
+                            numberColor: 'text-yellow-600'
+                        }
+                    };
+                    
+                    const config = priorityConfig[patient.priority] || {
+                        border: 'border-l-8 border-blue-500',
+                        gradient: 'from-blue-50 to-blue-100',
+                        badge: 'bg-gradient-to-r from-blue-500 to-blue-600 text-white',
+                        icon: 'fa-user',
+                        numberColor: 'text-blue-600'
+                    };
+                    
+                    return `
+                        <div class="queue-item slide-in bg-gradient-to-br ${config.gradient} p-6 rounded-2xl shadow-lg ${config.border} hover:shadow-xl">
+                            <div class="flex items-start justify-between mb-4">
+                                <div class="flex items-center space-x-3">
+                                    <div class="w-12 h-12 ${config.badge} rounded-xl flex items-center justify-center shadow-lg">
+                                        <i class="fas ${config.icon} text-xl"></i>
+                                    </div>
+                                    <span class="text-5xl font-black ${config.numberColor}">
+                                        #${patient.id}
+                                    </span>
+                                </div>
+                                <span class="px-4 py-2 rounded-xl text-sm font-bold shadow-md ${config.badge}">
+                                    ${patient.priority}
+                                </span>
+                            </div>
+                            <div class="bg-white rounded-xl p-4 shadow-sm">
+                                <p class="text-2xl text-gray-900 font-bold mb-2">
+                                    <i class="fas fa-user-circle text-gray-400 mr-2"></i>
+                                    ${patient.name}
+                                </p>
+                                <div class="flex items-center justify-between text-sm text-gray-600">
+                                    <span>
+                                        <i class="fas fa-clock text-gray-400 mr-2"></i>
+                                        <span class="font-semibold">${patient.wait_time_minutes} min</span> waiting
+                                    </span>
+                                    <span class="text-xs text-gray-400">#${idx + 1} in queue</span>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }
+            
+            // Update timestamp
+            document.getElementById('lastUpdate').textContent = new Date().toLocaleTimeString();
+        });
+
+        // Initial load
+        fetch('{{ url_for("queue_display.get_current_queue") }}')
+            .then(r => r.json())
+            .then(data => {
+                socket.emit('queue_update', data);
+            });
+    </script>
+</body>
+</html>

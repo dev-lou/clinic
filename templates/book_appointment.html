@@ -3,6 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Book Appointment — ISUFST CareHub</title>
@@ -64,6 +65,8 @@
                         <i class="fas fa-home mr-1.5"></i>Home
                     </a>
                     {% if current_user.is_authenticated %}
+                    <!-- Notification Bell -->
+                    {% include 'partials/notification_bell.html' %}
                     <!-- Profile Dropdown -->
                     <div class="relative group">
                         <button class="flex items-center gap-2 px-3 py-2 hover:bg-gray-50 rounded-lg transition-colors">
@@ -128,9 +131,9 @@
         {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
         <div id="flash-messages" style="display:none;">
-        {% for category, message in messages %}
-        <div data-category="{{ category }}" data-message="{{ message }}"></div>
-        {% endfor %}
+            {% for category, message in messages %}
+            <div data-category="{{ category }}" data-message="{{ message }}"></div>
+            {% endfor %}
         </div>
         {% endif %}
         {% endwith %}
@@ -430,7 +433,7 @@
                     const category = msg.getAttribute('data-category');
                     const message = msg.getAttribute('data-message');
                     const icon = category === 'error' ? 'error' : 'success';
-                    
+
                     Swal.fire({
                         icon: icon,
                         title: icon === 'error' ? 'Error' : 'Success',
@@ -472,6 +475,8 @@
             });
         }
     </script>
+
+    {% include 'partials/chatbot_widget.html' %}
 </body>
 
 </html>

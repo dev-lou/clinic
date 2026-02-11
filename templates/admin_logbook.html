@@ -1,0 +1,883 @@
+{% extends "admin_base.html" %}
+{% set active_page = 'logbook' %}
+{% block title %}Clinic Logbook{% endblock %}
+
+{% block extra_head %}
+<style>
+    /* Hide Html5Qrcode default UI elements we don't need */
+    #qr-reader__dashboard_section_swaplink { display: none !important; }
+    #qr-reader__status_span { display: none !important; }
+    #qr-reader__header_message { display: none !important; }
+    #qr-reader video { border-radius: 12px; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <!-- Header -->
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+            <h1 class="text-2xl font-bold text-gray-900 font-display">Clinic Logbook</h1>
+            <p class="text-sm text-gray-500 mt-1">Digital record of student visits — no manual writing needed</p>
+        </div>
+        <div class="flex items-center gap-3">
+            <button onclick="openExportModal()"
+                class="px-4 py-2.5 bg-white border border-gray-200 text-gray-700 text-sm font-semibold rounded-xl hover:bg-gray-50 transition-all">
+                <i class="fas fa-file-csv mr-1.5"></i>Export CSV
+            </button>
+            <button onclick="openScannerModal()"
+                class="px-4 py-2.5 bg-indigo-600 text-white text-sm font-semibold rounded-xl hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-600/25">
+                <i class="fas fa-qrcode mr-1.5"></i>Scan QR
+            </button>
+            <button onclick="openCheckInModal()"
+                class="px-4 py-2.5 bg-primary-600 text-white text-sm font-semibold rounded-xl hover:bg-primary-700 transition-all shadow-lg shadow-primary-600/25">
+                <i class="fas fa-user-plus mr-1.5"></i>Quick Check-In
+            </button>
+        </div>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div class="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-primary-100 rounded-xl flex items-center justify-center">
+                    <i class="fas fa-users text-primary-600"></i>
+                </div>
+                <div>
+                    <p class="text-2xl font-bold text-gray-900">{{ today_total }}</p>
+                    <p class="text-xs text-gray-500">Total Visits Today</p>
+                </div>
+            </div>
+        </div>
+        <div class="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-amber-100 rounded-xl flex items-center justify-center">
+                    <i class="fas fa-clock text-amber-600"></i>
+                </div>
+                <div>
+                    <p class="text-2xl font-bold text-gray-900">{{ checked_in }}</p>
+                    <p class="text-xs text-gray-500">Currently Checked In</p>
+                </div>
+            </div>
+        </div>
+        <div class="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-emerald-100 rounded-xl flex items-center justify-center">
+                    <i class="fas fa-check-circle text-emerald-600"></i>
+                </div>
+                <div>
+                    <p class="text-2xl font-bold text-gray-900">{{ completed_today }}</p>
+                    <p class="text-xs text-gray-500">Completed Today</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="bg-white rounded-2xl p-4 border border-gray-100 shadow-sm">
+        <form method="GET" class="flex flex-col sm:flex-row gap-3 items-end">
+            <div class="flex-1">
+                <label class="text-xs font-medium text-gray-500 mb-1 block">Date</label>
+                <input type="date" name="date" value="{{ filter_date }}"
+                    class="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                    onchange="this.form.submit()">
+            </div>
+            <div class="flex-1">
+                <label class="text-xs font-medium text-gray-500 mb-1 block">Purpose</label>
+                <select name="purpose"
+                    class="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                    onchange="this.form.submit()">
+                    <option value="all" {{ 'selected' if filter_purpose=='all' }}>All Purposes</option>
+                    <option value="Medical" {{ 'selected' if filter_purpose=='Medical' }}>Medical</option>
+                    <option value="Dental" {{ 'selected' if filter_purpose=='Dental' }}>Dental</option>
+                    <option value="Medicine Pickup" {{ 'selected' if filter_purpose=='Medicine Pickup' }}>Medicine
+                        Pickup</option>
+                    <option value="Walk-in" {{ 'selected' if filter_purpose=='Walk-in' }}>Walk-in</option>
+                </select>
+            </div>
+            <div class="flex-1">
+                <label class="text-xs font-medium text-gray-500 mb-1 block">Search</label>
+                <div class="relative">
+                    <input type="text" name="search" value="{{ search }}" placeholder="Student name or ID..."
+                        class="w-full pl-9 pr-3 py-2 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                    <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i>
+                </div>
+            </div>
+            <button type="submit"
+                class="px-4 py-2 bg-primary-600 text-white text-sm font-semibold rounded-xl hover:bg-primary-700 transition-all">
+                <i class="fas fa-filter mr-1"></i>Filter
+            </button>
+        </form>
+    </div>
+
+    <!-- Logbook Table -->
+    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="w-full">
+                <thead>
+                    <tr class="bg-gray-50/80 border-b border-gray-100">
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">#
+                        </th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                            Student</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                            Purpose</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                            Check-In</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                            Check-Out</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                            Staff</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                            Status</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                            Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-50">
+                    {% for entry in entries %}
+                    <tr class="hover:bg-gray-50/50 transition-colors">
+                        <td class="px-4 py-3 text-sm text-gray-400 font-mono">{{ loop.index }}</td>
+                        <td class="px-4 py-3">
+                            <div>
+                                <p class="text-sm font-semibold text-gray-900">{{ entry.student_name }}</p>
+                                {% if entry.student_number %}
+                                <p class="text-xs text-gray-400">{{ entry.student_number }}</p>
+                                {% endif %}
+                            </div>
+                        </td>
+                        <td class="px-4 py-3">
+                            <span class="inline-flex px-2.5 py-1 text-xs font-semibold rounded-lg
+                                {% if entry.purpose == 'Medical' %}bg-blue-100 text-blue-700
+                                {% elif entry.purpose == 'Dental' %}bg-purple-100 text-purple-700
+                                {% elif entry.purpose == 'Medicine Pickup' %}bg-emerald-100 text-emerald-700
+                                {% else %}bg-gray-100 text-gray-700{% endif %}">
+                                {{ entry.purpose }}
+                            </span>
+                        </td>
+                        <td class="px-4 py-3 text-sm text-gray-600">
+                            {{ entry.check_in_time.strftime('%I:%M %p') if entry.check_in_time else '—' }}
+                        </td>
+                        <td class="px-4 py-3 text-sm text-gray-600">
+                            {{ entry.check_out_time.strftime('%I:%M %p') if entry.check_out_time else '—' }}
+                        </td>
+                        <td class="px-4 py-3 text-sm text-gray-600">
+                            {{ entry.attending_staff.first_name if entry.attending_staff else '—' }}
+                        </td>
+                        <td class="px-4 py-3">
+                            <span class="inline-flex px-2.5 py-1 text-xs font-semibold rounded-lg
+                                {% if entry.status == 'Checked In' %}bg-amber-100 text-amber-700
+                                {% elif entry.status == 'Completed' %}bg-emerald-100 text-emerald-700
+                                {% else %}bg-gray-100 text-gray-700{% endif %}">
+                                {{ entry.status }}
+                            </span>
+                        </td>
+                        <td class="px-4 py-3">
+                            {% if entry.status == 'Checked In' %}
+                            <form method="POST" action="{{ url_for('logbook.check_out', entry_id=entry.id) }}"
+                                class="inline">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <button type="submit"
+                                    class="px-3 py-1.5 bg-emerald-600 text-white text-xs font-semibold rounded-lg hover:bg-emerald-700 transition-all">
+                                    <i class="fas fa-sign-out-alt mr-1"></i>Check Out
+                                </button>
+                            </form>
+                            {% else %}
+                            <span class="text-xs text-gray-400">Done</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="8" class="px-4 py-12 text-center">
+                            <div class="text-gray-400">
+                                <i class="fas fa-book-open text-4xl mb-3 block opacity-40"></i>
+                                <p class="text-sm font-medium">No entries for this date</p>
+                                <p class="text-xs mt-1">Try a different date or check in a student</p>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Check-In Modal -->
+<div id="checkin-modal" class="fixed inset-0 z-50 hidden">
+    <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" onclick="closeCheckInModal()"></div>
+    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-md">
+        <div class="bg-white rounded-2xl shadow-2xl p-6">
+            <div class="flex items-center justify-between mb-5">
+                <h3 class="text-lg font-bold text-gray-900 font-display">Quick Check-In</h3>
+                <button onclick="closeCheckInModal()" class="text-gray-400 hover:text-gray-600">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form method="POST" action="{{ url_for('logbook.check_in') }}">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <input type="hidden" name="appointment_id" id="checkin-appointment-id" value="">
+
+                <!-- Student Search -->
+                <div class="mb-4">
+                    <label class="text-sm font-medium text-gray-700 mb-1 block">Search Student</label>
+                    <div class="relative">
+                        <input type="text" id="student-search" placeholder="Type student name..." autocomplete="off"
+                            class="w-full pl-9 pr-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                        <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
+                    </div>
+                    <div id="student-results"
+                        class="mt-1 hidden bg-white border border-gray-200 rounded-xl shadow-lg max-h-48 overflow-y-auto">
+                    </div>
+                    <input type="hidden" name="student_id" id="checkin-student-id" required>
+                    <p id="selected-student" class="text-sm text-primary-600 font-medium mt-2 hidden"></p>
+                </div>
+
+                <!-- Purpose -->
+                <div class="mb-4">
+                    <label class="text-sm font-medium text-gray-700 mb-1 block">Purpose</label>
+                    <select name="purpose"
+                        class="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                        <option value="Medical">Medical Consultation</option>
+                        <option value="Dental">Dental Consultation</option>
+                        <option value="Medicine Pickup">Medicine Pickup</option>
+                        <option value="Walk-in">Walk-in / Other</option>
+                    </select>
+                </div>
+
+                <!-- Notes -->
+                <div class="mb-5">
+                    <label class="text-sm font-medium text-gray-700 mb-1 block">Notes (optional)</label>
+                    <textarea name="notes" rows="2" placeholder="Symptoms, reason for visit..."
+                        class="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 resize-none"></textarea>
+                </div>
+
+                <button type="submit"
+                    class="w-full py-3 bg-primary-600 text-white text-sm font-bold rounded-xl hover:bg-primary-700 transition-all shadow-lg shadow-primary-600/25">
+                    <i class="fas fa-check mr-1.5"></i>Check In Student
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- QR Scanner Modal -->
+<div id="scanner-modal" class="fixed inset-0 z-50 hidden">
+    <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" onclick="closeScannerModal()"></div>
+    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-lg">
+        <div class="bg-white rounded-2xl shadow-2xl p-6">
+            <div class="flex items-center justify-between mb-5">
+                <h3 class="text-lg font-bold text-gray-900 font-display">Scan QR Code</h3>
+                <button onclick="closeScannerModal()" class="text-gray-400 hover:text-gray-600">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <!-- Tab Buttons -->
+            <div class="flex gap-2 mb-4">
+                <button onclick="switchScannerTab('camera')" id="camera-tab-btn"
+                    class="flex-1 py-2 px-4 bg-indigo-600 text-white rounded-lg font-semibold transition-all">
+                    <i class="fas fa-camera mr-2"></i>Camera
+                </button>
+                <button onclick="switchScannerTab('file')" id="file-tab-btn"
+                    class="flex-1 py-2 px-4 bg-gray-200 text-gray-700 rounded-lg font-semibold transition-all">
+                    <i class="fas fa-image mr-2"></i>Upload Image
+                </button>
+                <button onclick="switchScannerTab('manual')" id="manual-tab-btn"
+                    class="flex-1 py-2 px-4 bg-gray-200 text-gray-700 rounded-lg font-semibold transition-all">
+                    <i class="fas fa-keyboard mr-2"></i>Manual
+                </button>
+            </div>
+
+            <!-- Camera Scanner Tab -->
+            <div id="camera-scanner-tab">
+                <div id="qr-reader" class="w-full rounded-xl overflow-hidden bg-black relative" style="min-height: 300px;">
+                    <video id="qr-video" autoplay playsinline muted class="w-full rounded-xl" style="min-height: 300px; object-fit: cover;"></video>
+                    <canvas id="qr-canvas" class="hidden"></canvas>
+                    <!-- Scanning overlay -->
+                    <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+                        <div style="width: 200px; height: 200px; border: 3px solid rgba(99,102,241,0.7); border-radius: 16px;"></div>
+                    </div>
+                    <div id="scan-status" class="absolute bottom-2 left-0 right-0 text-center">
+                        <span class="bg-black/60 text-white text-xs px-3 py-1 rounded-full">
+                            <i class="fas fa-spinner fa-spin mr-1"></i> Scanning...
+                        </span>
+                    </div>
+                </div>
+                <p class="text-xs text-gray-500 mt-2 text-center">
+                    <i class="fas fa-qrcode mr-1"></i>
+                    Point camera at QR code — auto-detects
+                </p>
+            </div>
+            
+            <!-- File Upload Tab -->
+            <div id="file-scanner-tab" class="hidden">
+                <div class="border-2 border-dashed border-indigo-300 rounded-xl p-8 text-center bg-indigo-50">
+                    <i class="fas fa-cloud-upload-alt text-4xl text-indigo-400 mb-3"></i>
+                    <p class="text-sm text-gray-600 mb-4">Upload a screenshot or photo of the QR code</p>
+                    <label for="qr-file-input" class="cursor-pointer inline-block px-6 py-3 bg-indigo-600 text-white font-semibold rounded-xl hover:bg-indigo-700 transition-all">
+                        <i class="fas fa-folder-open mr-2"></i>Choose Image
+                    </label>
+                    <input type="file" id="qr-file-input" accept="image/*" class="hidden" onchange="scanFromFile(this)">
+                </div>
+                <div id="file-result" class="hidden mt-3 p-3 bg-blue-50 rounded-xl text-sm text-blue-800">
+                    <i class="fas fa-spinner fa-spin mr-2"></i>Processing image...
+                </div>
+            </div>
+
+            <!-- Manual Entry Tab -->
+            <div id="manual-scanner-tab" class="hidden">
+                <p class="text-sm text-gray-600 mb-3">Paste QR data if camera not available:</p>
+                <textarea id="qr-data-input" rows="4" placeholder='Paste QR data here...'
+                    class="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 resize-none font-mono"></textarea>
+                <button onclick="verifyQRCode()"
+                    class="w-full mt-3 py-3 bg-indigo-600 text-white text-sm font-bold rounded-xl hover:bg-indigo-700 transition-all">
+                    <i class="fas fa-search mr-1.5"></i>Verify QR
+                </button>
+            </div>
+
+            <!-- Loading indicator -->
+            <div id="qr-loading" class="hidden mt-4 p-4 bg-blue-50 rounded-xl">
+                <div class="text-center py-3"><i class="fas fa-spinner fa-spin mr-2 text-blue-600"></i><span class="text-sm text-blue-700">Verifying...</span></div>
+            </div>
+
+            <!-- Result Display -->
+            <div id="qr-student-info" class="hidden mt-4 p-4 bg-green-50 rounded-xl">
+                <p class="text-sm font-semibold text-green-900 mb-1">Student Found:</p>
+                <p id="qr-student-name" class="text-sm text-green-700"></p>
+                <p id="qr-appointment-info" class="text-xs text-green-600 mt-1"></p>
+            </div>
+
+            <div id="qr-error" class="hidden mt-4 p-4 bg-red-50 rounded-xl">
+                <p class="text-sm text-red-700"></p>
+            </div>
+
+            <!-- Check In Button -->
+            <button onclick="checkInFromQR()" id="qr-checkin-btn" disabled
+                class="w-full mt-4 py-3 bg-green-600 text-white text-sm font-bold rounded-xl hover:bg-green-700 transition-all disabled:bg-gray-300 disabled:cursor-not-allowed">
+                <i class="fas fa-check mr-1.5"></i>Check In Student
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Export Modal -->
+<div id="export-modal" class="fixed inset-0 z-50 hidden">
+    <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" onclick="closeExportModal()"></div>
+    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-sm">
+        <div class="bg-white rounded-2xl shadow-2xl p-6">
+            <h3 class="text-lg font-bold text-gray-900 font-display mb-4">Export Logbook</h3>
+            <form id="export-form">
+                <div class="mb-4">
+                    <label class="text-sm font-medium text-gray-700 mb-1 block">Start Date</label>
+                    <input type="date" id="export-start" value="{{ filter_date }}"
+                        class="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                </div>
+                <div class="mb-5">
+                    <label class="text-sm font-medium text-gray-700 mb-1 block">End Date</label>
+                    <input type="date" id="export-end" value="{{ filter_date }}"
+                        class="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                </div>
+                <button type="button" onclick="downloadExport()"
+                    class="w-full py-3 bg-emerald-600 text-white text-sm font-bold rounded-xl hover:bg-emerald-700 transition-all">
+                    <i class="fas fa-download mr-1.5"></i>Download CSV
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Hidden div for Html5Qrcode canvas fallback -->
+<div id="qr-canvas-temp" class="hidden"></div>
+
+<!-- QR Code Libraries -->
+<script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+<script src="https://unpkg.com/jsqr@1.4.0/dist/jsQR.js"></script>
+
+<script>
+    // Check-In Modal
+    function openCheckInModal() { document.getElementById('checkin-modal').classList.remove('hidden'); }
+    function closeCheckInModal() { document.getElementById('checkin-modal').classList.add('hidden'); }
+
+    // Export Modal
+    function openExportModal() { document.getElementById('export-modal').classList.remove('hidden'); }
+    function closeExportModal() { document.getElementById('export-modal').classList.add('hidden'); }
+
+    function downloadExport() {
+        const start = document.getElementById('export-start').value;
+        const end = document.getElementById('export-end').value;
+        window.location.href = `/logbook/admin/export?start=${start}&end=${end}`;
+        closeExportModal();
+    }
+
+    // Student Search with Autocomplete
+    let searchTimeout;
+    const searchInput = document.getElementById('student-search');
+    const resultsDiv = document.getElementById('student-results');
+
+    searchInput.addEventListener('input', function () {
+        clearTimeout(searchTimeout);
+        const query = this.value.trim();
+
+        if (query.length < 2) {
+            resultsDiv.classList.add('hidden');
+            return;
+        }
+
+        searchTimeout = setTimeout(() => {
+            fetch(`/logbook/admin/search-students?q=${encodeURIComponent(query)}`)
+                .then(r => r.json())
+                .then(data => {
+                    if (data.length === 0) {
+                        resultsDiv.innerHTML = '<div class="px-4 py-3 text-sm text-gray-400">No students found</div>';
+                    } else {
+                        resultsDiv.innerHTML = data.map(s => {
+                            let apptBadge = '';
+                            if (s.appointments.length > 0) {
+                                apptBadge = `<span class="inline-flex px-2 py-0.5 bg-primary-100 text-primary-700 text-[10px] font-semibold rounded-full ml-2">
+                                    ${s.appointments[0].service} at ${s.appointments[0].time}
+                                </span>`;
+                            }
+                            return `<div class="px-4 py-2.5 hover:bg-gray-50 cursor-pointer transition-colors border-b border-gray-50 last:border-0"
+                                        onclick="selectStudent(${s.id}, '${s.name}', ${s.appointments.length > 0 ? s.appointments[0].id : 'null'})">
+                                <p class="text-sm font-semibold text-gray-900">${s.name}${apptBadge}</p>
+                                <p class="text-xs text-gray-400">${s.email}</p>
+                            </div>`;
+                        }).join('');
+                    }
+                    resultsDiv.classList.remove('hidden');
+                });
+        }, 300);
+    });
+
+    function selectStudent(id, name, appointmentId) {
+        document.getElementById('checkin-student-id').value = id;
+        document.getElementById('selected-student').textContent = `✓ Selected: ${name}`;
+        document.getElementById('selected-student').classList.remove('hidden');
+        document.getElementById('student-search').value = name;
+        document.getElementById('student-results').classList.add('hidden');
+        if (appointmentId) {
+            document.getElementById('checkin-appointment-id').value = appointmentId;
+        }
+    }
+
+    // QR Scanner Modal
+    let qrVerifiedData = null;
+    let html5QrCode = null;
+    let currentScannerTab = 'camera';
+    
+    function openScannerModal() { 
+        document.getElementById('scanner-modal').classList.remove('hidden'); 
+        qrVerifiedData = null;
+        document.getElementById('qr-data-input').value = '';
+        document.getElementById('qr-student-info').classList.add('hidden');
+        document.getElementById('qr-error').classList.add('hidden');
+        document.getElementById('qr-checkin-btn').disabled = true;
+        
+        // Start camera scanner by default
+        switchScannerTab('camera');
+    }
+    
+    function closeScannerModal() { 
+        document.getElementById('scanner-modal').classList.add('hidden');
+        qrVerifiedData = null;
+        stopScanner();
+    }
+    
+    function stopScanner() {
+        // Stop scan frame
+        if (window._qrScanFrame) {
+            cancelAnimationFrame(window._qrScanFrame);
+            window._qrScanFrame = null;
+        }
+        // Stop scan interval (legacy)
+        if (window._qrScanInterval) {
+            clearInterval(window._qrScanInterval);
+            window._qrScanInterval = null;
+        }
+        // Stop camera stream
+        if (window._qrStream) {
+            window._qrStream.getTracks().forEach(t => t.stop());
+            window._qrStream = null;
+        }
+        const video = document.getElementById('qr-video');
+        if (video) {
+            video.srcObject = null;
+        }
+        // Legacy cleanup
+        if (html5QrCode) {
+            try {
+                if (html5QrCode.isScanning) {
+                    html5QrCode.stop().catch(() => {});
+                }
+            } catch (e) {}
+            html5QrCode = null;
+        }
+    }
+
+    function switchScannerTab(tab) {
+        currentScannerTab = tab;
+        const tabs = ['camera', 'file', 'manual'];
+        tabs.forEach(t => {
+            const tabEl = document.getElementById(t + '-scanner-tab');
+            const btnEl = document.getElementById(t + '-tab-btn');
+            if (t === tab) {
+                tabEl.classList.remove('hidden');
+                btnEl.classList.add('bg-indigo-600', 'text-white');
+                btnEl.classList.remove('bg-gray-200', 'text-gray-700');
+            } else {
+                tabEl.classList.add('hidden');
+                btnEl.classList.remove('bg-indigo-600', 'text-white');
+                btnEl.classList.add('bg-gray-200', 'text-gray-700');
+            }
+        });
+        
+        if (tab === 'camera') {
+            startCameraScanner();
+        } else {
+            stopScanner();
+        }
+    }
+
+    async function startCameraScanner() {
+        console.log('Starting camera scanner...');
+        const video = document.getElementById('qr-video');
+        const canvas = document.getElementById('qr-canvas');
+        const ctx = canvas.getContext('2d');
+        const statusDiv = document.getElementById('scan-status');
+        
+        // Stop any existing stream
+        stopScanner();
+        
+        try {
+            // Get camera stream
+            const stream = await navigator.mediaDevices.getUserMedia({
+                video: { facingMode: 'environment', width: { ideal: 1920 }, height: { ideal: 1080 } }
+            });
+            video.srcObject = stream;
+            video.style.display = 'block';
+            window._qrStream = stream;
+            
+            await new Promise(resolve => { video.onloadedmetadata = resolve; });
+            await video.play();
+            
+            console.log('✅ Camera started:', video.videoWidth, 'x', video.videoHeight);
+            
+            // Image enhancement: boost contrast & convert to B/W for QR detection
+            function enhanceForQR(imageData) {
+                const data = imageData.data;
+                for (let i = 0; i < data.length; i += 4) {
+                    // Convert to grayscale
+                    const gray = data[i] * 0.299 + data[i+1] * 0.587 + data[i+2] * 0.114;
+                    // Apply threshold to create sharp black/white
+                    const bw = gray > 128 ? 255 : 0;
+                    data[i] = bw;
+                    data[i+1] = bw;
+                    data[i+2] = bw;
+                }
+                return imageData;
+            }
+            
+            // Scan loop using jsQR with multiple strategies
+            let scanCount = 0;
+            const scanFrame = () => {
+                if (!window._qrStream) return; // Stopped
+                
+                scanCount++;
+                if (video.readyState === video.HAVE_ENOUGH_DATA) {
+                    canvas.width = video.videoWidth;
+                    canvas.height = video.videoHeight;
+                    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+                    
+                    let code = null;
+                    
+                    // Strategy 1: Scan full frame raw
+                    const rawData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                    code = jsQR(rawData.data, rawData.width, rawData.height, {
+                        inversionAttempts: "attemptBoth",
+                    });
+                    
+                    // Strategy 2: If not found, try center crop (50% of frame)
+                    if (!code || !code.data) {
+                        const cx = Math.floor(canvas.width * 0.25);
+                        const cy = Math.floor(canvas.height * 0.25);
+                        const cw = Math.floor(canvas.width * 0.5);
+                        const ch = Math.floor(canvas.height * 0.5);
+                        const cropData = ctx.getImageData(cx, cy, cw, ch);
+                        code = jsQR(cropData.data, cropData.width, cropData.height, {
+                            inversionAttempts: "attemptBoth",
+                        });
+                    }
+                    
+                    // Strategy 3: If not found, try enhanced B/W of full frame
+                    if (!code || !code.data) {
+                        const enhData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                        enhanceForQR(enhData);
+                        code = jsQR(enhData.data, enhData.width, enhData.height, {
+                            inversionAttempts: "attemptBoth",
+                        });
+                    }
+                    
+                    // Strategy 4: Enhanced B/W of center crop
+                    if (!code || !code.data) {
+                        const cx = Math.floor(canvas.width * 0.25);
+                        const cy = Math.floor(canvas.height * 0.25);
+                        const cw = Math.floor(canvas.width * 0.5);
+                        const ch = Math.floor(canvas.height * 0.5);
+                        const cropEnhData = ctx.getImageData(cx, cy, cw, ch);
+                        enhanceForQR(cropEnhData);
+                        code = jsQR(cropEnhData.data, cropEnhData.width, cropEnhData.height, {
+                            inversionAttempts: "attemptBoth",
+                        });
+                    }
+                    
+                    if (code && code.data && code.data.length > 0) {
+                        console.log('✅ QR DETECTED (jsQR):', code.data);
+                        statusDiv.innerHTML = '<span class="bg-green-600/80 text-white text-xs px-3 py-1 rounded-full"><i class="fas fa-check mr-1"></i> QR Found!</span>';
+                        if (navigator.vibrate) navigator.vibrate(200);
+                        stopScanner();
+                        handleQRScan(code.data);
+                        return;
+                    }
+                    
+                    if (scanCount % 30 === 0) {
+                        console.log(`Scanned ${scanCount} frames (4 strategies each)...`);
+                    }
+                }
+                
+                // Continue scanning
+                window._qrScanFrame = requestAnimationFrame(scanFrame);
+            };
+            
+            // Start scanning loop
+            scanFrame();
+            
+        } catch (err) {
+            console.error('Camera error:', err);
+            const readerDiv = document.getElementById('qr-reader');
+            readerDiv.innerHTML = `
+                <div class="flex flex-col items-center justify-center h-64 p-4 text-center">
+                    <i class="fas fa-exclamation-triangle text-4xl text-red-400 mb-3"></i>
+                    <p class="text-sm font-semibold text-red-600">Camera Error</p>
+                    <p class="text-xs text-gray-500 mt-2">${err.message || err}</p>
+                    <p class="text-xs text-gray-500 mt-2">Try <strong>Upload Image</strong> tab instead</p>
+                </div>`;
+        }
+    }
+    
+    // File upload scanning
+    async function scanFromFile(input) {
+        const fileResult = document.getElementById('file-result');
+        
+        if (!input.files || !input.files[0]) return;
+        
+        fileResult.classList.remove('hidden');
+        fileResult.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Processing image...';
+        
+        try {
+            const tempScanner = new Html5Qrcode("file-result");
+            const result = await tempScanner.scanFile(input.files[0], true);
+            console.log('✅ QR from file:', result);
+            fileResult.innerHTML = '<i class="fas fa-check-circle mr-2 text-green-600"></i>QR code found! Verifying...';
+            fileResult.classList.remove('text-blue-800', 'bg-blue-50');
+            fileResult.classList.add('text-green-800', 'bg-green-50');
+            await tempScanner.clear();
+            handleQRScan(result);
+        } catch (err) {
+            console.error('File scan error:', err);
+            fileResult.innerHTML = '<i class="fas fa-times-circle mr-2 text-red-600"></i>Could not detect QR code in image. Try a clearer photo.';
+            fileResult.classList.remove('text-blue-800', 'bg-blue-50');
+            fileResult.classList.add('text-red-800', 'bg-red-50');
+        }
+        
+        // Reset file input
+        input.value = '';
+    }
+
+    function handleQRScan(qrData) {
+        // Auto-verify the scanned QR code
+        verifyQRCodeData(qrData);
+    }
+
+    async function verifyQRCode() {
+        const qrData = document.getElementById('qr-data-input').value.trim();
+        await verifyQRCodeData(qrData);
+    }
+
+    async function verifyQRCodeData(qrData) {
+        console.log('🔍 Verifying QR code...');
+        console.log('QR data length:', qrData.length);
+        console.log('First 200 chars:', qrData.substring(0, 200));
+        
+        const errorDiv = document.getElementById('qr-error');
+        const infoDiv = document.getElementById('qr-student-info');
+        
+        // Hide scan status indicators
+        
+        if (!qrData) {
+            errorDiv.querySelector('p').textContent = 'Please scan or paste QR code data';
+            errorDiv.classList.remove('hidden');
+            infoDiv.classList.add('hidden');
+            return;
+        }
+
+        // Validate JSON format first
+        try {
+            const testParse = JSON.parse(qrData);
+            if (!testParse.type || !testParse.token) {
+                console.error('❌ Missing required fields in QR data');
+                errorDiv.querySelector('p').textContent = 'Invalid QR code: Missing required data';
+                errorDiv.classList.remove('hidden');
+                infoDiv.classList.add('hidden');
+                return;
+            }
+            if (testParse.type === 'appointment_checkin' && !testParse.appointment_id) {
+                errorDiv.querySelector('p').textContent = 'Invalid QR code: Missing appointment ID';
+                errorDiv.classList.remove('hidden');
+                infoDiv.classList.add('hidden');
+                return;
+            }
+            if (testParse.type === 'medicine_reservation' && !testParse.reservation_id) {
+                errorDiv.querySelector('p').textContent = 'Invalid QR code: Missing reservation ID';
+                errorDiv.classList.remove('hidden');
+                infoDiv.classList.add('hidden');
+                return;
+            }
+        } catch (e) {
+            console.error('❌ QR data is not valid JSON:', e);
+            errorDiv.querySelector('p').textContent = 'Invalid QR code: Not valid JSON format';
+            errorDiv.classList.remove('hidden');
+            infoDiv.classList.add('hidden');
+            return;
+        }
+
+        // Show loading state
+        errorDiv.classList.add('hidden');
+        infoDiv.classList.add('hidden');
+        document.getElementById('qr-loading').classList.remove('hidden');
+
+        try {
+            console.log('📡 Sending verification request...');
+            
+            // Get CSRF token from meta tag or hidden input
+            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content || 
+                              document.querySelector('input[name="csrf_token"]')?.value || '';
+            console.log('🔑 CSRF token found:', csrfToken ? 'Yes (' + csrfToken.substring(0, 10) + '...)' : 'NO TOKEN!');
+            
+            const parsed = JSON.parse(qrData);
+            const verifyUrl = parsed.type === 'medicine_reservation'
+                ? '/reservations/api/verify-qr'
+                : '/appointments/api/verify-qr';
+
+            const response = await fetch(verifyUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrfToken,
+                },
+                body: JSON.stringify({ qr_data: qrData })
+            });
+
+            const data = await response.json();
+            console.log('📥 Server response:', data);
+            console.log('Response status:', response.status);
+
+            document.getElementById('qr-loading').classList.add('hidden');
+
+            if (!response.ok || data.error) {
+                console.error('❌ Verification failed:', data.error);
+                errorDiv.querySelector('p').textContent = data.error || 'Invalid QR code';
+                errorDiv.classList.remove('hidden');
+                infoDiv.classList.add('hidden');
+                document.getElementById('qr-checkin-btn').disabled = true;
+                qrVerifiedData = null;
+                return;
+            }
+
+            console.log('✅ QR code verified successfully!');
+            
+            // Show student info
+            document.getElementById('qr-student-name').textContent = 
+                `${data.student.name} (${data.student.student_id})`;
+            if (data.type === 'medicine_reservation') {
+                document.getElementById('qr-appointment-info').textContent = 
+                    `Medicine: ${data.reservation.medicine_name} (${data.reservation.quantity} unit(s))`;
+            } else {
+                document.getElementById('qr-appointment-info').textContent = 
+                    `${data.appointment.service_type} - ${data.appointment.date} at ${data.appointment.time}`;
+            }
+            
+            // Success - vibrate if available
+            if (navigator.vibrate) {
+                navigator.vibrate(200);
+            }
+            
+            infoDiv.classList.remove('hidden');
+            errorDiv.classList.add('hidden');
+            document.getElementById('qr-checkin-btn').disabled = false;
+            
+            qrVerifiedData = data;
+        } catch (error) {
+            console.error('❌ Verification error:', error);
+            document.getElementById('qr-loading').classList.add('hidden');
+            
+            errorDiv.querySelector('p').textContent = 'Failed to verify QR code: ' + error.message;
+            errorDiv.classList.remove('hidden');
+            infoDiv.classList.add('hidden');
+            document.getElementById('qr-checkin-btn').disabled = true;
+            qrVerifiedData = null;
+        }
+    }
+
+    function checkInFromQR() {
+        if (!qrVerifiedData) return;
+
+        // Auto-submit check-in directly using the QR data (no need for manual form)
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = '{{ url_for("logbook.check_in") }}';
+        form.style.display = 'none';
+
+        // CSRF token
+        const csrfInput = document.createElement('input');
+        csrfInput.type = 'hidden';
+        csrfInput.name = 'csrf_token';
+        csrfInput.value = document.querySelector('meta[name="csrf-token"]')?.content || 
+                          document.querySelector('input[name="csrf_token"]')?.value || '';
+        form.appendChild(csrfInput);
+
+        // Student ID
+        const studentInput = document.createElement('input');
+        studentInput.type = 'hidden';
+        studentInput.name = 'student_id';
+        studentInput.value = qrVerifiedData.student.id;
+        form.appendChild(studentInput);
+
+        // Appointment ID
+        const apptInput = document.createElement('input');
+        apptInput.type = 'hidden';
+        apptInput.name = 'appointment_id';
+        apptInput.value = qrVerifiedData.appointment.id;
+        form.appendChild(apptInput);
+
+        // Purpose from appointment service type
+        const purposeInput = document.createElement('input');
+        purposeInput.type = 'hidden';
+        purposeInput.name = 'purpose';
+        purposeInput.value = qrVerifiedData.appointment.service_type || 'Walk-in';
+        form.appendChild(purposeInput);
+
+        // Notes
+        const notesInput = document.createElement('input');
+        notesInput.type = 'hidden';
+        notesInput.name = 'notes';
+        notesInput.value = 'Checked in via QR code scan';
+        form.appendChild(notesInput);
+
+        document.body.appendChild(form);
+        closeScannerModal();
+        form.submit();
+    }
+</script>
+{% endblock %}

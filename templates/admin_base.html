@@ -3,6 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Admin{% endblock %} — ISUFST CareHub</title>
@@ -151,10 +152,33 @@
                 <i
                     class="fas fa-hand-holding-heart w-5 text-center {% if active_page == 'reservations' %}text-blue-300{% else %}text-blue-300/60{% endif %}"></i><span>Reservations</span>
             </a>
+            <a href="{{ url_for('logbook.admin_logbook') }}"
+                class="sidebar-link {% if active_page == 'logbook' %}active{% endif %} flex items-center space-x-3 px-3 py-2.5 rounded-xl text-sm font-medium {% if active_page != 'logbook' %}text-blue-200/80{% endif %}">
+                <i
+                    class="fas fa-book w-5 text-center {% if active_page == 'logbook' %}text-blue-300{% else %}text-blue-300/60{% endif %}"></i><span>Clinic
+                    Logbook</span>
+            </a>
             <a href="{{ url_for('auth.list_users') }}"
                 class="sidebar-link {% if active_page == 'users' %}active{% endif %} flex items-center space-x-3 px-3 py-2.5 rounded-xl text-sm font-medium {% if active_page != 'users' %}text-blue-200/80{% endif %}">
                 <i
                     class="fas fa-users w-5 text-center {% if active_page == 'users' %}text-blue-300{% else %}text-blue-300/60{% endif %}"></i><span>Users</span>
+            </a>
+
+            <p class="text-[10px] text-blue-300/40 font-bold uppercase tracking-widest px-3 pt-5 pb-2">Analytics & Tools</p>
+            <a href="{{ url_for('analytics.index') }}"
+                class="sidebar-link {% if active_page == 'analytics' %}active{% endif %} flex items-center space-x-3 px-3 py-2.5 rounded-xl text-sm font-medium {% if active_page != 'analytics' %}text-blue-200/80{% endif %}">
+                <i
+                    class="fas fa-chart-line w-5 text-center {% if active_page == 'analytics' %}text-blue-300{% else %}text-blue-300/60{% endif %}"></i><span>Analytics</span>
+            </a>
+            <a href="{{ url_for('search.index') }}"
+                class="sidebar-link {% if active_page == 'search' %}active{% endif %} flex items-center space-x-3 px-3 py-2.5 rounded-xl text-sm font-medium {% if active_page != 'search' %}text-blue-200/80{% endif %}">
+                <i
+                    class="fas fa-search w-5 text-center {% if active_page == 'search' %}text-blue-300{% else %}text-blue-300/60{% endif %}"></i><span>Search</span>
+            </a>
+            <a href="{{ url_for('queue_display.display') }}"
+                class="sidebar-link {% if active_page == 'queue' %}active{% endif %} flex items-center space-x-3 px-3 py-2.5 rounded-xl text-sm font-medium {% if active_page != 'queue' %}text-blue-200/80{% endif %}">
+                <i
+                    class="fas fa-tv w-5 text-center {% if active_page == 'queue' %}text-blue-300{% else %}text-blue-300/60{% endif %}"></i><span>Queue Display</span>
             </a>
 
             <p class="text-[10px] text-blue-300/40 font-bold uppercase tracking-widest px-3 pt-5 pb-2">Quick Links</p>
@@ -234,12 +258,35 @@
                     <i
                         class="fas fa-hand-holding-heart w-5 text-center {% if active_page == 'reservations' %}text-blue-300{% else %}text-blue-300/60{% endif %}"></i><span>Reservations</span>
                 </a>
+                <a href="{{ url_for('logbook.admin_logbook') }}"
+                    class="sidebar-link {% if active_page == 'logbook' %}active{% endif %} flex items-center space-x-3 px-3 py-2.5 rounded-xl text-sm font-medium {% if active_page != 'logbook' %}text-blue-200/80{% endif %}">
+                    <i
+                        class="fas fa-book w-5 text-center {% if active_page == 'logbook' %}text-blue-300{% else %}text-blue-300/60{% endif %}"></i><span>Clinic
+                        Logbook</span>
+                </a>
                 <a href="{{ url_for('auth.list_users') }}"
                     class="sidebar-link {% if active_page == 'users' %}active{% endif %} flex items-center space-x-3 px-3 py-2.5 rounded-xl text-sm font-medium {% if active_page != 'users' %}text-blue-200/80{% endif %}">
                     <i
                         class="fas fa-users w-5 text-center {% if active_page == 'users' %}text-blue-300{% else %}text-blue-300/60{% endif %}"></i><span>Users</span>
                 </a>
-                
+
+                <p class="text-[10px] text-blue-300/40 font-bold uppercase tracking-widest px-3 pt-6 pb-2">Analytics & Tools</p>
+                <a href="{{ url_for('analytics.index') }}"
+                    class="sidebar-link {% if active_page == 'analytics' %}active{% endif %} flex items-center space-x-3 px-3 py-2.5 rounded-xl text-sm font-medium {% if active_page != 'analytics' %}text-blue-200/80{% endif %}">
+                    <i
+                        class="fas fa-chart-line w-5 text-center {% if active_page == 'analytics' %}text-blue-300{% else %}text-blue-300/60{% endif %}"></i><span>Analytics</span>
+                </a>
+                <a href="{{ url_for('search.index') }}"
+                    class="sidebar-link {% if active_page == 'search' %}active{% endif %} flex items-center space-x-3 px-3 py-2.5 rounded-xl text-sm font-medium {% if active_page != 'search' %}text-blue-200/80{% endif %}">
+                    <i
+                        class="fas fa-search w-5 text-center {% if active_page == 'search' %}text-blue-300{% else %}text-blue-300/60{% endif %}"></i><span>Search</span>
+                </a>
+                <a href="{{ url_for('queue_display.display') }}"
+                    class="sidebar-link {% if active_page == 'queue' %}active{% endif %} flex items-center space-x-3 px-3 py-2.5 rounded-xl text-sm font-medium {% if active_page != 'queue' %}text-blue-200/80{% endif %}">
+                    <i
+                        class="fas fa-tv w-5 text-center {% if active_page == 'queue' %}text-blue-300{% else %}text-blue-300/60{% endif %}"></i><span>Queue Display</span>
+                </a>
+
                 <p class="text-[10px] text-blue-300/40 font-bold uppercase tracking-widest px-3 pt-6 pb-2">Quick Links
                 </p>
                 <a href="{{ url_for('reservations.view_medicines') }}"
@@ -334,7 +381,7 @@
                     const category = msg.getAttribute('data-category');
                     const message = msg.getAttribute('data-message');
                     const icon = category === 'error' ? 'error' : category === 'success' ? 'success' : 'info';
-                    
+
                     Swal.fire({
                         icon: icon,
                         title: message,
@@ -352,6 +399,8 @@
         });
     </script>
     {% block extra_scripts %}{% endblock %}
+
+    {% include 'partials/chatbot_widget.html' %}
 </body>
 
 </html>

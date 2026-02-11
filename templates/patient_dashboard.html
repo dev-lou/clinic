@@ -1,0 +1,208 @@
+{% extends "student_base.html" %}
+
+{% block title %}Dashboard - ISUFST CareHub{% endblock %}
+
+{% block content %}
+<div class="space-y-8">
+    <!-- Welcome Section -->
+    <div class="bg-gradient-to-r from-isufst-primary to-isufst-secondary text-white rounded-lg p-8 shadow-lg">
+        <h1 class="text-3xl font-bold mb-2">Welcome back, {{ current_user.first_name }}!</h1>
+        <p class="text-blue-100">Here's your health overview</p>
+    </div>
+
+    <!-- Quick Stats -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+        <div class="card bg-gradient-to-br from-blue-500 to-blue-600 text-white">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-blue-100 text-sm">Upcoming</p>
+                    <p class="text-3xl font-bold">{{ upcoming_appointments|length }}</p>
+                    <p class="text-sm">Appointments</p>
+                </div>
+                <i class="fas fa-calendar-check text-4xl text-blue-200"></i>
+            </div>
+        </div>
+        
+        <div class="card bg-gradient-to-br from-green-500 to-green-600 text-white">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-green-100 text-sm">Active</p>
+                    <p class="text-3xl font-bold">{{ active_reservations|length }}</p>
+                    <p class="text-sm">Reservations</p>
+                </div>
+                <i class="fas fa-pills text-4xl text-green-200"></i>
+            </div>
+        </div>
+        
+        <div class="card bg-gradient-to-br from-purple-500 to-purple-600 text-white">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-purple-100 text-sm">Total</p>
+                    <p class="text-3xl font-bold">{{ recent_visits|length }}</p>
+                    <p class="text-sm">Clinic Visits</p>
+                </div>
+                <i class="fas fa-heartbeat text-4xl text-purple-200"></i>
+            </div>
+        </div>
+        
+        <div class="card bg-gradient-to-br from-orange-500 to-orange-600 text-white">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-orange-100 text-sm">Certificates</p>
+                    <p class="text-3xl font-bold">{{ certificates|length }}</p>
+                    <p class="text-sm">Issued</p>
+                </div>
+                <i class="fas fa-certificate text-4xl text-orange-200"></i>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content Grid -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- Left Column - Appointments & Visits -->
+        <div class="lg:col-span-2 space-y-6">
+            <!-- Upcoming Appointments -->
+            <div class="card">
+                <div class="flex items-center justify-between mb-4">
+                    <h2 class="card-header mb-0">Upcoming Appointments</h2>
+                    <a href="{{ url_for('appointments.book') }}" class="btn-primary text-sm">
+                        <i class="fas fa-plus"></i> Book New
+                    </a>
+                </div>
+                
+                {% if upcoming_appointments %}
+                    <div class="space-y-3">
+                        {% for appt in upcoming_appointments %}
+                        <div class="border-l-4 border-blue-500 bg-blue-50 p-4 rounded">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="font-semibold text-gray-800">{{ appt.service_type }}</p>
+                                    <p class="text-sm text-gray-600">
+                                        <i class="fas fa-calendar"></i> {{ appt.appointment_date.strftime('%B %d, %Y') }}
+                                        <i class="fas fa-clock ml-3"></i> {{ appt.start_time.strftime('%I:%M %p') }}
+                                    </p>
+                                </div>
+                                <span class="badge badge-{{ 'success' if appt.status == 'Confirmed' else 'warning' }}">
+                                    {{ appt.status }}
+                                </span>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="text-center py-8 text-gray-500">
+                        <i class="fas fa-calendar-times text-4xl mb-3"></i>
+                        <p>No upcoming appointments</p>
+                        <a href="{{ url_for('symptom_screening.index') }}" class="text-blue-600 hover:underline mt-2 inline-block">
+                            Check symptoms first?
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- Recent Visits -->
+            <div class="card">
+                <h2 class="card-header">Recent Clinic Visits</h2>
+                {% if recent_visits %}
+                    <div class="space-y-3">
+                        {% for visit in recent_visits[:5] %}
+                        <div class="border-l-4 border-red-500 bg-red-50 p-4 rounded">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <p class="font-semibold text-gray-800">{{ visit.chief_complaint }}</p>
+                                    <p class="text-sm text-gray-600">{{ visit.visit_date.strftime('%B %d, %Y') }}</p>
+                                    {% if visit.diagnosis %}
+                                    <p class="text-sm text-gray-700 mt-1">
+                                        <strong>Diagnosis:</strong> {{ visit.diagnosis }}
+                                    </p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    <a href="{{ url_for('patient_dashboard.timeline') }}" class="text-blue-600 hover:underline mt-4 inline-block">
+                        View full health timeline →
+                    </a>
+                {% else %}
+                    <p class="text-center py-8 text-gray-500">No visit history</p>
+                {% endif %}
+            </div>
+
+            <!-- Pending Feedback -->
+            {% if pending_feedback %}
+            <div class="card bg-yellow-50 border-l-4 border-yellow-500">
+                <h3 class="font-bold mb-3">📝 Feedback Needed</h3>
+                <p class="text-sm text-gray-600 mb-3">Help us improve! Please rate your recent visits:</p>
+                <div class="space-y-2">
+                    {% for visit in pending_feedback %}
+                    <a href="#" class="block p-3 bg-white rounded hover:shadow transition">
+                        Visit on {{ visit.visit_date.strftime('%b %d') }} - {{ visit.chief_complaint[:50] }}
+                    </a>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Right Column - Sidebar -->
+        <div class="space-y-6">
+            <!-- Active Reservations -->
+            <div class="card">
+                <h3 class="font-bold mb-4">Medicine Reservations</h3>
+                {% if active_reservations %}
+                    <div class="space-y-3">
+                        {% for res in active_reservations %}
+                        <div class="bg-green-50 p-3 rounded">
+                            <p class="font-semibold text-gray-800">{{ res.medicine_name }}</p>
+                            <p class="text-sm text-gray-600">Qty: {{ res.quantity }}</p>
+                            <p class="text-xs text-green-600 mt-1">Ready for pickup</p>
+                        </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="text-sm text-gray-500 text-center py-4">No active reservations</p>
+                {% endif %}
+                <a href="{{ url_for('reservations.medicines') }}" class="btn-secondary w-full mt-4 text-center block">
+                    Reserve Medicine
+                </a>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="card">
+                <h3 class="font-bold mb-4">Quick Actions</h3>
+                <div class="space-y-2">
+                    <a href="{{ url_for('symptom_screening.index') }}" class="block p-3 bg-purple-50 hover:bg-purple-100 rounded transition">
+                        <i class="fas fa-stethoscope text-purple-600"></i>
+                        <span class="ml-2 font-semibold">Check Symptoms</span>
+                    </a>
+                    <a href="{{ url_for('appointments.book') }}" class="block p-3 bg-blue-50 hover:bg-blue-100 rounded transition">
+                        <i class="fas fa-calendar-plus text-blue-600"></i>
+                        <span class="ml-2 font-semibold">Book Appointment</span>
+                    </a>
+                    <a href="{{ url_for('patient_dashboard.timeline') }}" class="block p-3 bg-gray-50 hover:bg-gray-100 rounded transition">
+                        <i class="fas fa-history text-gray-600"></i>
+                        <span class="ml-2 font-semibold">Health Timeline</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Health Certificates -->
+            {% if certificates %}
+            <div class="card">
+                <h3 class="font-bold mb-4">Health Certificates</h3>
+                <div class="space-y-2">
+                    {% for cert in certificates %}
+                    <div class="bg-blue-50 p-3 rounded">
+                        <p class="font-semibold text-sm">Certificate #{{ cert.certificate_number }}</p>
+                        <p class="text-xs text-gray-600">Issued: {{ cert.issued_at.strftime('%b %d, %Y') }}</p>
+                        <a href="#" class="text-xs text-blue-600 hover:underline">Download PDF</a>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

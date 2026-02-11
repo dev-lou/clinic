@@ -3,6 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Reservations — ISUFST CareHub</title>
@@ -69,6 +70,7 @@
                         <i class="fas fa-pills mr-1.5"></i>Browse Medicines
                     </a>
                     {% if current_user.is_authenticated %}
+                    {% include 'partials/notification_bell.html' %}
                     <div class="relative group">
                         <button class="flex items-center gap-2 px-3 py-2 hover:bg-gray-50 rounded-lg transition-colors">
                             <div class="w-8 h-8 bg-primary-100 rounded-lg flex items-center justify-center">
@@ -131,9 +133,9 @@
         {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
         <div id="flash-messages" style="display:none;">
-        {% for category, message in messages %}
-        <div data-category="{{ category }}" data-message="{{ message }}"></div>
-        {% endfor %}
+            {% for category, message in messages %}
+            <div data-category="{{ category }}" data-message="{{ message }}"></div>
+            {% endfor %}
         </div>
         {% endif %}
         {% endwith %}
@@ -195,14 +197,20 @@
                     </div>
 
                     {% if res.status == 'Reserved' %}
-                    <form method="POST" action="{{ url_for('reservations.cancel_reservation', reservation_id=res.id) }}"
-                        onsubmit="return confirmCancelReservation(event);">
-                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                        <button type="submit"
-                            class="px-4 py-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition-colors text-sm font-semibold">
-                            <i class="fas fa-times mr-1"></i>Cancel
+                    <div class="flex flex-col gap-2">
+                        <button onclick="viewReservationQRCode({{ res.id }})"
+                            class="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors text-sm font-semibold">
+                            <i class="fas fa-qrcode mr-1"></i>QR Code
                         </button>
-                    </form>
+                        <form method="POST" action="{{ url_for('reservations.cancel_reservation', reservation_id=res.id) }}"
+                            onsubmit="return confirmCancelReservation(event);">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <button type="submit"
+                                class="w-full px-4 py-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition-colors text-sm font-semibold">
+                                <i class="fas fa-times mr-1"></i>Cancel
+                            </button>
+                        </form>
+                    </div>
                     {% endif %}
                 </div>
             </div>
@@ -238,6 +246,47 @@
             setTimeout(() => el.classList.add('visible'), i * 100);
         });
 
+        // View reservation QR Code
+        function viewReservationQRCode(reservationId) {
+            fetch(`/reservations/api/get-qr/${reservationId}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: data.error
+                        });
+                        return;
+                    }
+
+                    Swal.fire({
+                        title: '<strong>Your Reservation QR Code</strong>',
+                        html: `
+                            <div class="text-center">
+                                <img src="${data.qr_image}" alt="QR Code" class="mx-auto mb-4" style="max-width: 300px;">
+                                <p class="text-sm font-semibold text-gray-700">${data.reservation.medicine_name} (${data.reservation.quantity} unit(s))</p>
+                                <p class="text-xs text-gray-500 mt-2">Show this QR code at the clinic for fast check-in</p>
+                            </div>
+                        `,
+                        showConfirmButton: true,
+                        confirmButtonText: 'Close',
+                        customClass: {
+                            popup: 'rounded-2xl',
+                            confirmButton: 'bg-primary-600 hover:bg-primary-700 text-white font-bold py-3 px-6 rounded-xl'
+                        },
+                        buttonsStyling: false
+                    });
+                })
+                .catch(err => {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Failed to load QR code'
+                    });
+                });
+        }
+
         // Convert flash messages to SweetAlert
         document.addEventListener('DOMContentLoaded', () => {
             const flashContainer = document.getElementById('flash-messages');
@@ -247,7 +296,7 @@
                     const category = msg.getAttribute('data-category');
                     const message = msg.getAttribute('data-message');
                     const icon = category === 'error' ? 'error' : 'success';
-                    
+
                     Swal.fire({
                         icon: icon,
                         title: icon === 'error' ? 'Error' : 'Success',
@@ -269,7 +318,7 @@
         function confirmCancelReservation(e) {
             e.preventDefault();
             const form = e.target;
-            
+
             Swal.fire({
                 title: 'Cancel Reservation?',
                 text: 'Are you sure you want to cancel this medicine reservation?',
@@ -289,7 +338,7 @@
                     form.submit();
                 }
             });
-            
+
             return false;
         }
 
@@ -317,6 +366,8 @@
             });
         }
     </script>
+
+    {% include 'partials/chatbot_widget.html' %}
 </body>
 
 </html>

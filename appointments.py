@@ -4,10 +4,13 @@ Handles appointment booking, viewing, and cancellation.
 """
 from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify
 from flask_login import login_required, current_user
-from datetime import datetime, date, time, timedelta
+from datetime import datetime, date, time, timedelta, timezone
 import calendar
-from models import db, Appointment, User
+import json
+from models import db, Appointment, User, LogbookEntry
+from models_extended import AppointmentExtended
 from utils import check_availability
+from advanced_utils import generate_appointment_qr
 from sqlalchemy import func
 
 appointments = Blueprint('appointments', __name__, url_prefix='/appointments')
@@ -184,6 +187,33 @@ def book():
             status='Pending'
         )
         db.session.add(appointment)
+        db.session.flush()  # Get appointment.id without committing
+        
+        # Auto-assign doctor based on service type
+        # Medical -> doctor, Dental -> dentist (both have role='doctor' in DB)
+        default_doctor = User.query.filter(
+            User.role == 'doctor',
+            User.is_active == True
+        ).order_by(User.id.asc()).first()  # Get first doctor by default
+        
+        # Generate QR code for check-in
+        qr_image, qr_token = generate_appointment_qr(appointment.id)
+        
+        if default_doctor:
+            appointment_ext = AppointmentExtended(
+                appointment_id=appointment.id,
+                assigned_doctor_id=default_doctor.id,
+                qr_code=qr_token
+            )
+            db.session.add(appointment_ext)
+        else:
+            # Even without doctor, create extension with QR
+            appointment_ext = AppointmentExtended(
+                appointment_id=appointment.id,
+                qr_code=qr_token
+            )
+            db.session.add(appointment_ext)
+        
         db.session.commit()
         
         flash(f'Appointment booked successfully for {appointment_date.strftime("%B %d, %Y")} at {start_time.strftime("%I:%M %p")}.', 'success')
@@ -304,7 +334,16 @@ def admin_list():
         Appointment.start_time.desc()
     ).all()
     
-    return render_template('admin_appointments.html', appointments=appointments_list, filter_status=filter_status)
+    # Get all active doctors for assignment dropdown
+    doctors = User.query.filter(
+        User.role == 'doctor',
+        User.is_active == True
+    ).order_by(User.first_name, User.last_name).all()
+    
+    return render_template('admin_appointments.html', 
+                         appointments=appointments_list, 
+                         filter_status=filter_status,
+                         doctors=doctors)
 
 
 @appointments.route('/admin/<int:appointment_id>/update-status', methods=['POST'])
@@ -316,10 +355,245 @@ def admin_update_status(appointment_id):
     new_status = request.form.get('status')
     
     if new_status in ['Pending', 'Confirmed', 'Completed', 'Cancelled']:
+        # Prevent marking as Completed if student hasn't checked in
+        if new_status == 'Completed':
+            # Check if ANY logbook entry exists for this appointment
+            logbook_entry = LogbookEntry.query.filter_by(
+                appointment_id=appointment.id
+            ).first()
+            
+            if not logbook_entry:
+                # Return JSON error if request expects JSON
+                if request.headers.get('Accept') == 'application/json':
+                    return jsonify({
+                        'success': False,
+                        'error': 'Student has not checked in yet. Please check in the student first before marking as completed.'
+                    }), 400
+                else:
+                    flash('Student has not checked in yet. Please check in the student first.', 'error')
+                    return redirect(url_for('appointments.admin_list'))
+        
+        old_status = appointment.status
         appointment.status = new_status
+        
+        # Auto check-out logbook when appointment marked completed
+        if new_status == 'Completed':
+            # Find the LATEST logbook entry still checked in for this appointment
+            logbook_entry = LogbookEntry.query.filter_by(
+                appointment_id=appointment.id,
+                status='Checked In'
+            ).order_by(LogbookEntry.check_in_time.desc()).first()
+            
+            if logbook_entry:
+                logbook_entry.check_out_time = datetime.now(timezone.utc)
+                logbook_entry.status = 'Completed'
+        
         db.session.commit()
-        flash(f'Appointment status updated to {new_status}.', 'success')
+        
+        # Send notification to student
+        from notifications import create_notification
+        status_messages = {
+            'Confirmed': ('Appointment Confirmed ✅', f'Your {appointment.service_type} appointment on {appointment.appointment_date.strftime("%b %d, %Y")} at {appointment.start_time.strftime("%I:%M %p")} has been confirmed.'),
+            'Completed': ('Appointment Completed', f'Your {appointment.service_type} appointment has been marked as completed. Thank you for visiting!'),
+            'Cancelled': ('Appointment Cancelled ❌', f'Your {appointment.service_type} appointment on {appointment.appointment_date.strftime("%b %d, %Y")} at {appointment.start_time.strftime("%I:%M %p")} has been cancelled.'),
+            'Pending': ('Appointment Updated', f'Your {appointment.service_type} appointment status has been updated to Pending.'),
+        }
+        title, message = status_messages.get(new_status, ('Status Update', f'Your appointment status changed to {new_status}.'))
+        create_notification(
+            user_id=appointment.student_id,
+            notif_type='appointment_update',
+            title=title,
+            message=message,
+            link='/appointments/my'
+        )
+        
+        # Return JSON success if request expects JSON
+        if request.headers.get('Accept') == 'application/json':
+            return jsonify({'success': True, 'message': f'Appointment status updated to {new_status}.'})
+        else:
+            flash(f'Appointment status updated to {new_status}.', 'success')
     else:
-        flash('Invalid status.', 'error')
+        if request.headers.get('Accept') == 'application/json':
+            return jsonify({'success': False, 'error': 'Invalid status.'}), 400
+        else:
+            flash('Invalid status.', 'error')
     
     return redirect(url_for('appointments.admin_list'))
+
+
+@appointments.route('/admin/<int:appointment_id>/assign-doctor', methods=['POST'])
+@login_required
+@require_staff
+def admin_assign_doctor(appointment_id):
+    """Admin route to assign or change doctor for an appointment."""
+    appointment = Appointment.query.get_or_404(appointment_id)
+    new_doctor_id = request.form.get('doctor_id')
+    
+    if not new_doctor_id:
+        flash('Please select a doctor.', 'error')
+        return redirect(url_for('appointments.admin_list'))
+    
+    # Check if doctor exists and is active
+    doctor = User.query.filter(
+        User.id == new_doctor_id,
+        User.role == 'doctor',
+        User.is_active == True
+    ).first()
+    
+    if not doctor:
+        flash('Invalid doctor selection.', 'error')
+        return redirect(url_for('appointments.admin_list'))
+    
+    # Get or create appointment extension
+    appointment_ext = AppointmentExtended.query.filter_by(appointment_id=appointment.id).first()
+    if appointment_ext:
+        old_doctor_name = appointment_ext.assigned_doctor.first_name + ' ' + appointment_ext.assigned_doctor.last_name if appointment_ext.assigned_doctor else 'None'
+        appointment_ext.assigned_doctor_id = new_doctor_id
+    else:
+        appointment_ext = AppointmentExtended(
+            appointment_id=appointment.id,
+            assigned_doctor_id=new_doctor_id
+        )
+        db.session.add(appointment_ext)
+        old_doctor_name = 'None'
+    
+    db.session.commit()
+    
+    flash(f'Doctor assigned successfully: {doctor.first_name} {doctor.last_name}', 'success')
+    return redirect(url_for('appointments.admin_list'))
+
+
+@appointments.route('/api/get-qr/<int:appointment_id>')
+@login_required
+def get_qr_code(appointment_id):
+    """Get QR code image for appointment."""
+    from advanced_utils import generate_qr_code
+    import json
+    
+    appointment = Appointment.query.get_or_404(appointment_id)
+    
+    # Verify access - student can only view their own
+    if current_user.role == 'student' and appointment.student_id != current_user.id:
+        return jsonify({'error': 'Unauthorized'}), 403
+    
+    # Get extension with QR token
+    ext = AppointmentExtended.query.filter_by(appointment_id=appointment_id).first()
+    if not ext or not ext.qr_code:
+        return jsonify({'error': 'QR code not available'}), 404
+    
+    # Regenerate QR image from token
+    qr_data = json.dumps({
+        'type': 'appointment_checkin',
+        'appointment_id': appointment_id,
+        'token': ext.qr_code,
+        'expires': (datetime.now() + timedelta(days=30)).isoformat()
+    })
+    
+    qr_image = generate_qr_code(qr_data, add_logo=False)  # No logo for better scanner compatibility
+    
+    return jsonify({
+        'qr_image': qr_image,
+        'appointment': {
+            'id': appointment.id,
+            'service_type': appointment.service_type,
+            'date': appointment.appointment_date.strftime('%B %d, %Y'),
+            'time': appointment.start_time.strftime('%I:%M %p')
+        }
+    })
+
+
+@appointments.route('/api/verify-qr', methods=['POST'])
+@login_required
+@require_staff
+def verify_qr():
+    """Verify QR code and return student info for check-in."""
+    try:
+        import json as json_module
+        from models import ClinicVisit
+        
+        data = request.get_json(force=True, silent=True)
+        if not data:
+            return jsonify({'error': 'No JSON data received'}), 400
+            
+        qr_data_json = data.get('qr_data')
+        
+        if not qr_data_json:
+            return jsonify({'error': 'QR data required'}), 400
+        
+        try:
+            qr_data = json_module.loads(qr_data_json)
+        except json_module.JSONDecodeError as e:
+            return jsonify({'error': f'Invalid JSON in QR data: {str(e)}'}), 400
+        
+        # Validate required fields
+        if 'expires' not in qr_data:
+            return jsonify({'error': 'QR code missing expiration date'}), 400
+        if 'appointment_id' not in qr_data:
+            return jsonify({'error': 'QR code missing appointment ID'}), 400
+        if 'token' not in qr_data:
+            return jsonify({'error': 'QR code missing token'}), 400
+        
+        # Check expiration (use naive datetime for comparison - all in local/server time)
+        expires = datetime.fromisoformat(qr_data['expires'])
+        # Remove timezone info if present for comparison
+        if expires.tzinfo:
+            expires = expires.replace(tzinfo=None)
+        
+        now = datetime.now()
+        print(f"[QR DEBUG] Now: {now}, Expires: {expires}, Diff: {expires - now}")
+        
+        if now > expires:
+            return jsonify({'error': f'QR code expired on {expires.strftime("%B %d, %Y at %I:%M %p")}'}), 400
+        
+        # Get appointment
+        appointment_id = qr_data['appointment_id']
+        appointment = Appointment.query.get(appointment_id)
+        if not appointment:
+            return jsonify({'error': f'Appointment #{appointment_id} not found'}), 404
+        
+        # Verify token
+        ext = AppointmentExtended.query.filter_by(appointment_id=appointment_id).first()
+        if not ext:
+            return jsonify({'error': 'Appointment has no QR code generated'}), 400
+        if not ext.qr_code:
+            return jsonify({'error': 'Appointment QR code is empty'}), 400
+        if ext.qr_code != qr_data['token']:
+            return jsonify({'error': 'Invalid QR code token (does not match)'}), 400
+        
+        # Check if appointment date is within reasonable range (±7 days for flexibility)
+        date_diff = (appointment.appointment_date - date.today()).days
+        print(f"[QR DEBUG] Appointment date: {appointment.appointment_date}, Today: {date.today()}, Diff: {date_diff} days")
+        
+        if date_diff < -7 or date_diff > 7:
+            return jsonify({
+                'error': f'Appointment is for {appointment.appointment_date.strftime("%B %d, %Y")}. Can only check in within 7 days of appointment date. (Today: {date.today().strftime("%B %d, %Y")})'
+            }), 400
+        
+        # Return student info for check-in
+        student = appointment.student
+        return jsonify({
+            'success': True,
+            'type': 'appointment_checkin',
+            'student': {
+                'id': student.id,
+                'name': f'{student.first_name} {student.last_name}',
+                'email': student.email,
+                'student_id': student.student_profile.student_id_number if student.student_profile else 'N/A'
+            },
+            'appointment': {
+                'id': appointment.id,
+                'service_type': appointment.service_type,
+                'date': appointment.appointment_date.strftime('%B %d, %Y'),
+                'time': appointment.start_time.strftime('%I:%M %p'),
+                'status': appointment.status
+            }
+        })
+    except Exception as e:
+        # Log the full error for debugging
+        import traceback
+        print("=" * 80)
+        print("ERROR in verify_qr endpoint:")
+        print(traceback.format_exc())
+        print("=" * 80)
+        return jsonify({'error': f'Server error: {str(e)}'}), 500
+

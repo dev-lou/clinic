@@ -287,3 +287,60 @@ class MedicineReservation(db.Model):
 
     def __repr__(self):
         return f'<MedicineReservation {self.medicine_name} - {self.student_id}>'
+
+
+# ──────────────────────────────────────────────
+#  Notifications
+# ──────────────────────────────────────────────
+class Notification(db.Model):
+    __tablename__ = 'notifications'
+
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False, index=True)
+    type = db.Column(db.String(50), nullable=False)  # appointment_update, reservation_update, reminder
+    title = db.Column(db.String(200), nullable=False)
+    message = db.Column(db.Text, nullable=False)
+    link = db.Column(db.String(500))  # URL to navigate to when clicked
+    is_read = db.Column(db.Boolean, default=False, nullable=False, index=True)
+    created_at = db.Column(
+        db.DateTime(timezone=True),
+        default=lambda: datetime.now(timezone.utc),
+        nullable=False,
+        index=True
+    )
+
+    user = db.relationship('User', backref=db.backref('notifications', lazy='dynamic', order_by='Notification.created_at.desc()'))
+
+    def __repr__(self):
+        return f'<Notification {self.type} for user {self.user_id}>'
+
+
+# ──────────────────────────────────────────────
+#  Clinic Logbook
+# ──────────────────────────────────────────────
+class LogbookEntry(db.Model):
+    __tablename__ = 'logbook_entries'
+
+    id = db.Column(db.Integer, primary_key=True)
+    student_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False, index=True)
+    student_name = db.Column(db.String(200), nullable=False)
+    student_number = db.Column(db.String(50))  # Student ID number
+    purpose = db.Column(db.String(100), nullable=False)  # Medical, Dental, Medicine Pickup, Walk-in
+    appointment_id = db.Column(db.Integer, db.ForeignKey('appointments.id'), nullable=True)
+    check_in_time = db.Column(
+        db.DateTime(timezone=True),
+        default=lambda: datetime.now(timezone.utc),
+        nullable=False
+    )
+    check_out_time = db.Column(db.DateTime(timezone=True))
+    attending_staff_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)
+    notes = db.Column(db.Text)
+    status = db.Column(db.String(20), default='Checked In', nullable=False)  # Checked In, Completed, Left
+
+    # Relationships
+    student = db.relationship('User', foreign_keys=[student_id], backref='logbook_entries')
+    attending_staff = db.relationship('User', foreign_keys=[attending_staff_id])
+    appointment = db.relationship('Appointment', backref='logbook_entry')
+
+    def __repr__(self):
+        return f'<LogbookEntry {self.student_name} - {self.purpose} at {self.check_in_time}>'

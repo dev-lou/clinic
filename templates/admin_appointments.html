@@ -47,6 +47,9 @@
                         <th
                             class="px-5 py-4 text-left text-[11px] font-bold text-gray-500 uppercase tracking-wider hidden sm:table-cell">
                             Time</th>
+                        <th
+                            class="px-5 py-4 text-left text-[11px] font-bold text-gray-500 uppercase tracking-wider hidden lg:table-cell">
+                            Assigned Doctor</th>
                         <th class="px-5 py-4 text-left text-[11px] font-bold text-gray-500 uppercase tracking-wider">
                             Status</th>
                         <th class="px-5 py-4 text-left text-[11px] font-bold text-gray-500 uppercase tracking-wider">
@@ -70,8 +73,32 @@
                         <td class="px-5 py-4 text-sm text-gray-700">{{ appt.appointment_date.strftime('%b %d, %Y') }}
                         </td>
                         <td class="px-5 py-4 text-sm text-gray-600 hidden sm:table-cell">{{
-                            appt.start_time.strftime('%I:%M %p') }}</td>
-                        <td class="px-5 py-4">
+                            appt.start_time.strftime('%I:%M %p') }}</td>                        <td class="px-5 py-4 hidden lg:table-cell">
+                            <form method="POST"
+                                action="{{ url_for('appointments.admin_assign_doctor', appointment_id=appt.id) }}"
+                                class="inline-flex items-center gap-2" onsubmit="return confirmDoctorAssignment(event);">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <select name="doctor_id"
+                                    class="px-2 py-1 rounded-lg border border-gray-200 text-xs focus:border-primary-500 focus:ring-1 focus:ring-primary-500/20 outline-none bg-white">
+                                    {% if appt.extension and appt.extension.assigned_doctor %}
+                                        {% set assigned_doctor = appt.extension.assigned_doctor %}
+                                    {% else %}
+                                        {% set assigned_doctor = None %}
+                                    {% endif %}
+                                    
+                                    {% for doctor in doctors %}
+                                    <option value="{{ doctor.id }}" {% if assigned_doctor and assigned_doctor.id == doctor.id %}selected{% endif %}>
+                                        Dr. {{ doctor.first_name }} {{ doctor.last_name }}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                                <button type="submit"
+                                    class="px-2 py-1 bg-indigo-600 text-white rounded-lg text-xs font-semibold hover:bg-indigo-700 transition-colors"
+                                    title="Assign Doctor">
+                                    <i class="fas fa-user-md"></i>
+                                </button>
+                            </form>
+                        </td>                        <td class="px-5 py-4">
                             <span class="px-2.5 py-1 rounded-full text-[11px] font-bold
                                 {% if appt.status == 'Confirmed' %}bg-emerald-100 text-emerald-700
                                 {% elif appt.status == 'Pending' %}bg-amber-100 text-amber-700
@@ -105,7 +132,7 @@
                     </tr>
                     {% else %}
                     <tr>
-                        <td colspan="6" class="px-5 py-12 text-center">
+                        <td colspan="7" class="px-5 py-12 text-center">
                             <div
                                 class="w-14 h-14 bg-gray-100 rounded-2xl flex items-center justify-center mx-auto mb-3">
                                 <i class="fas fa-calendar-times text-gray-300 text-xl"></i>
@@ -127,6 +154,7 @@
         e.preventDefault();
         const form = e.target;
         const newStatus = form.querySelector('select[name="status"]').value;
+        const appointmentId = form.action.split('/').pop();
         
         Swal.fire({
             title: 'Update Status?',
@@ -138,6 +166,89 @@
             customClass: {
                 popup: 'rounded-2xl',
                 confirmButton: 'bg-primary-600 hover:bg-primary-700 text-white font-bold py-3 px-6 rounded-xl ml-2',
+                cancelButton: 'bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-3 px-6 rounded-xl mr-2'
+            },
+            buttonsStyling: false,
+            reverseButtons: true
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                // Use fetch to validate before submitting
+                const formData = new FormData(form);
+                
+                try {
+                    const response = await fetch(form.action, {
+                        method: 'POST',
+                        headers: {
+                            'Accept': 'application/json',
+                            'X-Requested-With': 'XMLHttpRequest'
+                        },
+                        body: formData
+                    });
+                    
+                    const data = await response.json();
+                    
+                    if (data.success) {
+                        // Success - reload page to show updated status
+                        Swal.fire({
+                            title: 'Updated!',
+                            text: data.message,
+                            icon: 'success',
+                            timer: 1500,
+                            showConfirmButton: false,
+                            customClass: { popup: 'rounded-2xl' }
+                        }).then(() => {
+                            window.location.reload();
+                        });
+                    } else {
+                        // Validation error (e.g., student hasn't checked in)
+                        Swal.fire({
+                            title: 'Cannot Complete',
+                            text: data.error,
+                            icon: 'warning',
+                            confirmButtonText: 'Okay',
+                            customClass: {
+                                popup: 'rounded-2xl',
+                                confirmButton: 'bg-amber-500 hover:bg-amber-600 text-white font-bold py-3 px-6 rounded-xl'
+                            },
+                            buttonsStyling: false
+                        });
+                    }
+                } catch (error) {
+                    // Network error or server error
+                    Swal.fire({
+                        title: 'Error',
+                        text: 'Failed to update status. Please try again.',
+                        icon: 'error',
+                        confirmButtonText: 'Okay',
+                        customClass: {
+                            popup: 'rounded-2xl',
+                            confirmButton: 'bg-red-500 hover:bg-red-600 text-white font-bold py-3 px-6 rounded-xl'
+                        },
+                        buttonsStyling: false
+                    });
+                }
+            }
+        });
+        
+        return false;
+    }
+    
+    function confirmDoctorAssignment(e) {
+        e.preventDefault();
+        const form = e.target;
+        const selectedOption = form.querySelector('select[name="doctor_id"]').selectedOptions[0];
+        const doctorName = selectedOption.textContent;
+        
+        Swal.fire({
+            title: 'Assign Doctor?',
+            html: `Assign <strong>${doctorName}</strong> to this appointment?`,
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'Yes, assign',
+            cancelButtonText: 'Cancel',
+            customClass: {
+                popup: 'rounded-2xl',
+                confirmButton: 'bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-xl ml-2',
                 cancelButton: 'bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-3 px-6 rounded-xl mr-2'
             },
             buttonsStyling: false,
