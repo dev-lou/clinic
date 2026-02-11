@@ -203,8 +203,8 @@ def download_certificate(cert_id):
     )
     
     # Header
-    elements.append(Paragraph("ISABELA STATE UNIVERSITY", title_style))
-    elements.append(Paragraph("Echague Campus - Health Services", subtitle_style))
+    elements.append(Paragraph("ILOILO STATE UNIVERSITY OF FISHERIES SCIENCE AND TECHNOLOGY", title_style))
+    elements.append(Paragraph("Dingle Campus - Health Services", subtitle_style))
     elements.append(Paragraph("HEALTH CERTIFICATE", title_style))
     elements.append(Spacer(1, 0.2*inch))
     
@@ -267,7 +267,7 @@ def download_certificate(cert_id):
         ['_'*40, ''],
         [f"{issuer.full_name}, RN", ''],
         ['Issued by:', ''],
-        ['ISUFST Health Services', ''],
+        ['ISUFST Dingle Campus Health Services', ''],
     ]
     
     sig_table = Table(sig_data, colWidths=[3*inch, 3*inch])
@@ -290,7 +290,7 @@ def download_certificate(cert_id):
         alignment=TA_CENTER
     )
     elements.append(Paragraph(
-        "This is an official health certificate issued by Isabela State University Health Services.<br/>"
+        "This is an official health certificate issued by Iloilo State University of Fisheries Science and Technology Health Services.<br/>"
         "For verification, please contact the clinic at clinic@isufst.edu.ph",
         footer_style
     ))
