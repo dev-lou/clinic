@@ -26,7 +26,10 @@ def create_app(config_name=None):
     app.config.from_object(config[config_name])
     if hasattr(config[config_name], 'init_app'):
         config[config_name].init_app()
-        app.config['SQLALCHEMY_DATABASE_URI'] = config[config_name].SQLALCHEMY_DATABASE_URI
+    
+    # Always re-evaluate database URI to ensure env vars are loaded
+    from config import Config
+    app.config['SQLALCHEMY_DATABASE_URI'] = Config._get_database_uri()
 
     # -- Init extensions --------------------------
     db.init_app(app)
