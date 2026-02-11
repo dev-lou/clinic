@@ -123,16 +123,23 @@
             <div class="w-8 h-8 bg-blue-50 rounded-lg flex items-center justify-center"><i class="fas fa-signature text-blue-600 text-sm"></i></div>
             Digital Signature
         </h2>
-        <p class="text-sm text-gray-600 mb-6">Draw your signature below. This will be used on health certificates and official documents.</p>
+        <p class="text-sm text-gray-600 mb-4">Draw your signature below. This will be used on health certificates and official documents.</p>
 
         {% if current_user.signature_data %}
-        <div class="mb-4 p-4 bg-gray-50 rounded-xl border border-gray-200">
-            <p class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Current Signature:</p>
-            <img src="{{ current_user.signature_data }}" alt="Current Signature" class="border border-gray-300 rounded-lg bg-white">
+        <!-- Saved Signature Display -->
+        <div id="savedSignatureView" class="mb-4">
+            <div class="p-4 bg-gray-50 rounded-xl border border-gray-200 mb-3">
+                <p class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Current Signature:</p>
+                <img src="{{ current_user.signature_data }}" alt="Current Signature" class="border border-gray-300 rounded-lg bg-white max-w-md">
+            </div>
+            <button type="button" id="updateSignatureBtn" class="w-full py-2.5 bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-700 transition text-sm">
+                <i class="fas fa-edit mr-2"></i>Update Signature
+            </button>
         </div>
         {% endif %}
 
-        <div class="border-2 border-dashed border-gray-300 rounded-xl p-4 bg-gray-50">
+        <!-- Signature Canvas (hidden if signature exists) -->
+        <div id="signatureCanvasContainer" class="border-2 border-dashed border-gray-300 rounded-xl p-4 bg-gray-50 {% if current_user.signature_data %}hidden{% endif %}">
             <canvas id="signatureCanvas" class="w-full bg-white border border-gray-200 rounded-lg cursor-crosshair" height="200" style="touch-action: none;"></canvas>
             <div class="flex gap-2 mt-4">
                 <button type="button" id="clearSignature" class="flex-1 py-2.5 bg-gray-200 text-gray-700 font-semibold rounded-xl hover:bg-gray-300 transition text-sm">
@@ -141,6 +148,11 @@
                 <button type="button" id="saveSignature" class="flex-1 py-2.5 bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-700 transition text-sm">
                     <i class="fas fa-save mr-2"></i>Save Signature
                 </button>
+                {% if current_user.signature_data %}
+                <button type="button" id="cancelUpdateBtn" class="flex-1 py-2.5 bg-gray-200 text-gray-700 font-semibold rounded-xl hover:bg-gray-300 transition text-sm">
+                    <i class="fas fa-times mr-2"></i>Cancel
+                </button>
+                {% endif %}
             </div>
         </div>
     </div>
@@ -324,6 +336,27 @@ document.getElementById('saveSignature').addEventListener('click', async () => {
         });
     }
 });
+
+// Update Signature button - show canvas, hide saved signature view
+const updateSignatureBtn = document.getElementById('updateSignatureBtn');
+if (updateSignatureBtn) {
+    updateSignatureBtn.addEventListener('click', () => {
+        document.getElementById('savedSignatureView').classList.add('hidden');
+        document.getElementById('signatureCanvasContainer').classList.remove('hidden');
+    });
+}
+
+// Cancel Update button - hide canvas, show saved signature view
+const cancelUpdateBtn = document.getElementById('cancelUpdateBtn');
+if (cancelUpdateBtn) {
+    cancelUpdateBtn.addEventListener('click', () => {
+        // Clear the canvas
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        // Toggle views
+        document.getElementById('signatureCanvasContainer').classList.add('hidden');
+        document.getElementById('savedSignatureView').classList.remove('hidden');
+    });
+}
 
 // Flash messages and form confirmations
 document.addEventListener('DOMContentLoaded',()=>{const fc=document.getElementById('flash-messages');if(fc){fc.querySelectorAll('[data-category]').forEach(m=>{const c=m.getAttribute('data-category'),msg=m.getAttribute('data-message');Swal.fire({icon:c==='error'?'error':'success',text:msg,toast:true,position:'top-end',showConfirmButton:false,timer:4000,timerProgressBar:true,customClass:{popup:'rounded-2xl shadow-2xl'}})})}});
