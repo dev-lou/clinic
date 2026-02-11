@@ -5,6 +5,7 @@ Handles appointment booking, viewing, and cancellation.
 from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify
 from flask_login import login_required, current_user
 from datetime import datetime, date, time, timedelta
+import calendar
 from models import db, Appointment, User
 from utils import check_availability
 from sqlalchemy import func
