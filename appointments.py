@@ -65,16 +65,15 @@ def check_availability_api():
     
     max_per_slot = MAX_APPOINTMENTS_PER_SLOT.get(service_type, 2)
     
-    for slot_time_str in time_slots:
-        slot_time = datetime.strptime(slot_time_str, '%H:%M').time()
-        slot_end = (datetime.strptime(slot_time_str, '%H:%M') + timedelta(minutes=SLOT_DURATION_MINUTES)).time()
+    for slot_dict in time_slots:
+        slot_time = datetime.strptime(slot_dict['value'], '%H:%M').time()
         
         # Count appointments in this slot
         count = sum(1 for appt in appointments 
                    if appt.start_time == slot_time)
         
         available_slots.append({
-            'time': slot_time_str,
+            'time': slot_dict['value'],
             'available': count < max_per_slot,
             'remaining': max(0, max_per_slot - count)
         })
@@ -82,7 +81,7 @@ def check_availability_api():
     return jsonify({
         'date': date_str,
         'service': service_type,
-        'slots': available_slots
+        'availableSlots': available_slots
     })
 
 
