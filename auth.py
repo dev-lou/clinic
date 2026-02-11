@@ -121,7 +121,12 @@ def logout():
 def profile():
     """User profile page - edit own account."""
     if request.method == 'POST':
-        action = request.form.get('action')
+        # Handle JSON requests (e.g., signature save)
+        if request.is_json:
+            data = request.get_json()
+            action = data.get('action')
+        else:
+            action = request.form.get('action')
         
         if action == 'update_info':
             current_user.first_name = request.form.get('first_name')
@@ -163,9 +168,8 @@ def profile():
         
         elif action == 'save_signature':
             try:
-                # Handle JSON request
+                # Get signature data from JSON or form
                 if request.is_json:
-                    data = request.get_json()
                     signature_data = data.get('signature_data')
                 else:
                     signature_data = request.form.get('signature_data')
