@@ -168,7 +168,7 @@ def download_certificate(cert_id):
     
     # Generate PDF
     buffer = io.BytesIO()
-    doc = SimpleDocTemplate(buffer, pagesize=letter, topMargin=0.5*inch, bottomMargin=0.8*inch)
+    doc = SimpleDocTemplate(buffer, pagesize=letter, topMargin=0.4*inch, bottomMargin=0.5*inch)
     
     # Container for elements
     elements = []
@@ -178,9 +178,9 @@ def download_certificate(cert_id):
     title_style = ParagraphStyle(
         'CustomTitle',
         parent=styles['Heading1'],
-        fontSize=20,
+        fontSize=18,
         textColor=colors.HexColor('#1e40af'),
-        spaceAfter=6,
+        spaceAfter=4,
         alignment=TA_CENTER,
         fontName='Helvetica-Bold'
     )
@@ -188,19 +188,19 @@ def download_certificate(cert_id):
     subtitle_style = ParagraphStyle(
         'CustomSubtitle',
         parent=styles['Normal'],
-        fontSize=12,
+        fontSize=10,
         textColor=colors.HexColor('#64748b'),
-        spaceAfter=20,
+        spaceAfter=12,
         alignment=TA_CENTER
     )
     
     heading_style = ParagraphStyle(
         'SectionHeading',
         parent=styles['Heading2'],
-        fontSize=12,
+        fontSize=11,
         textColor=colors.HexColor('#1e293b'),
-        spaceAfter=8,
-        spaceBefore=12,
+        spaceAfter=6,
+        spaceBefore=8,
         fontName='Helvetica-Bold'
     )
     
@@ -212,24 +212,23 @@ def download_certificate(cert_id):
     isufst_logo = None
     if os.path.exists(isufst_logo_path):
         try:
-            isufst_logo = Image(isufst_logo_path, width=1.2*inch, height=0.8*inch)
+            isufst_logo = Image(isufst_logo_path, width=1*inch, height=0.65*inch)
         except:
             isufst_logo = ''
     else:
         isufst_logo = ''
     
-    # Center Text - Modern Professional Style
+    # Center Text - University Name Only
     header_text = Paragraph(
-        "<b>ILOILO STATE UNIVERSITY OF FISHERIES SCIENCE AND TECHNOLOGY</b><br/>"
-        "<font size=18 color='#2563eb'><b>CareHub</b></font><br/>"
-        "<font size=14><b>HEALTH CERTIFICATE</b></font>",
+        "<b>ILOILO STATE UNIVERSITY OF FISHERIES SCIENCE AND TECHNOLOGY</b>",
         ParagraphStyle(
             'HeaderCenter',
             parent=styles['Normal'],
-            fontSize=10,
+            fontSize=11,
             alignment=TA_CENTER,
             textColor=colors.HexColor('#1e293b'),
-            leading=16
+            leading=14,
+            fontName='Helvetica-Bold'
         )
     )
     
@@ -238,7 +237,7 @@ def download_certificate(cert_id):
     bayan_logo = None
     if os.path.exists(bayan_logo_path):
         try:
-            bayan_logo = Image(bayan_logo_path, width=0.8*inch, height=0.8*inch)
+            bayan_logo = Image(bayan_logo_path, width=0.65*inch, height=0.65*inch)
         except:
             bayan_logo = ''
     else:
@@ -246,7 +245,7 @@ def download_certificate(cert_id):
     
     # Create header table
     header_data = [[isufst_logo, header_text, bayan_logo]]
-    header_table = Table(header_data, colWidths=[1.2*inch, 5*inch, 1.2*inch])
+    header_table = Table(header_data, colWidths=[1*inch, 5.5*inch, 1*inch])
     header_table.setStyle(TableStyle([
         ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
         ('ALIGN', (0, 0), (0, 0), 'LEFT'),
@@ -254,7 +253,39 @@ def download_certificate(cert_id):
         ('ALIGN', (2, 0), (2, 0), 'RIGHT'),
     ]))
     elements.append(header_table)
-    elements.append(Spacer(1, 0.3*inch))
+    elements.append(Spacer(1, 0.1*inch))
+    
+    # Verification text under university name
+    verification_text = Paragraph(
+        "This is an official health certificate issued by Iloilo State University of Fisheries Science and Technology Health Services.<br/>"
+        "For verification, please contact the clinic at clinic@isufst.edu.ph",
+        ParagraphStyle(
+            'Verification',
+            parent=styles['Normal'],
+            fontSize=8,
+            textColor=colors.HexColor('#64748b'),
+            alignment=TA_CENTER,
+            leading=10
+        )
+    )
+    elements.append(verification_text)
+    elements.append(Spacer(1, 0.15*inch))
+    
+    # CareHub Health Certificate Title
+    carehub_title = Paragraph(
+        "<font size=20 color='#2563eb'><b>CareHub Health Certificate</b></font>",
+        ParagraphStyle(
+            'CareHubTitle',
+            parent=styles['Normal'],
+            fontSize=20,
+            alignment=TA_CENTER,
+            textColor=colors.HexColor('#2563eb'),
+            fontName='Helvetica-Bold',
+            spaceAfter=6
+        )
+    )
+    elements.append(carehub_title)
+    elements.append(Spacer(1, 0.2*inch))
     
     # Certificate details table
     student = cert.student
@@ -271,10 +302,10 @@ def download_certificate(cert_id):
         ('TEXTCOLOR', (2, 0), (2, -1), colors.HexColor('#64748b')),
         ('FONTNAME', (0, 0), (-1, -1), 'Helvetica'),
         ('FONTSIZE', (0, 0), (-1, -1), 9),
-        ('BOTTOMPADDING', (0, 0), (-1, -1), 8),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 6),
     ]))
     elements.append(cert_table)
-    elements.append(Spacer(1, 0.15*inch))
+    elements.append(Spacer(1, 0.1*inch))
     
     # Student Information
     elements.append(Paragraph("STUDENT INFORMATION", heading_style))
@@ -295,18 +326,18 @@ def download_certificate(cert_id):
         ('VALIGN', (0, 0), (-1, -1), 'TOP'),
     ]))
     elements.append(student_table)
-    elements.append(Spacer(1, 0.15*inch))
+    elements.append(Spacer(1, 0.1*inch))
     
     # Medical Findings
     elements.append(Paragraph("MEDICAL FINDINGS", heading_style))
     findings_text = cert.medical_findings or "General health check completed. No significant medical findings."
     elements.append(Paragraph(findings_text, styles['Normal']))
-    elements.append(Spacer(1, 0.15*inch))
+    elements.append(Spacer(1, 0.1*inch))
     
     # Purpose
     elements.append(Paragraph("PURPOSE", heading_style))
     elements.append(Paragraph(cert.purpose or "General purpose", styles['Normal']))
-    elements.append(Spacer(1, 0.3*inch))
+    elements.append(Spacer(1, 0.2*inch))
     
     # Signature Section
     issuer = cert.issuer
@@ -356,7 +387,7 @@ def download_certificate(cert_id):
     elements.append(sig_table)
     
     # Push footer toward bottom
-    elements.append(Spacer(1, 0.8*inch))
+    elements.append(Spacer(1, 0.3*inch))
     
     # Footer with Core Values and Accreditation Logo
     
@@ -380,7 +411,7 @@ def download_certificate(cert_id):
     gcl_logo = None
     if os.path.exists(gcl_logo_path):
         try:
-            gcl_logo = Image(gcl_logo_path, width=1.2*inch, height=0.8*inch)
+            gcl_logo = Image(gcl_logo_path, width=1*inch, height=0.65*inch)
         except:
             gcl_logo = ''
     else:
@@ -389,7 +420,7 @@ def download_certificate(cert_id):
     heart_logo = None
     if os.path.exists(heart_logo_path):
         try:
-            heart_logo = Image(heart_logo_path, width=1.2*inch, height=0.8*inch)
+            heart_logo = Image(heart_logo_path, width=1*inch, height=0.65*inch)
         except:
             heart_logo = ''
     else:
@@ -397,7 +428,7 @@ def download_certificate(cert_id):
     
     # Combine logos in a nested table (heart first, then GCL)
     if gcl_logo and heart_logo:
-        logos_table = Table([[heart_logo, gcl_logo]], colWidths=[1.3*inch, 1.3*inch])
+        logos_table = Table([[heart_logo, gcl_logo]], colWidths=[1.1*inch, 1.1*inch])
         logos_table.setStyle(TableStyle([
             ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
             ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
@@ -419,21 +450,6 @@ def download_certificate(cert_id):
         ('ALIGN', (1, 0), (1, 0), 'RIGHT'),
     ]))
     elements.append(footer_table)
-    
-    # Additional footer info
-    elements.append(Spacer(1, 0.1*inch))
-    footer_style = ParagraphStyle(
-        'Footer',
-        parent=styles['Normal'],
-        fontSize=7,
-        textColor=colors.HexColor('#94a3b8'),
-        alignment=TA_CENTER
-    )
-    elements.append(Paragraph(
-        "This is an official health certificate issued by Iloilo State University of Fisheries Science and Technology Health Services.<br/>"
-        "For verification, please contact the clinic at clinic@isufst.edu.ph",
-        footer_style
-    ))
     
     # Build PDF
     doc.build(elements)
