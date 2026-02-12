@@ -2,6 +2,7 @@ services:
   - type: web
     name: isufst-carehub
     runtime: python
+    pythonVersion: "3.12"
     buildCommand: pip install -r requirements.txt
     startCommand: gunicorn "app:create_app('production')" --bind 0.0.0.0:$PORT --timeout 120 --workers 1
     envVars:
@@ -10,6 +11,4 @@ services:
       - key: SECRET_KEY
         generateValue: true
       - key: DATABASE_URL
-        sync: false  # Set in Render dashboard: postgresql://postgres:FLbQcBZGlb1E2Dxm@db.jwzzuwhvngmqzdqbtscm.supabase.co:5432/postgres
-      - key: PYTHON_VERSION
-        value: "3.12.3"
+        sync: false  # Set in Render dashboard: postgresql://postgres.jwzzuwhvngmqzdqbtscm:KUYPPc1Z1y65f5Zx@aws-1-ap-northeast-1.pooler.supabase.com:5432/postgres
