@@ -251,7 +251,29 @@ def create_app(config_name=None):
 
     # -- Create tables (dev convenience) ----------
     with app.app_context():
-        db.create_all()
+        try:
+            # Only create tables if they don't exist
+            # This prevents issues with existing Turso databases
+            from sqlalchemy import inspect
+            inspector = inspect(db.engine)
+            existing_tables = inspector.get_table_names()
+            
+            if not existing_tables:
+                print("📋 Creating database tables...")
+                db.create_all()
+                print("✅ Database tables created successfully")
+            else:
+                print(f"✅ Database already initialized ({len(existing_tables)} tables found)")
+        except Exception as e:
+            # Log the error but don't crash the app
+            # This allows the app to start even if table creation fails
+            print(f"⚠️  Database initialization warning: {str(e)}")
+            if config_name == 'production':
+                # In production, assume tables already exist
+                print("ℹ️  Continuing in production mode (tables should already exist)")
+            else:
+                # In development, re-raise the error
+                raise
 
     return app
 

@@ -17,23 +17,37 @@ class Config:
         
         # Use Turso remote database via sqlalchemy-libsql driver
         if uri.startswith('libsql://'):
-            auth_token = os.environ.get('TURSO_AUTH_TOKEN', '')
+            auth_token = os.environ.get('TURSO_AUTH_TOKEN', '').strip()
+            
+            # Validate auth token is present
+            if not auth_token:
+                error_msg = (
+                    "❌ TURSO_AUTH_TOKEN environment variable is required but not set!\n"
+                    "Please set TURSO_AUTH_TOKEN in your environment variables.\n"
+                    "On Render: Dashboard > Environment > Add Environment Variable"
+                )
+                print(error_msg)
+                raise ValueError(error_msg)
+            
             # Check if sqlalchemy-libsql driver is available
             try:
                 import sqlalchemy_libsql  # noqa: F401
                 driver_available = True
             except ImportError:
                 driver_available = False
+                error_msg = (
+                    "❌ sqlalchemy-libsql package is required for Turso!\n"
+                    "Add it to requirements.txt: sqlalchemy-libsql"
+                )
+                print(error_msg)
+                raise ImportError(error_msg)
             
-            if driver_available and auth_token:
-                host = uri.replace('libsql://', '')
-                print(f"🚀 Using Turso Cloud Database: {host}")
-                return f'sqlite+libsql://{host}?authToken={auth_token}&secure=true'
-            else:
-                # Fallback to local SQLite for development (driver not installed)
-                print("⚠️  sqlalchemy-libsql not available — using local SQLite for development")
-                os.makedirs(os.path.join(basedir, 'instance'), exist_ok=True)
-                return default_db
+            host = uri.replace('libsql://', '')
+            print(f"🚀 Using Turso Cloud Database: {host}")
+            # URL encode the auth token to handle special characters
+            from urllib.parse import quote_plus
+            encoded_token = quote_plus(auth_token)
+            return f'sqlite+libsql://{host}?authToken={encoded_token}&secure=true'
         
         # Ensure instance directory exists for local SQLite
         os.makedirs(os.path.join(basedir, 'instance'), exist_ok=True)
