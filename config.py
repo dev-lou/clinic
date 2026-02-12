@@ -10,47 +10,33 @@ class Config:
     
     @staticmethod
     def _get_database_uri():
-        """Get database URI - supports Turso (libsql) and local SQLite."""
+        """Get database URI - supports PostgreSQL, local SQLite, or Turso."""
         basedir = os.path.abspath(os.path.dirname(__file__))
         default_db = f'sqlite:///{os.path.join(basedir, "instance", "carehub_dev.db")}'
         uri = os.environ.get('DATABASE_URL', default_db)
         
-        # Use Turso remote database via sqlalchemy-libsql driver
+        # For Turso - currently not supported without Rust compilation
+        # Use PostgreSQL or SQLite instead
         if uri.startswith('libsql://'):
-            auth_token = os.environ.get('TURSO_AUTH_TOKEN', '').strip()
+            print("⚠️  Turso (libsql://) URLs require Rust compilation which may fail on Render")
+            print("📝 Using local SQLite instead. For production, consider PostgreSQL.")
+            print("ℹ️  To use Turso: Install Rust locally or use PostgreSQL on Render")
             
-            # Validate auth token is present
-            if not auth_token:
-                error_msg = (
-                    "❌ TURSO_AUTH_TOKEN environment variable is required but not set!\n"
-                    "Please set TURSO_AUTH_TOKEN in your environment variables.\n"
-                    "On Render: Dashboard > Environment > Add Environment Variable"
-                )
-                print(error_msg)
-                raise ValueError(error_msg)
-            
-            # Check if sqlalchemy-libsql driver is available
-            try:
-                import sqlalchemy_libsql  # noqa: F401
-                driver_available = True
-            except ImportError:
-                driver_available = False
-                error_msg = (
-                    "❌ sqlalchemy-libsql package is required for Turso!\n"
-                    "Add it to requirements.txt: sqlalchemy-libsql"
-                )
-                print(error_msg)
-                raise ImportError(error_msg)
-            
-            host = uri.replace('libsql://', '')
-            print(f"🚀 Using Turso Cloud Database: {host}")
-            # URL encode the auth token to handle special characters
-            from urllib.parse import quote_plus
-            encoded_token = quote_plus(auth_token)
-            return f'sqlite+libsql://{host}?authToken={encoded_token}&secure=true'
+            # Fall back to local SQLite
+            os.makedirs(os.path.join(basedir, 'instance'), exist_ok=True)
+            return default_db
+        
+        # PostgreSQL support (recommended for Render production)
+        if uri.startswith('postgresql://') or uri.startswith('postgres://'):
+            # Fix postgres:// to postgresql:// for SQLAlchemy 1.4+
+            if uri.startswith('postgres://'):
+                uri = uri.replace('postgres://', 'postgresql://', 1)
+            print(f"🐘 Using PostgreSQL database")
+            return uri
         
         # Ensure instance directory exists for local SQLite
         os.makedirs(os.path.join(basedir, 'instance'), exist_ok=True)
+        print(f"💾 Using local SQLite database")
         return uri
     
     SQLALCHEMY_DATABASE_URI = _get_database_uri.__func__()
