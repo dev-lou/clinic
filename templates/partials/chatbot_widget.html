@@ -20,18 +20,35 @@
         justify-content: center;
         z-index: 9999;
         transition: all 0.3s cubic-bezier(.16, 1, .3, 1);
+        animation: chatbotIdle 3s infinite ease-in-out;
     }
+
+    @keyframes chatbotIdle {
+
+        0%,
+        100% {
+            transform: translateY(0) scale(1);
+        }
+
+        50% {
+            transform: translateY(-5px) scale(1.05);
+        }
+    }
+
     .chatbot-fab:hover {
         transform: scale(1.08);
         box-shadow: 0 6px 28px rgba(37, 99, 235, 0.55);
     }
+
     .chatbot-fab .fab-icon {
         font-size: 26px;
         transition: transform 0.3s ease;
     }
+
     .chatbot-fab.open .fab-icon {
         transform: rotate(90deg);
     }
+
     .chatbot-fab.open {
         opacity: 0;
         pointer-events: none;
@@ -49,7 +66,7 @@
         max-height: calc(100vh - 140px);
         background: white;
         border-radius: 20px;
-        box-shadow: 0 12px 48px rgba(0,0,0,0.18);
+        box-shadow: 0 12px 48px rgba(0, 0, 0, 0.18);
         display: flex;
         flex-direction: column;
         overflow: hidden;
@@ -59,11 +76,13 @@
         pointer-events: none;
         transition: all 0.3s cubic-bezier(.16, 1, .3, 1);
     }
+
     .chatbot-window.open {
         opacity: 1;
         transform: translateY(0) scale(1);
         pointer-events: auto;
     }
+
     .chatbot-window.maximized {
         top: 16px;
         right: 16px;
@@ -86,35 +105,40 @@
         gap: 12px;
         flex-shrink: 0;
     }
+
     .chatbot-header-avatar {
         width: 40px;
         height: 40px;
-        background: rgba(255,255,255,0.2);
+        background: rgba(255, 255, 255, 0.2);
         border-radius: 50%;
         display: flex;
         align-items: center;
         justify-content: center;
         font-size: 20px;
     }
+
     .chatbot-header-info h3 {
         font-size: 16px;
         font-weight: 700;
         margin: 0;
         font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
     }
+
     .chatbot-header-info p {
         font-size: 12px;
         opacity: 0.85;
         margin: 2px 0 0;
     }
+
     .chatbot-header-actions {
         margin-left: auto;
         display: flex;
         align-items: center;
         gap: 6px;
     }
+
     .chatbot-close-btn {
-        background: rgba(255,255,255,0.15);
+        background: rgba(255, 255, 255, 0.15);
         border: none;
         color: white;
         width: 32px;
@@ -126,11 +150,13 @@
         justify-content: center;
         transition: background 0.2s;
     }
+
     .chatbot-close-btn:hover {
-        background: rgba(255,255,255,0.3);
+        background: rgba(255, 255, 255, 0.3);
     }
+
     .chatbot-control-btn {
-        background: rgba(255,255,255,0.15);
+        background: rgba(255, 255, 255, 0.15);
         border: none;
         color: white;
         width: 32px;
@@ -142,8 +168,9 @@
         justify-content: center;
         transition: background 0.2s;
     }
+
     .chatbot-control-btn:hover {
-        background: rgba(255,255,255,0.3);
+        background: rgba(255, 255, 255, 0.3);
     }
 
     /* Messages Area */
@@ -156,8 +183,15 @@
         gap: 12px;
         scroll-behavior: smooth;
     }
-    .chatbot-messages::-webkit-scrollbar { width: 4px; }
-    .chatbot-messages::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 10px; }
+
+    .chatbot-messages::-webkit-scrollbar {
+        width: 4px;
+    }
+
+    .chatbot-messages::-webkit-scrollbar-thumb {
+        background: #d1d5db;
+        border-radius: 10px;
+    }
 
     /* Message Bubbles */
     .chat-msg {
@@ -168,24 +202,49 @@
         line-height: 1.5;
         word-wrap: break-word;
     }
+
     .chat-msg.user {
         align-self: flex-end;
         background: #2563eb;
         color: white;
         border-bottom-right-radius: 4px;
     }
+
     .chat-msg.bot {
         align-self: flex-start;
         background: #f3f4f6;
         color: #1f2937;
         border-bottom-left-radius: 4px;
     }
-    .chat-msg.bot p { margin: 0 0 8px; }
-    .chat-msg.bot p:last-child { margin-bottom: 0; }
-    .chat-msg.bot ul, .chat-msg.bot ol { margin: 4px 0; padding-left: 20px; }
-    .chat-msg.bot li { margin-bottom: 2px; }
-    .chat-msg.bot strong { font-weight: 600; }
-    .chat-msg.bot code { background: #e5e7eb; padding: 1px 4px; border-radius: 4px; font-size: 13px; }
+
+    .chat-msg.bot p {
+        margin: 0 0 8px;
+    }
+
+    .chat-msg.bot p:last-child {
+        margin-bottom: 0;
+    }
+
+    .chat-msg.bot ul,
+    .chat-msg.bot ol {
+        margin: 4px 0;
+        padding-left: 20px;
+    }
+
+    .chat-msg.bot li {
+        margin-bottom: 2px;
+    }
+
+    .chat-msg.bot strong {
+        font-weight: 600;
+    }
+
+    .chat-msg.bot code {
+        background: #e5e7eb;
+        padding: 1px 4px;
+        border-radius: 4px;
+        font-size: 13px;
+    }
 
     /* Typing Indicator */
     .chat-typing {
@@ -197,6 +256,7 @@
         border-radius: 16px;
         border-bottom-left-radius: 4px;
     }
+
     .chat-typing span {
         width: 8px;
         height: 8px;
@@ -204,11 +264,26 @@
         border-radius: 50%;
         animation: typingBounce 1.4s infinite ease-in-out;
     }
-    .chat-typing span:nth-child(2) { animation-delay: 0.2s; }
-    .chat-typing span:nth-child(3) { animation-delay: 0.4s; }
+
+    .chat-typing span:nth-child(2) {
+        animation-delay: 0.2s;
+    }
+
+    .chat-typing span:nth-child(3) {
+        animation-delay: 0.4s;
+    }
+
     @keyframes typingBounce {
-        0%, 80%, 100% { transform: translateY(0); }
-        40% { transform: translateY(-6px); }
+
+        0%,
+        80%,
+        100% {
+            transform: translateY(0);
+        }
+
+        40% {
+            transform: translateY(-6px);
+        }
     }
 
     /* Welcome Message */
@@ -217,27 +292,35 @@
         padding: 24px 16px;
         color: #6b7280;
     }
+
     .chatbot-welcome .welcome-icon {
         font-size: 40px;
         margin-bottom: 12px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
     }
+
     .chatbot-welcome h4 {
         color: #1f2937;
         font-size: 16px;
         font-weight: 600;
         margin: 0 0 8px;
     }
+
     .chatbot-welcome p {
         font-size: 13px;
         margin: 0 0 16px;
         line-height: 1.5;
     }
+
     .chatbot-suggestions {
         display: flex;
         flex-wrap: wrap;
         gap: 8px;
         justify-content: center;
     }
+
     .chatbot-suggestion-btn {
         background: #eff6ff;
         border: 1px solid #bfdbfe;
@@ -248,6 +331,7 @@
         cursor: pointer;
         transition: all 0.2s;
     }
+
     .chatbot-suggestion-btn:hover {
         background: #2563eb;
         color: white;
@@ -264,6 +348,7 @@
         flex-shrink: 0;
         background: white;
     }
+
     .chatbot-input {
         flex: 1;
         border: 1.5px solid #e5e7eb;
@@ -277,12 +362,15 @@
         transition: border-color 0.2s;
         font-family: 'Inter', sans-serif;
     }
+
     .chatbot-input:focus {
         border-color: #2563eb;
     }
+
     .chatbot-input::placeholder {
         color: #9ca3af;
     }
+
     .chatbot-send-btn {
         width: 40px;
         height: 40px;
@@ -297,8 +385,15 @@
         transition: background 0.2s;
         flex-shrink: 0;
     }
-    .chatbot-send-btn:hover { background: #1d4ed8; }
-    .chatbot-send-btn:disabled { background: #93c5fd; cursor: not-allowed; }
+
+    .chatbot-send-btn:hover {
+        background: #1d4ed8;
+    }
+
+    .chatbot-send-btn:disabled {
+        background: #93c5fd;
+        cursor: not-allowed;
+    }
 
     /* Disclaimer Footer */
     .chatbot-disclaimer {
@@ -318,6 +413,7 @@
             height: calc(100vh - 120px);
             border-radius: 16px;
         }
+
         .chatbot-fab {
             right: 16px;
             bottom: 16px;
@@ -330,8 +426,14 @@
 <!-- Floating Action Button -->
 <button id="chatbotFab" class="chatbot-fab" onclick="openChatbot()" title="Chat with CareHub AI">
     <span class="fab-icon">
-        <svg width="28" height="28" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+        <!-- Robot Head SVG -->
+        <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="11" width="18" height="10" rx="2" />
+            <circle cx="12" cy="5" r="2" />
+            <path d="M12 7v4" />
+            <line x1="8" y1="16" x2="8" y2="16" />
+            <line x1="16" y1="16" x2="16" y2="16" />
         </svg>
     </span>
 </button>
@@ -340,7 +442,17 @@
 <div id="chatbotWindow" class="chatbot-window">
     <!-- Header -->
     <div class="chatbot-header">
-        <div class="chatbot-header-avatar">🤖</div>
+        <div class="chatbot-header-avatar">
+            <!-- Professional Robot SVG -->
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="11" width="18" height="10" rx="2" />
+                <circle cx="12" cy="5" r="2" />
+                <path d="M12 7v4" />
+                <line x1="8" y1="16" x2="8" y2="16" />
+                <line x1="16" y1="16" x2="16" y2="16" />
+            </svg>
+        </div>
         <div class="chatbot-header-info">
             <h3>CareHub AI</h3>
             <p>Health Assistant</p>
@@ -368,15 +480,32 @@
     <div id="chatbotMessages" class="chatbot-messages">
         <!-- Welcome screen -->
         <div id="chatbotWelcome" class="chatbot-welcome">
-            <div class="welcome-icon">🏥</div>
-            <h4>Hi {% if current_user.is_authenticated %}{{ current_user.first_name }}{% else %}there{% endif %}! 👋</h4>
-            <p>I'm CareHub AI, your health assistant. {% if current_user.is_authenticated %}Ask me about symptoms, first aid, wellness tips, or clinic services.{% else %}Please <a href="{{ url_for('auth.login') }}" style="color: #2563eb; font-weight: 600;">log in</a> to start chatting.{% endif %}</p>
+            <div class="welcome-icon">
+                <!-- Robot AI Bot SVG -->
+                <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="1.5"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="11" width="18" height="10" rx="2" />
+                    <circle cx="12" cy="5" r="2" />
+                    <path d="M12 7v4" />
+                    <line x1="8" y1="16" x2="8" y2="16" />
+                    <line x1="16" y1="16" x2="16" y2="16" />
+                </svg>
+            </div>
+            <h4>Hi {% if current_user.is_authenticated %}{{ current_user.first_name }}{% else %}there{% endif %}! 👋
+            </h4>
+            <p>I'm CareHub AI, your health assistant. {% if current_user.is_authenticated %}Ask me about symptoms, first
+                aid, wellness tips, or clinic services.{% else %}Please <a href="{{ url_for('auth.login') }}"
+                    style="color: #2563eb; font-weight: 600;">log in</a> to start chatting.{% endif %}</p>
             {% if current_user.is_authenticated %}
             <div class="chatbot-suggestions">
-                <button class="chatbot-suggestion-btn" onclick="sendSuggestion('I have a headache, what should I do?')">🤕 Headache help</button>
-                <button class="chatbot-suggestion-btn" onclick="sendSuggestion('What services does the clinic offer?')">🏥 Clinic services</button>
-                <button class="chatbot-suggestion-btn" onclick="sendSuggestion('How do I book an appointment?')">📅 Book appointment</button>
-                <button class="chatbot-suggestion-btn" onclick="sendSuggestion('I feel sick, should I go to the clinic?')">🤒 Feeling sick</button>
+                <button class="chatbot-suggestion-btn"
+                    onclick="sendSuggestion('I have a headache, what should I do?')">🤕 Headache help</button>
+                <button class="chatbot-suggestion-btn"
+                    onclick="sendSuggestion('What services does the clinic offer?')">🏥 Clinic services</button>
+                <button class="chatbot-suggestion-btn" onclick="sendSuggestion('How do I book an appointment?')">📅 Book
+                    appointment</button>
+                <button class="chatbot-suggestion-btn"
+                    onclick="sendSuggestion('I feel sick, should I go to the clinic?')">🤒 Feeling sick</button>
             </div>
             {% endif %}
         </div>
@@ -384,8 +513,12 @@
 
     <!-- Input -->
     <div class="chatbot-input-area">
-        <textarea id="chatbotInput" class="chatbot-input" placeholder="{% if current_user.is_authenticated %}Ask about symptoms, health tips...{% else %}Please log in to chat{% endif %}" rows="1" onkeydown="handleChatKeydown(event)" oninput="autoResizeInput(this)" {% if not current_user.is_authenticated %}disabled{% endif %}></textarea>
-        <button id="chatbotSendBtn" class="chatbot-send-btn" onclick="sendChatMessage()" title="Send" {% if not current_user.is_authenticated %}disabled{% endif %}>
+        <textarea id="chatbotInput" class="chatbot-input"
+            placeholder="{% if current_user.is_authenticated %}Ask about symptoms, health tips...{% else %}Please log in to chat{% endif %}"
+            rows="1" onkeydown="handleChatKeydown(event)" oninput="autoResizeInput(this)" {% if not
+            current_user.is_authenticated %}disabled{% endif %}></textarea>
+        <button id="chatbotSendBtn" class="chatbot-send-btn" onclick="sendChatMessage()" title="Send" {% if not
+            current_user.is_authenticated %}disabled{% endif %}>
             <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
                 <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"></path>
             </svg>

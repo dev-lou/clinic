@@ -1,17 +1,21 @@
 <!DOCTYPE html>
-<html lang="en" class="scroll-smooth">
+<html lang="en" class="scroll-smooth overflow-x-hidden">
+
 <head>
     <meta charset="UTF-8">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ISUFST CareHub &mdash; Your Health, Digitized</title>
-    <meta name="description" content="ISUFST CareHub: Modern clinic management system for students. Book appointments, reserve medicines, and manage your health records.">
+    <meta name="description"
+        content="ISUFST CareHub: Modern clinic management system for students. Book appointments, reserve medicines, and manage your health records.">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/fontawesome.min.css') }}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/animations.css') }}">
     <script>
         tailwind.config = {
@@ -19,7 +23,7 @@
                 extend: {
                     fontFamily: { 'display': ['"Plus Jakarta Sans"', 'sans-serif'], 'body': ['Inter', 'sans-serif'] },
                     colors: {
-                        'primary': { 50:'#eff6ff',100:'#dbeafe',200:'#bfdbfe',300:'#93c5fd',400:'#60a5fa',500:'#3b82f6',600:'#2563eb',700:'#1d4ed8',800:'#1e3a5f',900:'#0f1d30',950:'#080d1a' },
+                        'primary': { 50: '#eff6ff', 100: '#dbeafe', 200: '#bfdbfe', 300: '#93c5fd', 400: '#60a5fa', 500: '#3b82f6', 600: '#2563eb', 700: '#1d4ed8', 800: '#1e3a5f', 900: '#0f1d30', 950: '#080d1a' },
                         'accent': '#10b981',
                         'gold': '#f59e0b',
                     }
@@ -28,887 +32,1420 @@
         }
     </script>
     <style>
-        *{font-family:'Inter',sans-serif}
-        h1,h2,h3,h4,h5,h6{font-family:'Plus Jakarta Sans',sans-serif}
+        * {
+            font-family: 'Inter', sans-serif
+        }
+
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6 {
+            font-family: 'Plus Jakarta Sans', sans-serif
+        }
 
         /* ── Scroll progress ─────────────── */
-        #scroll-progress{height:3px;background:linear-gradient(90deg,#2563eb,#10b981,#3b82f6);z-index:9999;transition:width .15s}
+        #scroll-progress {
+            height: 3px;
+            background: linear-gradient(90deg, #2563eb, #10b981, #3b82f6);
+            z-index: 9999;
+            transition: width .15s
+        }
+
 
         /* ── Hero with photo background ──────────── */
-        .hero-mesh{position:relative;overflow:hidden;background:url('https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?auto=format&fit=crop&w=1920&q=80') center/cover no-repeat}
-        .hero-mesh::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(8,13,26,.88) 0%,rgba(15,29,48,.82) 40%,rgba(8,13,26,.85) 100%);z-index:1}
+        .hero-mesh {
+            position: relative;
+            overflow: hidden;
+            background: url('https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?auto=format&fit=crop&w=1920&q=80') center/cover no-repeat;
+        }
+
+        .hero-mesh::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(8, 13, 26, .88) 0%, rgba(15, 29, 48, .82) 40%, rgba(8, 13, 26, .85) 100%);
+            z-index: 1
+        }
 
         /* ── Grid lines overlay ──────────── */
-        .grid-overlay{background-image:linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px);background-size:64px 64px}
+        .grid-overlay {
+            background-image: linear-gradient(rgba(255, 255, 255, .025) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, .025) 1px, transparent 1px);
+            background-size: 64px 64px
+        }
 
         /* ── Grain texture ────────────────── */
-        .grain{position:absolute;inset:0;opacity:.04;pointer-events:none;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E")}
+        .grain {
+            position: absolute;
+            inset: 0;
+            opacity: .04;
+            pointer-events: none;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E")
+        }
 
         /* ── Glass card premium ───────────── */
-        .glass-premium{background:rgba(255,255,255,.04);backdrop-filter:blur(24px) saturate(180%);-webkit-backdrop-filter:blur(24px) saturate(180%);border:1px solid rgba(255,255,255,.08)}
-        .glass-premium:hover{background:rgba(255,255,255,.07);border-color:rgba(255,255,255,.15)}
+        .glass-premium {
+            background: rgba(255, 255, 255, .04);
+            backdrop-filter: blur(24px) saturate(180%);
+            -webkit-backdrop-filter: blur(24px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, .08)
+        }
+
+        .glass-premium:hover {
+            background: rgba(255, 255, 255, .07);
+            border-color: rgba(255, 255, 255, .15)
+        }
 
         /* ── Nav blur ─────────────────────── */
-        .nav-blur{backdrop-filter:blur(20px) saturate(180%);-webkit-backdrop-filter:blur(20px) saturate(180%)}
-        .nav-scrolled{background:rgba(255,255,255,.92)!important;box-shadow:0 1px 3px rgba(0,0,0,.08)}
+        .nav-blur {
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%)
+        }
+
+        .nav-scrolled {
+            background: rgba(255, 255, 255, .92) !important;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, .08)
+        }
 
         /* ── Text gradient ────────────────── */
-        .gradient-text{background:linear-gradient(135deg,#3b82f6,#10b981);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-        .gradient-text-hero{background:linear-gradient(135deg,#60a5fa,#34d399,#818cf8);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+        .gradient-text {
+            background: linear-gradient(135deg, #3b82f6, #10b981);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text
+        }
+
+        .gradient-text-hero {
+            background: linear-gradient(135deg, #60a5fa, #34d399, #818cf8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text
+        }
 
         /* ── Feature card premium ─────────── */
-        .feature-card-premium{position:relative;overflow:hidden;transition:all .5s cubic-bezier(.16,1,.3,1)}
-        .feature-card-premium::before{content:'';position:absolute;inset:0;border-radius:inherit;padding:1.5px;background:linear-gradient(135deg,transparent 40%,rgba(37,99,235,.3),rgba(16,185,129,.3));-webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);-webkit-mask-composite:xor;mask-composite:exclude;opacity:0;transition:opacity .4s}
-        .feature-card-premium:hover::before{opacity:1}
-        .feature-card-premium:hover{transform:translateY(-6px);box-shadow:0 25px 60px -15px rgba(0,0,0,.12)}
-        .feature-card-premium .icon-wrap{transition:transform .4s cubic-bezier(.16,1,.3,1)}
-        .feature-card-premium:hover .icon-wrap{transform:scale(1.1) rotate(-5deg)}
+        .feature-card-premium {
+            position: relative;
+            overflow: hidden;
+            transition: all .5s cubic-bezier(.16, 1, .3, 1)
+        }
+
+        .feature-card-premium::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: inherit;
+            padding: 1.5px;
+            background: linear-gradient(135deg, transparent 40%, rgba(37, 99, 235, .3), rgba(16, 185, 129, .3));
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            opacity: 0;
+            transition: opacity .4s
+        }
+
+        .feature-card-premium:hover::before {
+            opacity: 1
+        }
+
+        .feature-card-premium:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 25px 60px -15px rgba(0, 0, 0, .12)
+        }
+
+        .feature-card-premium .icon-wrap {
+            transition: transform .4s cubic-bezier(.16, 1, .3, 1)
+        }
+
+        .feature-card-premium:hover .icon-wrap {
+            transform: scale(1.1) rotate(-5deg)
+        }
 
         /* ── Process step connector ──────── */
-        .step-connector{position:relative}
-        .step-connector::after{content:'';position:absolute;top:2rem;left:calc(50% + 3rem);width:calc(100% - 6rem);height:2px;background:linear-gradient(90deg,#2563eb,#10b981);opacity:.2}
-        .step-connector:last-child::after{display:none}
+        .step-connector {
+            position: relative
+        }
+
+        .step-connector::after {
+            content: '';
+            position: absolute;
+            top: 2rem;
+            left: calc(50% + 3rem);
+            width: calc(100% - 6rem);
+            height: 2px;
+            background: linear-gradient(90deg, #2563eb, #10b981);
+            opacity: .2
+        }
+
+        .step-connector:last-child::after {
+            display: none
+        }
 
         /* ── Team card hover ─────────────── */
-        .team-card{transition:all .5s cubic-bezier(.16,1,.3,1)}
-        .team-card:hover{transform:translateY(-8px)}
-        .team-card img{transition:transform .6s cubic-bezier(.16,1,.3,1)}
-        .team-card:hover img{transform:scale(1.04)}
-        .team-card .overlay{opacity:0;transition:opacity .4s}
-        .team-card:hover .overlay{opacity:1}
+        .team-card {
+            transition: all .5s cubic-bezier(.16, 1, .3, 1)
+        }
+
+        .team-card:hover {
+            transform: translateY(-8px)
+        }
+
+        .team-card img {
+            transition: transform .6s cubic-bezier(.16, 1, .3, 1)
+        }
+
+        .team-card:hover img {
+            transform: scale(1.04)
+        }
+
+        .team-card .overlay {
+            opacity: 0;
+            transition: opacity .4s
+        }
+
+        .team-card:hover .overlay {
+            opacity: 1
+        }
 
         /* ── Testimonial card ────────────── */
-        .testimonial-card{transition:all .4s ease}
-        .testimonial-card:hover{transform:translateY(-4px);box-shadow:0 20px 50px -15px rgba(0,0,0,.1)}
+        .testimonial-card {
+            transition: all .4s ease
+        }
+
+        .testimonial-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 50px -15px rgba(0, 0, 0, .1)
+        }
 
         /* ── FAQ accordion ────────────────── */
-        .faq-answer{max-height:0;overflow:hidden;transition:max-height .4s cubic-bezier(.16,1,.3,1),padding .3s}
-        .faq-item.active .faq-answer{max-height:300px;padding-top:.75rem;padding-bottom:.25rem}
-        .faq-item .faq-chevron{transition:transform .3s}
-        .faq-item.active .faq-chevron{transform:rotate(180deg)}
+        .faq-answer {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height .4s cubic-bezier(.16, 1, .3, 1), padding .3s
+        }
+
+        .faq-item.active .faq-answer {
+            max-height: 300px;
+            padding-top: .75rem;
+            padding-bottom: .25rem
+        }
+
+        .faq-item .faq-chevron {
+            transition: transform .3s
+        }
+
+        .faq-item.active .faq-chevron {
+            transform: rotate(180deg)
+        }
 
         /* ── Scroll reveal ────────────────── */
-        .reveal{opacity:0;transform:translateY(30px);transition:all .7s cubic-bezier(.16,1,.3,1)}
-        .reveal.visible{opacity:1;transform:translateY(0)}
-        .reveal-delay-1{transition-delay:.1s}
-        .reveal-delay-2{transition-delay:.2s}
-        .reveal-delay-3{transition-delay:.3s}
-        .reveal-delay-4{transition-delay:.4s}
-        .reveal-delay-5{transition-delay:.5s}
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all .7s cubic-bezier(.16, 1, .3, 1)
+        }
+
+        .reveal.visible {
+            opacity: 1;
+            transform: translateY(0)
+        }
+
+        .reveal-delay-1 {
+            transition-delay: .1s
+        }
+
+        .reveal-delay-2 {
+            transition-delay: .2s
+        }
+
+        .reveal-delay-3 {
+            transition-delay: .3s
+        }
+
+        .reveal-delay-4 {
+            transition-delay: .4s
+        }
+
+        .reveal-delay-5 {
+            transition-delay: .5s
+        }
 
         /* ── Back to top ──────────────────── */
-        #back-to-top{opacity:0;pointer-events:none;transition:all .3s}
-        #back-to-top.visible{opacity:1;pointer-events:auto}
+        #back-to-top {
+            opacity: 0;
+            pointer-events: none;
+            transition: all .3s
+        }
+
+        #back-to-top.visible {
+            opacity: 1;
+            pointer-events: auto
+        }
 
         /* ── Mobile menu ──────────────────── */
-        #mobile-overlay{opacity:0;pointer-events:none;transition:opacity .3s}
-        #mobile-overlay.active{opacity:1;pointer-events:auto}
-        #mobile-drawer{transform:translateX(-100%);transition:transform .35s cubic-bezier(.16,1,.3,1)}
-        #mobile-drawer.active{transform:translateX(0)}
+        #mobile-overlay {
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity .3s
+        }
+
+        #mobile-overlay.active {
+            opacity: 1;
+            pointer-events: auto
+        }
+
+        #mobile-drawer {
+            transform: translateX(-100%);
+            transition: transform .35s cubic-bezier(.16, 1, .3, 1)
+        }
+
+        #mobile-drawer.active {
+            transform: translateX(0)
+        }
 
         /* ── Bento card sizes ────────────── */
-        .bento-large{grid-column:span 2;grid-row:span 2}
-        @media(max-width:768px){.bento-large{grid-column:span 1;grid-row:span 1}}
+        .bento-large {
+            grid-column: span 2;
+            grid-row: span 2
+        }
+
+        @media(max-width:768px) {
+            .bento-large {
+                grid-column: span 1;
+                grid-row: span 1
+            }
+        }
 
         /* ── Stat glow ────────────────────── */
-        .stat-card{transition:all .4s;position:relative;overflow:hidden}
-        .stat-card::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,transparent 50%,rgba(37,99,235,.03));pointer-events:none}
-        .stat-card:hover{transform:translateY(-2px);box-shadow:0 12px 30px -8px rgba(0,0,0,.1)}
+        .stat-card {
+            transition: all .4s;
+            position: relative;
+            overflow: hidden
+        }
+
+        .stat-card::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, transparent 50%, rgba(37, 99, 235, .03));
+            pointer-events: none
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 30px -8px rgba(0, 0, 0, .1)
+        }
 
         /* ── Shimmer effect ───────────────── */
-        @keyframes shimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}
-        .shimmer-line{background:linear-gradient(90deg,transparent 0%,rgba(255,255,255,.06) 50%,transparent 100%);background-size:200% 100%;animation:shimmer 3s infinite}
+        @keyframes shimmer {
+            0% {
+                background-position: -200% 0
+            }
+
+            100% {
+                background-position: 200% 0
+            }
+        }
+
+        .shimmer-line {
+            background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, .06) 50%, transparent 100%);
+            background-size: 200% 100%;
+            animation: shimmer 3s infinite
+        }
 
         /* ── CTA gradient animation ──────── */
-        @keyframes ctaGradient{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
-        .cta-animated{background-size:200% 200%;animation:ctaGradient 6s ease infinite}
+        @keyframes ctaGradient {
+            0% {
+                background-position: 0% 50%
+            }
+
+            50% {
+                background-position: 100% 50%
+            }
+
+            100% {
+                background-position: 0% 50%
+            }
+        }
+
+        .cta-animated {
+            background-size: 200% 200%;
+            animation: ctaGradient 6s ease infinite
+        }
 
         /* ── AI Chat mockup ───────────────── */
-        .chat-bubble{animation:chatReveal .5s ease-out both}
-        .chat-bubble:nth-child(1){animation-delay:.2s}
-        .chat-bubble:nth-child(2){animation-delay:.8s}
-        .chat-bubble:nth-child(3){animation-delay:1.4s}
-        @keyframes chatReveal{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+        .chat-bubble {
+            animation: chatReveal .5s ease-out both
+        }
+
+        .chat-bubble:nth-child(1) {
+            animation-delay: .2s
+        }
+
+        .chat-bubble:nth-child(2) {
+            animation-delay: .8s
+        }
+
+        .chat-bubble:nth-child(3) {
+            animation-delay: 1.4s
+        }
+
+        @keyframes chatReveal {
+            from {
+                opacity: 0;
+                transform: translateY(10px)
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0)
+            }
+        }
 
         /* ── Dot pattern ──────────────────── */
-        .dots-bg{background-image:radial-gradient(rgba(37,99,235,.06) 1px,transparent 1px);background-size:24px 24px}
+        .dots-bg {
+            background-image: radial-gradient(rgba(37, 99, 235, .06) 1px, transparent 1px);
+            background-size: 24px 24px
+        }
     </style>
 </head>
 
 <body class="bg-white text-gray-900 antialiased overflow-x-hidden">
 
-<!-- Scroll Progress Bar -->
-<div id="scroll-progress" class="fixed top-0 left-0" style="width:0%"></div>
+    <!-- Scroll Progress Bar -->
+    <div id="scroll-progress" class="fixed top-0 left-0" style="width:0%"></div>
 
-<!-- ═══════════════════════ MOBILE MENU ═══════════════════════ -->
-<div id="mobile-overlay" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-[100] lg:hidden"></div>
-<aside id="mobile-drawer" class="fixed inset-y-0 left-0 w-[300px] bg-gradient-to-b from-primary-900 via-primary-800 to-primary-950 z-[101] flex flex-col lg:hidden">
-    <div class="flex items-center justify-between p-6">
-        <a href="/" class="flex items-center space-x-3">
-            <div class="w-10 h-10 bg-gradient-to-br from-primary-500 to-accent rounded-xl flex items-center justify-center">
-                <i class="fas fa-heartbeat text-white"></i>
-            </div>
-            <span class="text-lg font-bold text-white">CareHub</span>
-        </a>
-        <button onclick="toggleMobileMenu()" class="w-9 h-9 bg-white/10 rounded-lg flex items-center justify-center text-white hover:bg-white/20 transition">
-            <i class="fas fa-times"></i>
-        </button>
-    </div>
-    <nav class="flex-1 px-4 space-y-1 overflow-y-auto">
-        <a href="#features" onclick="toggleMobileMenu()" class="flex items-center space-x-3 px-4 py-3 rounded-xl text-blue-200/80 hover:bg-white/10 hover:text-white transition text-sm font-medium">
-            <i class="fas fa-th-large w-5 text-center text-blue-300/60"></i><span>Features</span>
-        </a>
-        <a href="#how-it-works" onclick="toggleMobileMenu()" class="flex items-center space-x-3 px-4 py-3 rounded-xl text-blue-200/80 hover:bg-white/10 hover:text-white transition text-sm font-medium">
-            <i class="fas fa-route w-5 text-center text-blue-300/60"></i><span>How It Works</span>
-        </a>
-        <a href="#team" onclick="toggleMobileMenu()" class="flex items-center space-x-3 px-4 py-3 rounded-xl text-blue-200/80 hover:bg-white/10 hover:text-white transition text-sm font-medium">
-            <i class="fas fa-user-md w-5 text-center text-blue-300/60"></i><span>Our Team</span>
-        </a>
-        <a href="{{ url_for('reservations.view_medicines') }}" class="flex items-center space-x-3 px-4 py-3 rounded-xl text-blue-200/80 hover:bg-white/10 hover:text-white transition text-sm font-medium">
-            <i class="fas fa-pills w-5 text-center text-emerald-400/60"></i><span>Medicines</span>
-        </a>
-        <a href="#faq" onclick="toggleMobileMenu()" class="flex items-center space-x-3 px-4 py-3 rounded-xl text-blue-200/80 hover:bg-white/10 hover:text-white transition text-sm font-medium">
-            <i class="fas fa-question-circle w-5 text-center text-blue-300/60"></i><span>FAQ</span>
-        </a>
-        <div class="border-t border-white/10 my-4"></div>
-        {% if current_user.is_authenticated %}
-        <a href="{{ url_for('appointments.my_appointments') }}" class="flex items-center space-x-3 px-4 py-3 rounded-xl text-blue-200/80 hover:bg-white/10 hover:text-white transition text-sm font-medium">
-            <i class="fas fa-calendar-alt w-5 text-center text-blue-300/60"></i><span>My Appointments</span>
-        </a>
-        <a href="{{ url_for('reservations.my_reservations') }}" class="flex items-center space-x-3 px-4 py-3 rounded-xl text-blue-200/80 hover:bg-white/10 hover:text-white transition text-sm font-medium">
-            <i class="fas fa-capsules w-5 text-center text-blue-300/60"></i><span>My Reservations</span>
-        </a>
-        <a href="{{ url_for('auth.profile') }}" class="flex items-center space-x-3 px-4 py-3 rounded-xl text-blue-200/80 hover:bg-white/10 hover:text-white transition text-sm font-medium">
-            <i class="fas fa-user-circle w-5 text-center text-blue-300/60"></i><span>Profile</span>
-        </a>
-        {% if current_user.role in ['admin', 'staff'] %}
-        <a href="{{ url_for('admin') }}" class="flex items-center space-x-3 px-4 py-3 rounded-xl text-blue-200/80 hover:bg-white/10 hover:text-white transition text-sm font-medium">
-            <i class="fas fa-user-shield w-5 text-center text-yellow-400/60"></i><span>Admin Dashboard</span>
-        </a>
-        {% endif %}
-        <a href="{{ url_for('auth.logout') }}" class="flex items-center space-x-3 px-4 py-3 rounded-xl text-red-300/80 hover:bg-red-500/10 hover:text-red-300 transition text-sm font-medium">
-            <i class="fas fa-sign-out-alt w-5 text-center"></i><span>Sign Out</span>
-        </a>
-        {% else %}
-        <a href="{{ url_for('auth.login') }}" class="flex items-center justify-center px-4 py-3 bg-white/10 rounded-xl text-white font-semibold text-sm hover:bg-white/20 transition">Sign In</a>
-        <a href="{{ url_for('auth.register') }}" class="flex items-center justify-center px-4 py-3 bg-white rounded-xl text-primary-900 font-bold text-sm hover:bg-blue-50 transition mt-2">Get Started</a>
-        {% endif %}
-    </nav>
-</aside>
-
-<!-- ═══════════════════════ NAVBAR ═══════════════════════ -->
-<nav id="main-nav" class="fixed top-0 inset-x-0 z-50 nav-blur bg-white/80 border-b border-gray-100/50 transition-all duration-300">
-    <div class="max-w-7xl mx-auto px-6 lg:px-8">
-        <div class="flex items-center justify-between h-[72px]">
-            <a href="/" class="flex items-center space-x-3 group">
-                <div class="w-10 h-10 bg-gradient-to-br from-primary-600 to-accent rounded-xl flex items-center justify-center shadow-lg group-hover:shadow-primary-600/30 transition-all duration-300 group-hover:scale-105">
-                    <i class="fas fa-heartbeat text-white text-lg"></i>
+    <!-- ═══════════════════════ MOBILE MENU ═══════════════════════ -->
+    <div id="mobile-overlay" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-[100] lg:hidden"></div>
+    <aside id="mobile-drawer"
+        class="fixed inset-y-0 left-0 w-[300px] bg-gradient-to-b from-primary-900 via-primary-800 to-primary-950 z-[101] flex flex-col lg:hidden">
+        <div class="flex items-center justify-between p-6">
+            <a href="/" class="flex items-center space-x-3">
+                <div
+                    class="w-10 h-10 bg-gradient-to-br from-primary-500 to-accent rounded-xl flex items-center justify-center">
+                    <i class="fas fa-heartbeat text-white"></i>
                 </div>
-                <div>
-                    <span class="text-lg font-bold text-primary-900 tracking-tight">CareHub</span>
-                    <span class="hidden sm:inline text-xs text-gray-400 ml-1 font-medium">by ISUFST</span>
-                </div>
+                <span class="text-lg font-bold text-white">CareHub</span>
             </a>
+            <button onclick="toggleMobileMenu()"
+                class="w-9 h-9 bg-white/10 rounded-lg flex items-center justify-center text-white hover:bg-white/20 transition">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <nav class="flex-1 px-4 space-y-1 overflow-y-auto">
+            <a href="#features" onclick="toggleMobileMenu()"
+                class="flex items-center space-x-3 px-4 py-3 rounded-xl text-blue-200/80 hover:bg-white/10 hover:text-white transition text-sm font-medium">
+                <i class="fas fa-th-large w-5 text-center text-blue-300/60"></i><span>Features</span>
+            </a>
+            <a href="#how-it-works" onclick="toggleMobileMenu()"
+                class="flex items-center space-x-3 px-4 py-3 rounded-xl text-blue-200/80 hover:bg-white/10 hover:text-white transition text-sm font-medium">
+                <i class="fas fa-route w-5 text-center text-blue-300/60"></i><span>How It Works</span>
+            </a>
+            <a href="#team" onclick="toggleMobileMenu()"
+                class="flex items-center space-x-3 px-4 py-3 rounded-xl text-blue-200/80 hover:bg-white/10 hover:text-white transition text-sm font-medium">
+                <i class="fas fa-user-md w-5 text-center text-blue-300/60"></i><span>Our Team</span>
+            </a>
+            <a href="{{ url_for('reservations.view_medicines') }}"
+                class="flex items-center space-x-3 px-4 py-3 rounded-xl text-blue-200/80 hover:bg-white/10 hover:text-white transition text-sm font-medium">
+                <i class="fas fa-pills w-5 text-center text-emerald-400/60"></i><span>Medicines</span>
+            </a>
+            <a href="#faq" onclick="toggleMobileMenu()"
+                class="flex items-center space-x-3 px-4 py-3 rounded-xl text-blue-200/80 hover:bg-white/10 hover:text-white transition text-sm font-medium">
+                <i class="fas fa-question-circle w-5 text-center text-blue-300/60"></i><span>FAQ</span>
+            </a>
+            <div class="border-t border-white/10 my-4"></div>
+            {% if current_user.is_authenticated %}
+            <a href="{{ url_for('appointments.my_appointments') }}"
+                class="flex items-center space-x-3 px-4 py-3 rounded-xl text-blue-200/80 hover:bg-white/10 hover:text-white transition text-sm font-medium">
+                <i class="fas fa-calendar-alt w-5 text-center text-blue-300/60"></i><span>My Appointments</span>
+            </a>
+            <a href="{{ url_for('reservations.my_reservations') }}"
+                class="flex items-center space-x-3 px-4 py-3 rounded-xl text-blue-200/80 hover:bg-white/10 hover:text-white transition text-sm font-medium">
+                <i class="fas fa-capsules w-5 text-center text-blue-300/60"></i><span>My Reservations</span>
+            </a>
+            <a href="{{ url_for('auth.profile') }}"
+                class="flex items-center space-x-3 px-4 py-3 rounded-xl text-blue-200/80 hover:bg-white/10 hover:text-white transition text-sm font-medium">
+                <i class="fas fa-user-circle w-5 text-center text-blue-300/60"></i><span>Profile</span>
+            </a>
+            {% if current_user.role in ['admin', 'staff'] %}
+            <a href="{{ url_for('admin') }}"
+                class="flex items-center space-x-3 px-4 py-3 rounded-xl text-blue-200/80 hover:bg-white/10 hover:text-white transition text-sm font-medium">
+                <i class="fas fa-user-shield w-5 text-center text-yellow-400/60"></i><span>Admin Dashboard</span>
+            </a>
+            {% endif %}
+            <a href="{{ url_for('auth.logout') }}"
+                class="flex items-center space-x-3 px-4 py-3 rounded-xl text-red-300/80 hover:bg-red-500/10 hover:text-red-300 transition text-sm font-medium">
+                <i class="fas fa-sign-out-alt w-5 text-center"></i><span>Sign Out</span>
+            </a>
+            {% else %}
+            <a href="{{ url_for('auth.login') }}"
+                class="flex items-center justify-center px-4 py-3 bg-white/10 rounded-xl text-white font-semibold text-sm hover:bg-white/20 transition">Sign
+                In</a>
+            <a href="{{ url_for('auth.register') }}"
+                class="flex items-center justify-center px-4 py-3 bg-white rounded-xl text-primary-900 font-bold text-sm hover:bg-blue-50 transition mt-2">Get
+                Started</a>
+            {% endif %}
+        </nav>
+    </aside>
 
-            <div class="hidden lg:flex items-center space-x-1">
-                <a href="#features" class="px-4 py-2 text-sm font-medium text-gray-600 hover:text-primary-700 rounded-lg hover:bg-primary-50/80 transition-all">Features</a>
-                <a href="#how-it-works" class="px-4 py-2 text-sm font-medium text-gray-600 hover:text-primary-700 rounded-lg hover:bg-primary-50/80 transition-all">How It Works</a>
-                <a href="#team" class="px-4 py-2 text-sm font-medium text-gray-600 hover:text-primary-700 rounded-lg hover:bg-primary-50/80 transition-all">Our Team</a>
-                <a href="{{ url_for('reservations.view_medicines') }}" class="px-4 py-2 text-sm font-medium text-gray-600 hover:text-primary-700 rounded-lg hover:bg-primary-50/80 transition-all">
-                    <i class="fas fa-pills mr-1.5 text-accent"></i>Medicines
+    <!-- ═══════════════════════ NAVBAR ═══════════════════════ -->
+    <nav id="main-nav"
+        class="fixed top-0 inset-x-0 z-50 nav-blur bg-white/80 border-b border-gray-100/50 transition-all duration-300">
+        <div class="max-w-7xl mx-auto px-6 lg:px-8">
+            <div class="flex items-center justify-between h-[72px]">
+                <a href="/" class="flex items-center space-x-3 group">
+                    <div
+                        class="w-10 h-10 bg-gradient-to-br from-primary-600 to-accent rounded-xl flex items-center justify-center shadow-lg group-hover:shadow-primary-600/30 transition-all duration-300 group-hover:scale-105">
+                        <i class="fas fa-heartbeat text-white text-lg"></i>
+                    </div>
+                    <div>
+                        <span class="text-lg font-bold text-primary-900 tracking-tight">CareHub</span>
+                        <span class="hidden sm:inline text-xs text-gray-400 ml-1 font-medium">by ISUFST</span>
+                    </div>
                 </a>
-                <a href="#faq" class="px-4 py-2 text-sm font-medium text-gray-600 hover:text-primary-700 rounded-lg hover:bg-primary-50/80 transition-all">FAQ</a>
-            </div>
 
-            <div class="flex items-center space-x-3">
-                {% if current_user.is_authenticated %}
-                {% include 'partials/notification_bell.html' %}
-                <div class="relative group">
-                    <button class="flex items-center space-x-2 px-3 py-2 rounded-xl hover:bg-gray-50 transition-all">
-                        <div class="w-8 h-8 bg-gradient-to-br from-primary-100 to-primary-200 rounded-lg flex items-center justify-center">
-                            <span class="text-xs font-bold text-primary-700">{{ current_user.first_name[0] }}{{ current_user.last_name[0] }}</span>
-                        </div>
-                        <span class="hidden sm:block text-sm font-semibold text-gray-700">{{ current_user.first_name }}</span>
-                        <i class="fas fa-chevron-down text-[10px] text-gray-400"></i>
-                    </button>
-                    <div class="absolute right-0 mt-2 w-60 bg-white rounded-2xl shadow-xl shadow-black/8 border border-gray-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform group-hover:translate-y-0 translate-y-1">
-                        <div class="px-4 py-3 border-b border-gray-100">
-                            <p class="text-sm font-bold text-gray-900">{{ current_user.first_name }} {{ current_user.last_name }}</p>
-                            <p class="text-xs text-gray-500">{{ current_user.email }}</p>
-                        </div>
-                        <div class="py-1.5">
-                            <a href="{{ url_for('appointments.my_appointments') }}" class="flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors rounded-lg mx-1.5"><i class="fas fa-calendar-alt w-5 text-gray-400 mr-2.5"></i>My Appointments</a>
-                            <a href="{{ url_for('reservations.my_reservations') }}" class="flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors rounded-lg mx-1.5"><i class="fas fa-capsules w-5 text-gray-400 mr-2.5"></i>My Reservations</a>
-                            <a href="{{ url_for('auth.profile') }}" class="flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors rounded-lg mx-1.5"><i class="fas fa-user-circle w-5 text-gray-400 mr-2.5"></i>My Profile</a>
-                            {% if current_user.role in ['admin', 'staff'] %}
-                            <div class="border-t border-gray-100 my-1 mx-4"></div>
-                            <a href="{{ url_for('admin') }}" class="flex items-center px-4 py-2.5 text-sm text-primary-700 hover:bg-primary-50 transition-colors rounded-lg mx-1.5"><i class="fas fa-user-shield w-5 text-primary-600 mr-2.5"></i>Admin Dashboard</a>
-                            {% endif %}
-                            <div class="border-t border-gray-100 my-1 mx-4"></div>
-                            <a href="{{ url_for('auth.logout') }}" class="flex items-center px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors rounded-lg mx-1.5"><i class="fas fa-sign-out-alt w-5 text-red-400 mr-2.5"></i>Sign Out</a>
+                <div class="hidden lg:flex items-center space-x-1">
+                    <a href="#features"
+                        class="px-4 py-2 text-sm font-medium text-gray-600 hover:text-primary-700 rounded-lg hover:bg-primary-50/80 transition-all">Features</a>
+                    <a href="#how-it-works"
+                        class="px-4 py-2 text-sm font-medium text-gray-600 hover:text-primary-700 rounded-lg hover:bg-primary-50/80 transition-all">How
+                        It Works</a>
+                    <a href="#team"
+                        class="px-4 py-2 text-sm font-medium text-gray-600 hover:text-primary-700 rounded-lg hover:bg-primary-50/80 transition-all">Our
+                        Team</a>
+                    <a href="{{ url_for('reservations.view_medicines') }}"
+                        class="px-4 py-2 text-sm font-medium text-gray-600 hover:text-primary-700 rounded-lg hover:bg-primary-50/80 transition-all">
+                        <i class="fas fa-pills mr-1.5 text-accent"></i>Medicines
+                    </a>
+                    <a href="#faq"
+                        class="px-4 py-2 text-sm font-medium text-gray-600 hover:text-primary-700 rounded-lg hover:bg-primary-50/80 transition-all">FAQ</a>
+                </div>
+
+                <div class="flex items-center space-x-3">
+                    {% if current_user.is_authenticated %}
+                    {% include 'partials/notification_bell.html' %}
+                    <div class="relative group">
+                        <button
+                            class="flex items-center space-x-2 px-3 py-2 rounded-xl hover:bg-gray-50 transition-all">
+                            <div
+                                class="w-8 h-8 bg-gradient-to-br from-primary-100 to-primary-200 rounded-lg flex items-center justify-center">
+                                <span class="text-xs font-bold text-primary-700">{{ current_user.first_name[0] }}{{
+                                    current_user.last_name[0] }}</span>
+                            </div>
+                            <span class="hidden sm:block text-sm font-semibold text-gray-700">{{ current_user.first_name
+                                }}</span>
+                            <i class="fas fa-chevron-down text-[10px] text-gray-400"></i>
+                        </button>
+                        <div
+                            class="absolute right-0 mt-2 w-60 bg-white rounded-2xl shadow-xl shadow-black/8 border border-gray-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform group-hover:translate-y-0 translate-y-1">
+                            <div class="px-4 py-3 border-b border-gray-100">
+                                <p class="text-sm font-bold text-gray-900">{{ current_user.first_name }} {{
+                                    current_user.last_name }}</p>
+                                <p class="text-xs text-gray-500">{{ current_user.email }}</p>
+                            </div>
+                            <div class="py-1.5">
+                                <a href="{{ url_for('patient_dashboard.index') }}"
+                                    class="flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors rounded-lg mx-1.5"><i
+                                        class="fas fa-th-large w-5 text-gray-400 mr-2.5"></i>Dashboard</a>
+                                <a href="{{ url_for('appointments.my_appointments') }}"
+                                    class="flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors rounded-lg mx-1.5"><i
+                                        class="fas fa-calendar-alt w-5 text-gray-400 mr-2.5"></i>My Appointments</a>
+                                <a href="{{ url_for('reservations.my_reservations') }}"
+                                    class="flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors rounded-lg mx-1.5"><i
+                                        class="fas fa-capsules w-5 text-gray-400 mr-2.5"></i>My Reservations</a>
+                                <a href="{{ url_for('patient_dashboard.timeline') }}"
+                                    class="flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors rounded-lg mx-1.5"><i
+                                        class="fas fa-history w-5 text-gray-400 mr-2.5"></i>Health Timeline</a>
+                                <a href="{{ url_for('symptom_screening.index') }}"
+                                    class="flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors rounded-lg mx-1.5"><i
+                                        class="fas fa-stethoscope w-5 text-gray-400 mr-2.5"></i>Symptom Check</a>
+                                <a href="{{ url_for('auth.profile') }}"
+                                    class="flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors rounded-lg mx-1.5"><i
+                                        class="fas fa-user-circle w-5 text-gray-400 mr-2.5"></i>My Profile</a>
+                                {% if current_user.role in ['admin', 'staff'] %}
+                                <div class="border-t border-gray-100 my-1 mx-4"></div>
+                                <a href="{{ url_for('admin') }}"
+                                    class="flex items-center px-4 py-2.5 text-sm text-primary-700 hover:bg-primary-50 transition-colors rounded-lg mx-1.5"><i
+                                        class="fas fa-user-shield w-5 text-primary-600 mr-2.5"></i>Admin Dashboard</a>
+                                {% endif %}
+                                <div class="border-t border-gray-100 my-1 mx-4"></div>
+                                <a href="{{ url_for('auth.logout') }}"
+                                    class="flex items-center px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors rounded-lg mx-1.5"><i
+                                        class="fas fa-sign-out-alt w-5 text-red-400 mr-2.5"></i>Sign Out</a>
+                            </div>
                         </div>
                     </div>
+                    {% else %}
+                    <a href="{{ url_for('auth.login') }}"
+                        class="hidden sm:inline-flex px-4 py-2 text-sm font-semibold text-primary-700 hover:text-primary-800 transition-colors">Sign
+                        In</a>
+                    <a href="{{ url_for('auth.register') }}"
+                        class="hidden sm:inline-flex px-5 py-2.5 bg-primary-700 text-white text-sm font-semibold rounded-xl hover:bg-primary-800 transition-all shadow-lg shadow-primary-700/25 hover:shadow-primary-700/40">Get
+                        Started</a>
+                    {% endif %}
+                    <button onclick="toggleMobileMenu()"
+                        class="lg:hidden w-10 h-10 flex items-center justify-center rounded-xl hover:bg-gray-100 transition text-gray-600">
+                        <i class="fas fa-bars text-lg"></i>
+                    </button>
                 </div>
-                {% else %}
-                <a href="{{ url_for('auth.login') }}" class="hidden sm:inline-flex px-4 py-2 text-sm font-semibold text-primary-700 hover:text-primary-800 transition-colors">Sign In</a>
-                <a href="{{ url_for('auth.register') }}" class="hidden sm:inline-flex px-5 py-2.5 bg-primary-700 text-white text-sm font-semibold rounded-xl hover:bg-primary-800 transition-all shadow-lg shadow-primary-700/25 hover:shadow-primary-700/40">Get Started</a>
-                {% endif %}
-                <button onclick="toggleMobileMenu()" class="lg:hidden w-10 h-10 flex items-center justify-center rounded-xl hover:bg-gray-100 transition text-gray-600">
-                    <i class="fas fa-bars text-lg"></i>
-                </button>
             </div>
         </div>
-    </div>
-</nav>
+    </nav>
 
 
-<!-- ═══════════════════════ HERO ═══════════════════════ -->
-<section class="hero-mesh min-h-screen flex items-center relative pt-20">
-    <div class="absolute inset-0 grid-overlay" style="z-index:2"></div>
-    <div class="grain" style="z-index:2"></div>
+    <!-- ═══════════════════════ HERO ═══════════════════════ -->
+    <section class="hero-mesh min-h-screen flex items-center relative pt-20">
+        <div class="absolute inset-0 grid-overlay" style="z-index:2"></div>
+        <div class="grain" style="z-index:2"></div>
 
-    <div class="max-w-7xl mx-auto px-6 lg:px-8 relative z-10 w-full py-12">
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-            <!-- Left -->
-            <div class="space-y-8 fade-in">
-                <div class="inline-flex items-center px-4 py-2 bg-white/[0.06] border border-white/[0.08] rounded-full text-sm text-blue-200/90 font-medium backdrop-blur-sm">
-                    <span class="w-2 h-2 bg-emerald-400 rounded-full mr-2.5 pulse"></span>
-                    Now serving ISUFST students
-                </div>
-
-                <h1 class="text-5xl sm:text-6xl lg:text-[4.5rem] font-extrabold text-white leading-[1.08] tracking-tight">
-                    Your Health,<br>
-                    <span class="gradient-text-hero" id="hero-rotating">Simplified.</span>
-                </h1>
-
-                <p class="text-lg sm:text-xl text-blue-200/60 max-w-lg leading-relaxed font-light">
-                    Book appointments, reserve medicines, and track your health &mdash; all from one modern platform built for the ISUFST community.
-                </p>
-
-                <div class="flex flex-col sm:flex-row gap-4 pt-2">
-                    <a href="{{ url_for('appointments.book') }}" class="group relative px-8 py-4 bg-white text-primary-900 font-bold rounded-2xl transition-all shadow-2xl shadow-black/25 hover:shadow-white/15 text-center overflow-hidden">
-                        <div class="absolute inset-0 bg-gradient-to-r from-blue-50 to-emerald-50 opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                        <span class="relative z-10 flex items-center justify-center"><i class="fas fa-calendar-check mr-2 group-hover:scale-110 inline-block transition-transform"></i>Book Appointment</span>
-                    </a>
-                    <a href="#how-it-works" class="px-8 py-4 bg-white/[0.06] border border-white/[0.12] text-white font-semibold rounded-2xl hover:bg-white/[0.1] backdrop-blur-sm transition-all text-center">
-                        <i class="fas fa-play-circle mr-2 text-accent"></i>See How It Works
-                    </a>
-                </div>
-
-                <!-- Trust -->
-                <div class="flex items-center gap-6 pt-4">
-                    <div class="flex -space-x-3">
-                        <img src="{{ url_for('static', filename='img/member1.jpg') }}" class="w-10 h-10 rounded-full border-2 border-white/20 object-cover" alt="">
-                        <img src="{{ url_for('static', filename='img/member2.png') }}" class="w-10 h-10 rounded-full border-2 border-white/20 object-cover" alt="">
-                        <img src="{{ url_for('static', filename='img/member3.jpg') }}" class="w-10 h-10 rounded-full border-2 border-white/20 object-cover" alt="">
-                        <div class="w-10 h-10 rounded-full border-2 border-white/20 bg-primary-600/80 flex items-center justify-center text-xs text-white font-bold backdrop-blur-sm">
-                            <span class="counter-hero" data-target="500">0</span>+
-                        </div>
+        <div class="max-w-7xl mx-auto px-6 lg:px-8 relative z-10 w-full py-12">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+                <!-- Left -->
+                <div class="space-y-8 fade-in">
+                    <div
+                        class="inline-flex items-center px-4 py-2 bg-white/[0.06] border border-white/[0.08] rounded-full text-sm text-blue-200/90 font-medium backdrop-blur-sm">
+                        <span class="w-2 h-2 bg-emerald-400 rounded-full mr-2.5 pulse"></span>
+                        Now serving ISUFST students
                     </div>
-                    <div class="text-sm text-blue-200/50">Trusted by <strong class="text-blue-200/90 font-semibold"><span class="counter-hero" data-target="500">0</span>+</strong> students</div>
-                </div>
-            </div>
 
-            <!-- Right: Glass card -->
-            <div class="hidden lg:block slide-in-right">
-                <div class="relative">
-                    <div class="glass-premium rounded-3xl p-8 space-y-6">
-                        <div class="flex items-center space-x-4">
-                            <img src="{{ url_for('static', filename='images/jm.png') }}" class="w-14 h-14 rounded-2xl object-cover shadow-lg ring-2 ring-white/10" style="object-position:center 30%" alt="Doctor">
-                            <div>
-                                <h4 class="text-white font-bold">Dr. Jun Michael Hechanova</h4>
-                                <p class="text-blue-300/70 text-sm">University Physician</p>
+                    <h1
+                        class="text-5xl sm:text-6xl lg:text-[4.5rem] font-extrabold text-white leading-[1.08] tracking-tight">
+                        Your Health,<br>
+                        <span class="gradient-text-hero" id="hero-rotating">Simplified.</span>
+                    </h1>
+
+                    <p class="text-lg sm:text-xl text-blue-200/60 max-w-lg leading-relaxed font-light">
+                        Book appointments, reserve medicines, and track your health &mdash; all from one modern platform
+                        built for the ISUFST community.
+                    </p>
+
+                    <div class="flex flex-col sm:flex-row gap-4 pt-2">
+                        <a href="{{ url_for('appointments.book') }}"
+                            class="group relative px-8 py-4 bg-white text-primary-900 font-bold rounded-2xl transition-all shadow-2xl shadow-black/25 hover:shadow-white/15 text-center overflow-hidden">
+                            <div
+                                class="absolute inset-0 bg-gradient-to-r from-blue-50 to-emerald-50 opacity-0 group-hover:opacity-100 transition-opacity">
                             </div>
-                            <span class="ml-auto px-3 py-1.5 bg-emerald-500/15 text-emerald-300 rounded-full text-xs font-semibold flex items-center border border-emerald-500/20">
-                                <span class="w-1.5 h-1.5 bg-emerald-400 rounded-full mr-1.5 pulse"></span>Available
-                            </span>
+                            <span class="relative z-10 flex items-center justify-center"><i
+                                    class="fas fa-calendar-check mr-2 group-hover:scale-110 inline-block transition-transform"></i>Book
+                                Appointment</span>
+                        </a>
+                        <a href="#how-it-works"
+                            class="px-8 py-4 bg-white/[0.06] border border-white/[0.12] text-white font-semibold rounded-2xl hover:bg-white/[0.1] backdrop-blur-sm transition-all text-center">
+                            <i class="fas fa-play-circle mr-2 text-accent"></i>See How It Works
+                        </a>
+                    </div>
+
+                    <!-- Trust -->
+                    <div class="flex items-center gap-6 pt-4">
+                        <div class="flex -space-x-3">
+                            <img src="{{ url_for('static', filename='img/member1.jpg') }}"
+                                class="w-10 h-10 rounded-full border-2 border-white/20 object-cover" alt="">
+                            <img src="{{ url_for('static', filename='img/member2.png') }}"
+                                class="w-10 h-10 rounded-full border-2 border-white/20 object-cover" alt="">
+                            <img src="{{ url_for('static', filename='img/member3.jpg') }}"
+                                class="w-10 h-10 rounded-full border-2 border-white/20 object-cover" alt="">
+                            <div
+                                class="w-10 h-10 rounded-full border-2 border-white/20 bg-primary-600/80 flex items-center justify-center text-xs text-white font-bold backdrop-blur-sm">
+                                <span class="counter-hero" data-target="500">0</span>+
+                            </div>
                         </div>
-                        <div class="space-y-3">
-                            <p class="text-sm text-blue-300/60 font-medium">Today's Slots <span class="text-blue-400/40 text-xs">({{ ph_time }} PHT)</span></p>
-                            <div class="grid grid-cols-4 gap-2">
-                                {% for slot in today_slots %}
-                                <div class="px-3 py-2 rounded-xl text-center text-sm font-medium transition-all duration-200
+                        <div class="text-sm text-blue-200/50">Trusted by <strong
+                                class="text-blue-200/90 font-semibold"><span class="counter-hero"
+                                    data-target="500">0</span>+</strong> students</div>
+                    </div>
+                </div>
+
+                <!-- Right: Glass card -->
+                <div class="block mt-12 lg:mt-0 slide-in-right">
+                    <div class="relative">
+                        <div class="glass-premium rounded-3xl p-8 space-y-6">
+                            <div class="flex items-center space-x-4">
+                                <img src="{{ url_for('static', filename='images/jm.png') }}"
+                                    class="w-14 h-14 rounded-2xl object-cover shadow-lg ring-2 ring-white/10"
+                                    style="object-position:center 30%" alt="Doctor">
+                                <div>
+                                    <h4 class="text-white font-bold">Dr. Jun Michael Hechanova</h4>
+                                    <p class="text-blue-300/70 text-sm">University Physician</p>
+                                </div>
+                                <span
+                                    class="ml-auto px-3 py-1.5 bg-emerald-500/15 text-emerald-300 rounded-full text-xs font-semibold flex items-center border border-emerald-500/20">
+                                    <span class="w-1.5 h-1.5 bg-emerald-400 rounded-full mr-1.5 pulse"></span>Available
+                                </span>
+                            </div>
+                            <div class="space-y-3">
+                                <p class="text-sm text-blue-300/60 font-medium">Today's Slots <span
+                                        class="text-blue-400/40 text-xs">({{ ph_time }} PHT)</span></p>
+                                <div class="grid grid-cols-4 gap-2">
+                                    {% for slot in today_slots %}
+                                    <div
+                                        class="px-3 py-2 rounded-xl text-center text-sm font-medium transition-all duration-200
                                     {% if slot.is_past %}bg-white/[0.03] text-white/30 line-through
                                     {% elif slot.is_booked %}bg-red-500/10 text-red-300/70 line-through
                                     {% else %}bg-white/[0.06] text-white/90 hover:bg-accent/20 hover:text-emerald-200 cursor-pointer{% endif %}">
-                                    {{ slot.time }}
+                                        {{ slot.time }}
+                                    </div>
+                                    {% endfor %}
                                 </div>
-                                {% endfor %}
+                            </div>
+                            <div class="flex justify-between text-sm pt-3 border-t border-white/[0.06]">
+                                <span class="text-blue-300/60"><i class="fas fa-check-circle text-accent mr-1.5"></i>{{
+                                    available_count }} slots left</span>
+                                <span class="text-blue-300/60"><i class="fas fa-clock text-gold mr-1.5"></i>30 min
+                                    each</span>
                             </div>
                         </div>
-                        <div class="flex justify-between text-sm pt-3 border-t border-white/[0.06]">
-                            <span class="text-blue-300/60"><i class="fas fa-check-circle text-accent mr-1.5"></i>{{ available_count }} slots left</span>
-                            <span class="text-blue-300/60"><i class="fas fa-clock text-gold mr-1.5"></i>30 min each</span>
+                        <div
+                            class="absolute -top-4 right-0 sm:-right-4 glass-premium px-4 py-2 rounded-2xl text-white text-sm font-semibold shadow-xl bounce">
+                            <i class="fas fa-shield-alt text-accent mr-1.5"></i>Secure
+                        </div>
+                        <div
+                            class="absolute -bottom-4 left-0 sm:-left-4 glass-premium px-4 py-2 rounded-2xl text-white text-sm font-semibold shadow-xl heartbeat">
+                            <i class="fas fa-heart text-red-400 mr-1.5"></i>24/7 Access
                         </div>
                     </div>
-                    <div class="absolute -top-4 -right-4 glass-premium px-4 py-2 rounded-2xl text-white text-sm font-semibold shadow-xl bounce"><i class="fas fa-shield-alt text-accent mr-1.5"></i>Secure</div>
-                    <div class="absolute -bottom-4 -left-4 glass-premium px-4 py-2 rounded-2xl text-white text-sm font-semibold shadow-xl heartbeat"><i class="fas fa-heart text-red-400 mr-1.5"></i>24/7 Access</div>
                 </div>
             </div>
         </div>
-    </div>
-
-    <div class="absolute bottom-0 inset-x-0">
-        <svg viewBox="0 0 1440 80" preserveAspectRatio="none" class="w-full h-16 sm:h-20"><path d="M0,40 C360,80 720,0 1440,40 L1440,80 L0,80 Z" fill="white"/></svg>
-    </div>
-</section>
 
 
-<!-- ═══════════════════════ STATS BAR ═══════════════════════ -->
-<section class="py-16 bg-white relative -mt-1">
-    <div class="max-w-6xl mx-auto px-6 lg:px-8">
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 reveal">
-            <div class="stat-card text-center rounded-2xl p-6 bg-gradient-to-br from-blue-50 to-indigo-50/50 border border-blue-100/50">
-                <div class="text-3xl sm:text-4xl font-extrabold text-primary-700 tracking-tight"><span class="counter" data-target="500">0</span>+</div>
-                <div class="text-sm text-gray-500 mt-1.5 font-medium">Students Served</div>
-            </div>
-            <div class="stat-card text-center rounded-2xl p-6 bg-gradient-to-br from-emerald-50 to-teal-50/50 border border-emerald-100/50">
-                <div class="text-3xl sm:text-4xl font-extrabold text-emerald-600 tracking-tight"><span class="counter" data-target="98">0</span>%</div>
-                <div class="text-sm text-gray-500 mt-1.5 font-medium">Satisfaction Rate</div>
-            </div>
-            <div class="stat-card text-center rounded-2xl p-6 bg-gradient-to-br from-amber-50 to-orange-50/50 border border-amber-100/50">
-                <div class="text-3xl sm:text-4xl font-extrabold text-amber-600 tracking-tight">24/7</div>
-                <div class="text-sm text-gray-500 mt-1.5 font-medium">Online Access</div>
-            </div>
-            <div class="stat-card text-center rounded-2xl p-6 bg-gradient-to-br from-violet-50 to-purple-50/50 border border-violet-100/50">
-                <div class="text-3xl sm:text-4xl font-extrabold text-violet-600 tracking-tight"><span class="counter" data-target="5">0</span> min</div>
-                <div class="text-sm text-gray-500 mt-1.5 font-medium">Avg. Wait Time</div>
-            </div>
+        <div class="absolute bottom-0 inset-x-0" style="z-index: 20;">
+            <svg viewBox="0 0 1440 80" preserveAspectRatio="none" class="w-full h-16 sm:h-20">
+                <path d="M0,40 C360,80 720,0 1440,40 L1440,80 L0,80 Z" fill="white" />
+            </svg>
         </div>
-    </div>
-</section>
+    </section>
 
 
-<!-- ═══════════════════════ HOW IT WORKS ═══════════════════════ -->
-<section id="how-it-works" class="py-24 bg-gray-50/50">
-    <div class="max-w-6xl mx-auto px-6 lg:px-8">
-        <div class="text-center mb-16 reveal">
-            <span class="inline-block px-4 py-1.5 bg-primary-100/80 text-primary-700 text-xs font-bold rounded-full mb-4 uppercase tracking-wider">Simple Process</span>
-            <h2 class="text-4xl sm:text-5xl font-extrabold text-primary-900 mb-4">How it <span class="gradient-text">works.</span></h2>
-            <p class="text-lg text-gray-500 max-w-xl mx-auto">Get started in three easy steps. Your health journey begins here.</p>
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 lg:gap-12">
-            <div class="step-connector text-center reveal reveal-delay-1">
-                <div class="w-16 h-16 bg-gradient-to-br from-primary-500 to-primary-600 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg shadow-primary-500/25">
-                    <i class="fas fa-user-plus text-white text-xl"></i>
+    <!-- ═══════════════════════ STATS BAR ═══════════════════════ -->
+    <section class="py-16 bg-white relative -mt-1">
+        <div class="max-w-6xl mx-auto px-6 lg:px-8">
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 reveal">
+                <div
+                    class="stat-card text-center rounded-2xl p-6 bg-gradient-to-br from-blue-50 to-indigo-50/50 border border-blue-100/50">
+                    <div class="text-3xl sm:text-4xl font-extrabold text-primary-700 tracking-tight"><span
+                            class="counter" data-target="500">0</span>+</div>
+                    <div class="text-sm text-gray-500 mt-1.5 font-medium">Students Served</div>
                 </div>
-                <div class="inline-flex items-center justify-center w-8 h-8 bg-primary-100 rounded-full text-primary-700 font-bold text-sm mb-4">1</div>
-                <h3 class="text-xl font-bold text-gray-900 mb-3">Create Your Account</h3>
-                <p class="text-gray-500 text-sm leading-relaxed">Sign up with your ISUFST email in under a minute. It's completely free for all enrolled students.</p>
-            </div>
-            <div class="step-connector text-center reveal reveal-delay-2">
-                <div class="w-16 h-16 bg-gradient-to-br from-accent to-emerald-600 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg shadow-emerald-500/25">
-                    <i class="fas fa-calendar-check text-white text-xl"></i>
+                <div
+                    class="stat-card text-center rounded-2xl p-6 bg-gradient-to-br from-emerald-50 to-teal-50/50 border border-emerald-100/50">
+                    <div class="text-3xl sm:text-4xl font-extrabold text-emerald-600 tracking-tight"><span
+                            class="counter" data-target="98">0</span>%</div>
+                    <div class="text-sm text-gray-500 mt-1.5 font-medium">Satisfaction Rate</div>
                 </div>
-                <div class="inline-flex items-center justify-center w-8 h-8 bg-emerald-100 rounded-full text-emerald-700 font-bold text-sm mb-4">2</div>
-                <h3 class="text-xl font-bold text-gray-900 mb-3">Book or Reserve</h3>
-                <p class="text-gray-500 text-sm leading-relaxed">Schedule an appointment or reserve medicines online. Pick your preferred date, time, and service.</p>
-            </div>
-            <div class="step-connector text-center reveal reveal-delay-3">
-                <div class="w-16 h-16 bg-gradient-to-br from-violet-500 to-violet-600 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg shadow-violet-500/25">
-                    <i class="fas fa-heart text-white text-xl"></i>
+                <div
+                    class="stat-card text-center rounded-2xl p-6 bg-gradient-to-br from-amber-50 to-orange-50/50 border border-amber-100/50">
+                    <div class="text-3xl sm:text-4xl font-extrabold text-amber-600 tracking-tight">24/7</div>
+                    <div class="text-sm text-gray-500 mt-1.5 font-medium">Online Access</div>
                 </div>
-                <div class="inline-flex items-center justify-center w-8 h-8 bg-violet-100 rounded-full text-violet-700 font-bold text-sm mb-4">3</div>
-                <h3 class="text-xl font-bold text-gray-900 mb-3">Get Quality Care</h3>
-                <p class="text-gray-500 text-sm leading-relaxed">Visit the clinic at your scheduled time. Our staff will be ready and waiting &mdash; no long queues.</p>
+                <div
+                    class="stat-card text-center rounded-2xl p-6 bg-gradient-to-br from-violet-50 to-purple-50/50 border border-violet-100/50">
+                    <div class="text-3xl sm:text-4xl font-extrabold text-violet-600 tracking-tight"><span
+                            class="counter" data-target="5">0</span> min</div>
+                    <div class="text-sm text-gray-500 mt-1.5 font-medium">Avg. Wait Time</div>
+                </div>
             </div>
         </div>
-    </div>
-</section>
+    </section>
 
 
-<!-- ═══════════════════════ FEATURES ═══════════════════════ -->
-<section id="features" class="py-24 dots-bg">
-    <div class="max-w-7xl mx-auto px-6 lg:px-8">
-        <div class="text-center mb-16 reveal">
-            <span class="inline-block px-4 py-1.5 bg-primary-100/80 text-primary-700 text-xs font-bold rounded-full mb-4 uppercase tracking-wider">Powerful Features</span>
-            <h2 class="text-4xl sm:text-5xl font-extrabold text-primary-900 mb-4">Everything you need, <span class="gradient-text">in one place.</span></h2>
-            <p class="text-lg text-gray-500 max-w-2xl mx-auto">From appointment booking to medicine reservations &mdash; CareHub streamlines your entire clinic experience.</p>
-        </div>
+    <!-- ═══════════════════════ HOW IT WORKS ═══════════════════════ -->
+    <section id="how-it-works" class="py-24 bg-gray-50/50">
+        <div class="max-w-6xl mx-auto px-6 lg:px-8">
+            <div class="text-center mb-16 reveal">
+                <span
+                    class="inline-block px-4 py-1.5 bg-primary-100/80 text-primary-700 text-xs font-bold rounded-full mb-4 uppercase tracking-wider">Simple
+                    Process</span>
+                <h2 class="text-4xl sm:text-5xl font-extrabold text-primary-900 mb-4">How it <span
+                        class="gradient-text">works.</span></h2>
+                <p class="text-lg text-gray-500 max-w-xl mx-auto">Get started in three easy steps. Your health journey
+                    begins here.</p>
+            </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <!-- Feature 1: Smart Scheduling -->
-            <div class="feature-card-premium bg-white rounded-3xl p-8 border border-gray-100 reveal reveal-delay-1 md:col-span-2 lg:col-span-2">
-                <div class="flex flex-col sm:flex-row sm:items-start gap-6">
-                    <div class="icon-wrap w-14 h-14 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-lg shadow-blue-500/20">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 lg:gap-12">
+                <div class="step-connector text-center reveal reveal-delay-1">
+                    <div
+                        class="w-16 h-16 bg-gradient-to-br from-primary-500 to-primary-600 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg shadow-primary-500/25">
+                        <i class="fas fa-user-plus text-white text-xl"></i>
+                    </div>
+                    <div
+                        class="inline-flex items-center justify-center w-8 h-8 bg-primary-100 rounded-full text-primary-700 font-bold text-sm mb-4">
+                        1</div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-3">Create Your Account</h3>
+                    <p class="text-gray-500 text-sm leading-relaxed">Sign up with your ISUFST email in under a minute.
+                        It's completely free for all enrolled students.</p>
+                </div>
+                <div class="step-connector text-center reveal reveal-delay-2">
+                    <div
+                        class="w-16 h-16 bg-gradient-to-br from-accent to-emerald-600 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg shadow-emerald-500/25">
                         <i class="fas fa-calendar-check text-white text-xl"></i>
                     </div>
-                    <div class="flex-1">
-                        <h3 class="text-xl font-bold text-gray-900 mb-2">Smart Scheduling</h3>
-                        <p class="text-gray-500 leading-relaxed mb-4">Interactive calendar with real-time availability. Color-coded dates show open, limited, and fully booked slots. Pick your preferred time with just a click.</p>
-                        <a href="{{ url_for('appointments.book') }}" class="inline-flex items-center text-primary-700 font-semibold text-sm group">Book Now <i class="fas fa-arrow-right ml-2 group-hover:translate-x-1 transition-transform"></i></a>
+                    <div
+                        class="inline-flex items-center justify-center w-8 h-8 bg-emerald-100 rounded-full text-emerald-700 font-bold text-sm mb-4">
+                        2</div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-3">Book or Reserve</h3>
+                    <p class="text-gray-500 text-sm leading-relaxed">Schedule an appointment or reserve medicines
+                        online. Pick your preferred date, time, and service.</p>
+                </div>
+                <div class="step-connector text-center reveal reveal-delay-3">
+                    <div
+                        class="w-16 h-16 bg-gradient-to-br from-violet-500 to-violet-600 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg shadow-violet-500/25">
+                        <i class="fas fa-heart text-white text-xl"></i>
                     </div>
+                    <div
+                        class="inline-flex items-center justify-center w-8 h-8 bg-violet-100 rounded-full text-violet-700 font-bold text-sm mb-4">
+                        3</div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-3">Get Quality Care</h3>
+                    <p class="text-gray-500 text-sm leading-relaxed">Visit the clinic at your scheduled time. Our staff
+                        will be ready and waiting &mdash; no long queues.</p>
                 </div>
-            </div>
-
-            <!-- Feature 2: Medicine Reservations -->
-            <div class="feature-card-premium bg-white rounded-3xl p-8 border border-gray-100 reveal reveal-delay-2">
-                <div class="icon-wrap w-14 h-14 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-2xl flex items-center justify-center mb-6 shadow-lg shadow-emerald-500/20">
-                    <i class="fas fa-capsules text-white text-xl"></i>
-                </div>
-                <h3 class="text-xl font-bold text-gray-900 mb-3">Medicine Reservations</h3>
-                <p class="text-gray-500 leading-relaxed mb-6">Browse available medicines and reserve them for FREE. Pick up anytime during clinic hours.</p>
-                <a href="{{ url_for('reservations.view_medicines') }}" class="inline-flex items-center text-emerald-700 font-semibold text-sm group">Browse <i class="fas fa-arrow-right ml-2 group-hover:translate-x-1 transition-transform"></i></a>
-            </div>
-
-            <!-- Feature 3: Health Records -->
-            <div class="feature-card-premium bg-white rounded-3xl p-8 border border-gray-100 reveal reveal-delay-1">
-                <div class="icon-wrap w-14 h-14 bg-gradient-to-br from-violet-500 to-violet-600 rounded-2xl flex items-center justify-center mb-6 shadow-lg shadow-violet-500/20">
-                    <i class="fas fa-file-medical text-white text-xl"></i>
-                </div>
-                <h3 class="text-xl font-bold text-gray-900 mb-3">Health Records</h3>
-                <p class="text-gray-500 leading-relaxed mb-6">Complete medical history in one place. Past visits, prescriptions, and health summaries.</p>
-                <a href="{{ url_for('appointments.my_appointments') }}" class="inline-flex items-center text-violet-700 font-semibold text-sm group">View Records <i class="fas fa-arrow-right ml-2 group-hover:translate-x-1 transition-transform"></i></a>
-            </div>
-
-            <!-- Feature 4: Live Queue -->
-            <div class="feature-card-premium bg-white rounded-3xl p-8 border border-gray-100 reveal reveal-delay-2">
-                <div class="icon-wrap w-14 h-14 bg-gradient-to-br from-amber-500 to-orange-500 rounded-2xl flex items-center justify-center mb-6 shadow-lg shadow-amber-500/20">
-                    <i class="fas fa-users text-white text-xl"></i>
-                </div>
-                <h3 class="text-xl font-bold text-gray-900 mb-3">Live Queue</h3>
-                <p class="text-gray-500 leading-relaxed mb-6">Real-time queue position tracking. Know exactly when it's your turn.</p>
-                <span class="inline-flex items-center text-amber-700 font-semibold text-sm"><i class="fas fa-bolt mr-1.5"></i>Real-time Updates</span>
-            </div>
-
-            <!-- Feature 5: AI Health Assistant -->
-            <div class="feature-card-premium bg-gradient-to-br from-primary-900 to-primary-800 rounded-3xl p-8 border border-primary-700/30 reveal reveal-delay-3 md:col-span-2 lg:col-span-2">
-                <div class="flex flex-col sm:flex-row sm:items-start gap-6">
-                    <div class="icon-wrap w-14 h-14 bg-gradient-to-br from-cyan-400 to-blue-500 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-lg shadow-cyan-500/30">
-                        <i class="fas fa-robot text-white text-xl"></i>
-                    </div>
-                    <div class="flex-1">
-                        <div class="flex items-center gap-2 mb-2">
-                            <h3 class="text-xl font-bold text-white">CareHub AI Assistant</h3>
-                            <span class="px-2 py-0.5 bg-cyan-400/20 text-cyan-300 text-[10px] font-bold rounded-full uppercase tracking-wider">Powered by Gemini</span>
-                        </div>
-                        <p class="text-blue-200/60 leading-relaxed mb-4">Get instant health advice, symptom guidance, and clinic information 24/7. Our AI assistant helps you decide if you need to visit the clinic.</p>
-                        <div class="flex flex-wrap gap-2">
-                            <span class="px-3 py-1 bg-white/[0.06] rounded-lg text-xs text-blue-200/70 border border-white/[0.06]">Symptom Check</span>
-                            <span class="px-3 py-1 bg-white/[0.06] rounded-lg text-xs text-blue-200/70 border border-white/[0.06]">Medicine Info</span>
-                            <span class="px-3 py-1 bg-white/[0.06] rounded-lg text-xs text-blue-200/70 border border-white/[0.06]">Wellness Tips</span>
-                            <span class="px-3 py-1 bg-white/[0.06] rounded-lg text-xs text-blue-200/70 border border-white/[0.06]">24/7 Available</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Feature 6: Smart Alerts -->
-            <div class="feature-card-premium bg-white rounded-3xl p-8 border border-gray-100 reveal reveal-delay-1">
-                <div class="icon-wrap w-14 h-14 bg-gradient-to-br from-rose-500 to-pink-500 rounded-2xl flex items-center justify-center mb-6 shadow-lg shadow-rose-500/20">
-                    <i class="fas fa-bell text-white text-xl"></i>
-                </div>
-                <h3 class="text-xl font-bold text-gray-900 mb-3">Smart Alerts</h3>
-                <p class="text-gray-500 leading-relaxed mb-6">Reminders for appointments, medicine pickups, and health updates.</p>
-                <span class="inline-flex items-center text-rose-700 font-semibold text-sm"><i class="fas fa-check-circle mr-1.5"></i>Never Miss a Visit</span>
-            </div>
-
-            <!-- Feature 7: Secure -->
-            <div class="feature-card-premium bg-white rounded-3xl p-8 border border-gray-100 reveal reveal-delay-2">
-                <div class="icon-wrap w-14 h-14 bg-gradient-to-br from-cyan-500 to-teal-500 rounded-2xl flex items-center justify-center mb-6 shadow-lg shadow-cyan-500/20">
-                    <i class="fas fa-shield-alt text-white text-xl"></i>
-                </div>
-                <h3 class="text-xl font-bold text-gray-900 mb-3">Secure & Private</h3>
-                <p class="text-gray-500 leading-relaxed mb-6">Encrypted data with role-based access. Your health info stays confidential.</p>
-                <span class="inline-flex items-center text-teal-700 font-semibold text-sm"><i class="fas fa-lock mr-1.5"></i>Enterprise Security</span>
-            </div>
-
-            <!-- Feature 8: Symptom Screening -->
-            <div class="feature-card-premium bg-white rounded-3xl p-8 border border-gray-100 reveal reveal-delay-3">
-                <div class="icon-wrap w-14 h-14 bg-gradient-to-br from-indigo-500 to-indigo-600 rounded-2xl flex items-center justify-center mb-6 shadow-lg shadow-indigo-500/20">
-                    <i class="fas fa-stethoscope text-white text-xl"></i>
-                </div>
-                <h3 class="text-xl font-bold text-gray-900 mb-3">Symptom Screening</h3>
-                <p class="text-gray-500 leading-relaxed mb-6">Quick self-assessment before visiting. Get personalized triage recommendations.</p>
-                <span class="inline-flex items-center text-indigo-700 font-semibold text-sm"><i class="fas fa-clipboard-check mr-1.5"></i>Pre-visit Screening</span>
             </div>
         </div>
-    </div>
-</section>
+    </section>
 
 
-<!-- ═══════════════════════ MEDICAL TEAM ═══════════════════════ -->
-<section id="team" class="py-24 bg-gray-50/50">
-    <div class="max-w-7xl mx-auto px-6 lg:px-8">
-        <div class="text-center mb-16 reveal">
-            <span class="inline-block px-4 py-1.5 bg-emerald-100/80 text-emerald-700 text-xs font-bold rounded-full mb-4 uppercase tracking-wider">Meet Our Professionals</span>
-            <h2 class="text-4xl sm:text-5xl font-extrabold text-primary-900 mb-4">Expert care from <span class="gradient-text">trusted doctors.</span></h2>
-            <p class="text-lg text-gray-500 max-w-2xl mx-auto">Our dedicated medical team is committed to providing the highest quality healthcare to every ISUFST student.</p>
-        </div>
+    <!-- ═══════════════════════ FEATURES ═══════════════════════ -->
+    <section id="features" class="py-24 dots-bg">
+        <div class="max-w-7xl mx-auto px-6 lg:px-8">
+            <div class="text-center mb-16 reveal">
+                <span
+                    class="inline-block px-4 py-1.5 bg-primary-100/80 text-primary-700 text-xs font-bold rounded-full mb-4 uppercase tracking-wider">Powerful
+                    Features</span>
+                <h2 class="text-4xl sm:text-5xl font-extrabold text-primary-900 mb-4">Everything you need, <span
+                        class="gradient-text">in one place.</span></h2>
+                <p class="text-lg text-gray-500 max-w-2xl mx-auto">From appointment booking to medicine reservations
+                    &mdash; CareHub streamlines your entire clinic experience.</p>
+            </div>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
-            <div class="team-card bg-white rounded-3xl overflow-hidden border border-gray-100 group reveal reveal-delay-1">
-                <div class="aspect-[3/4] overflow-hidden bg-gradient-to-b from-primary-100 to-primary-50 relative">
-                    <img src="{{ url_for('static', filename='images/lou.png') }}" alt="Dr. Lou Vincent Baroro" class="w-full h-full object-cover">
-                    <div class="overlay absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent flex items-end p-6">
-                        <div class="flex gap-2">
-                            <span class="px-3 py-1 bg-white/20 backdrop-blur-sm rounded-full text-white text-xs font-medium">MD</span>
-                            <span class="px-3 py-1 bg-white/20 backdrop-blur-sm rounded-full text-white text-xs font-medium">General Practice</span>
+            <div class="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-6">
+                <!-- Feature 1: Smart Scheduling -->
+                <div
+                    class="feature-card-premium bg-white rounded-2xl md:rounded-3xl p-5 md:p-8 border border-gray-100 reveal reveal-delay-1 md:col-span-2 lg:col-span-2">
+                    <div class="flex flex-col sm:flex-row sm:items-start gap-4 md:gap-6">
+                        <div
+                            class="icon-wrap w-10 h-10 md:w-14 md:h-14 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl md:rounded-2xl flex items-center justify-center flex-shrink-0 shadow-lg shadow-blue-500/20">
+                            <i class="fas fa-calendar-check text-white text-base md:text-xl"></i>
+                        </div>
+                        <div class="flex-1">
+                            <h3 class="text-sm sm:text-xl font-bold text-gray-900 mb-1 md:mb-2">Smart Scheduling</h3>
+                            <p class="text-xs sm:text-base text-gray-500 leading-relaxed mb-3 md:mb-4">Interactive
+                                calendar with real-time
+                                availability. Color-coded dates show open, limited, and fully booked slots. Pick your
+                                preferred time with just a click.</p>
+                            <a href="{{ url_for('appointments.book') }}"
+                                class="inline-flex items-center text-primary-700 font-semibold text-xs sm:text-sm group">Book
+                                Now
+                                <i
+                                    class="fas fa-arrow-right ml-2 group-hover:translate-x-1 transition-transform"></i></a>
                         </div>
                     </div>
                 </div>
-                <div class="p-6">
-                    <h4 class="text-lg font-bold text-gray-900">Dr. Lou Vincent Baroro</h4>
-                    <p class="text-primary-600 text-sm font-medium">Medical Officer</p>
-                </div>
-            </div>
 
-            <div class="team-card bg-white rounded-3xl overflow-hidden border border-gray-100 group reveal reveal-delay-2">
-                <div class="aspect-[3/4] overflow-hidden bg-gradient-to-b from-emerald-100 to-emerald-50 relative">
-                    <img src="{{ url_for('static', filename='images/kath.png') }}" alt="Dr. Katherine Bicodo" class="w-full h-full object-cover">
-                    <div class="overlay absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent flex items-end p-6">
-                        <div class="flex gap-2">
-                            <span class="px-3 py-1 bg-white/20 backdrop-blur-sm rounded-full text-white text-xs font-medium">MD</span>
-                            <span class="px-3 py-1 bg-white/20 backdrop-blur-sm rounded-full text-white text-xs font-medium">General Practice</span>
+                <!-- Feature 2: Medicine Reservations -->
+                <div
+                    class="feature-card-premium bg-white rounded-2xl md:rounded-3xl p-5 md:p-8 border border-gray-100 reveal reveal-delay-2">
+                    <div
+                        class="icon-wrap w-10 h-10 md:w-14 md:h-14 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-xl md:rounded-2xl flex items-center justify-center mb-4 md:mb-6 shadow-lg shadow-emerald-500/20">
+                        <i class="fas fa-capsules text-white text-base md:text-xl"></i>
+                    </div>
+                    <h3 class="text-sm sm:text-xl font-bold text-gray-900 mb-2 md:mb-3">Medicine Reservations</h3>
+                    <p class="text-xs sm:text-base text-gray-500 leading-relaxed mb-4 md:mb-6">Browse available
+                        medicines and reserve them for FREE.
+                        Pick up anytime during clinic hours.</p>
+                    <a href="{{ url_for('reservations.view_medicines') }}"
+                        class="inline-flex items-center text-emerald-700 font-semibold text-xs sm:text-sm group">Browse
+                        <i class="fas fa-arrow-right ml-2 group-hover:translate-x-1 transition-transform"></i></a>
+                </div>
+
+                <!-- Feature 3: Health Records -->
+                <div
+                    class="feature-card-premium bg-white rounded-2xl md:rounded-3xl p-5 md:p-8 border border-gray-100 reveal reveal-delay-1">
+                    <div
+                        class="icon-wrap w-10 h-10 md:w-14 md:h-14 bg-gradient-to-br from-violet-500 to-violet-600 rounded-xl md:rounded-2xl flex items-center justify-center mb-4 md:mb-6 shadow-lg shadow-violet-500/20">
+                        <i class="fas fa-file-medical text-white text-base md:text-xl"></i>
+                    </div>
+                    <h3 class="text-sm sm:text-xl font-bold text-gray-900 mb-2 md:mb-3">Health Records</h3>
+                    <p class="text-xs sm:text-base text-gray-500 leading-relaxed mb-4 md:mb-6">Complete medical history
+                        in one place. Past visits,
+                        prescriptions, and health summaries.</p>
+                    <a href="{{ url_for('appointments.my_appointments') }}"
+                        class="inline-flex items-center text-violet-700 font-semibold text-xs sm:text-sm group">View
+                        Records <i
+                            class="fas fa-arrow-right ml-2 group-hover:translate-x-1 transition-transform"></i></a>
+                </div>
+
+                <!-- Feature 4: Live Queue -->
+                <div
+                    class="feature-card-premium bg-white rounded-2xl md:rounded-3xl p-5 md:p-8 border border-gray-100 reveal reveal-delay-2">
+                    <div
+                        class="icon-wrap w-10 h-10 md:w-14 md:h-14 bg-gradient-to-br from-amber-500 to-orange-500 rounded-xl md:rounded-2xl flex items-center justify-center mb-4 md:mb-6 shadow-lg shadow-amber-500/20">
+                        <i class="fas fa-users text-white text-base md:text-xl"></i>
+                    </div>
+                    <h3 class="text-sm sm:text-xl font-bold text-gray-900 mb-2 md:mb-3">Live Queue</h3>
+                    <p class="text-xs sm:text-base text-gray-500 leading-relaxed mb-4 md:mb-6">Real-time queue position
+                        tracking. Know exactly when
+                        it's your turn.</p>
+                    <span class="inline-flex items-center text-amber-700 font-semibold text-xs sm:text-sm"><i
+                            class="fas fa-bolt mr-1.5"></i>Real-time Updates</span>
+                </div>
+
+                <!-- Feature 5: AI Health Assistant -->
+                <div
+                    class="feature-card-premium bg-gradient-to-br from-primary-900 to-primary-800 rounded-2xl md:rounded-3xl p-5 md:p-8 border border-primary-700/30 reveal reveal-delay-3 md:col-span-2 lg:col-span-2">
+                    <div class="flex flex-col sm:flex-row sm:items-start gap-4 md:gap-6">
+                        <div
+                            class="icon-wrap w-10 h-10 md:w-14 md:h-14 bg-gradient-to-br from-cyan-400 to-blue-500 rounded-xl md:rounded-2xl flex items-center justify-center flex-shrink-0 shadow-lg shadow-cyan-500/30">
+                            <i class="fas fa-robot text-white text-base md:text-xl"></i>
+                        </div>
+                        <div class="flex-1">
+                            <div class="flex flex-col sm:flex-row sm:items-center gap-2 mb-2">
+                                <h3 class="text-sm sm:text-xl font-bold text-white">CareHub AI Assistant</h3>
+                                <span
+                                    class="inline-block w-max px-2 py-0.5 bg-cyan-400/20 text-cyan-300 text-[8px] sm:text-[10px] font-bold rounded-full uppercase tracking-wider">Powered
+                                    by Gemini</span>
+                            </div>
+                            <p class="text-xs sm:text-base text-blue-200/60 leading-relaxed mb-3 md:mb-4">Get instant
+                                health advice, symptom
+                                guidance, and clinic information 24/7. Our AI assistant helps you decide if you need to
+                                visit the clinic.</p>
+                            <div class="flex flex-wrap gap-2">
+                                <span
+                                    class="px-2 py-1 sm:px-3 bg-white/[0.06] rounded-lg text-[10px] sm:text-xs text-blue-200/70 border border-white/[0.06]">Symptom
+                                    Check</span>
+                                <span
+                                    class="px-2 py-1 sm:px-3 bg-white/[0.06] rounded-lg text-[10px] sm:text-xs text-blue-200/70 border border-white/[0.06]">Medicine
+                                    Info</span>
+                                <span
+                                    class="px-2 py-1 sm:px-3 bg-white/[0.06] rounded-lg text-[10px] sm:text-xs text-blue-200/70 border border-white/[0.06]">Wellness
+                                    Tips</span>
+                                <span
+                                    class="px-2 py-1 sm:px-3 bg-white/[0.06] rounded-lg text-[10px] sm:text-xs text-blue-200/70 border border-white/[0.06]">24/7
+                                    Available</span>
+                            </div>
                         </div>
                     </div>
                 </div>
-                <div class="p-6">
-                    <h4 class="text-lg font-bold text-gray-900">Dr. Katherine Bicodo</h4>
-                    <p class="text-emerald-600 text-sm font-medium">Medical Officer</p>
+
+                <!-- Feature 6: Smart Alerts -->
+                <div
+                    class="feature-card-premium bg-white rounded-2xl md:rounded-3xl p-5 md:p-8 border border-gray-100 reveal reveal-delay-1">
+                    <div
+                        class="icon-wrap w-10 h-10 md:w-14 md:h-14 bg-gradient-to-br from-rose-500 to-pink-500 rounded-xl md:rounded-2xl flex items-center justify-center mb-4 md:mb-6 shadow-lg shadow-rose-500/20">
+                        <i class="fas fa-bell text-white text-base md:text-xl"></i>
+                    </div>
+                    <h3 class="text-sm sm:text-xl font-bold text-gray-900 mb-2 md:mb-3">Smart Alerts</h3>
+                    <p class="text-xs sm:text-base text-gray-500 leading-relaxed mb-4 md:mb-6">Reminders for
+                        appointments, medicine pickups, and
+                        health updates.</p>
+                    <span class="inline-flex items-center text-rose-700 font-semibold text-xs sm:text-sm"><i
+                            class="fas fa-check-circle mr-1.5"></i>Never Miss a Visit</span>
+                </div>
+
+                <!-- Feature 7: Secure -->
+                <div
+                    class="feature-card-premium bg-white rounded-2xl md:rounded-3xl p-5 md:p-8 border border-gray-100 reveal reveal-delay-2">
+                    <div
+                        class="icon-wrap w-10 h-10 md:w-14 md:h-14 bg-gradient-to-br from-cyan-500 to-teal-500 rounded-xl md:rounded-2xl flex items-center justify-center mb-4 md:mb-6 shadow-lg shadow-cyan-500/20">
+                        <i class="fas fa-shield-alt text-white text-base md:text-xl"></i>
+                    </div>
+                    <h3 class="text-sm sm:text-xl font-bold text-gray-900 mb-2 md:mb-3">Secure & Private</h3>
+                    <p class="text-xs sm:text-base text-gray-500 leading-relaxed mb-4 md:mb-6">Encrypted data with
+                        role-based access. Your health
+                        info stays confidential.</p>
+                    <span class="inline-flex items-center text-teal-700 font-semibold text-xs sm:text-sm"><i
+                            class="fas fa-lock mr-1.5"></i>Enterprise Security</span>
+                </div>
+
+                <!-- Feature 8: Symptom Screening -->
+                <div
+                    class="feature-card-premium bg-white rounded-2xl md:rounded-3xl p-5 md:p-8 border border-gray-100 reveal reveal-delay-3">
+                    <div
+                        class="icon-wrap w-10 h-10 md:w-14 md:h-14 bg-gradient-to-br from-indigo-500 to-indigo-600 rounded-xl md:rounded-2xl flex items-center justify-center mb-4 md:mb-6 shadow-lg shadow-indigo-500/20">
+                        <i class="fas fa-stethoscope text-white text-base md:text-xl"></i>
+                    </div>
+                    <h3 class="text-sm sm:text-xl font-bold text-gray-900 mb-2 md:mb-3">Symptom Screening</h3>
+                    <p class="text-xs sm:text-base text-gray-500 leading-relaxed mb-4 md:mb-6">Quick self-assessment
+                        before visiting. Get
+                        personalized triage recommendations.</p>
+                    <span class="inline-flex items-center text-indigo-700 font-semibold text-xs sm:text-sm"><i
+                            class="fas fa-clipboard-check mr-1.5"></i>Pre-visit Screening</span>
                 </div>
             </div>
+        </div>
+    </section>
 
-            <div class="team-card bg-white rounded-3xl overflow-hidden border border-gray-100 group reveal reveal-delay-3">
-                <div class="aspect-[3/4] overflow-hidden bg-gradient-to-b from-blue-100 to-blue-50 relative">
-                    <img src="{{ url_for('static', filename='images/jm.png') }}" alt="Dr. Jun Michael Hechanova" class="w-full h-full object-cover">
-                    <div class="overlay absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent flex items-end p-6">
-                        <div class="flex gap-2">
-                            <span class="px-3 py-1 bg-white/20 backdrop-blur-sm rounded-full text-white text-xs font-medium">MD</span>
-                            <span class="px-3 py-1 bg-white/20 backdrop-blur-sm rounded-full text-white text-xs font-medium">Internal Medicine</span>
+
+    <!-- ═══════════════════════ MEDICAL TEAM ═══════════════════════ -->
+    <section id="team" class="py-24 bg-gray-50/50">
+        <div class="max-w-7xl mx-auto px-6 lg:px-8">
+            <div class="text-center mb-16 reveal">
+                <span
+                    class="inline-block px-4 py-1.5 bg-emerald-100/80 text-emerald-700 text-xs font-bold rounded-full mb-4 uppercase tracking-wider">Meet
+                    Our Professionals</span>
+                <h2 class="text-4xl sm:text-5xl font-extrabold text-primary-900 mb-4">Expert care from <span
+                        class="gradient-text">trusted doctors.</span></h2>
+                <p class="text-lg text-gray-500 max-w-2xl mx-auto">Our dedicated medical team is committed to providing
+                    the highest quality healthcare to every ISUFST student.</p>
+            </div>
+
+            <div class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-6 lg:gap-8">
+                <div
+                    class="team-card bg-white rounded-2xl md:rounded-3xl overflow-hidden border border-gray-100 group reveal reveal-delay-1">
+                    <div class="aspect-[3/4] overflow-hidden bg-gradient-to-b from-primary-100 to-primary-50 relative">
+                        <img src="{{ url_for('static', filename='images/lou.png') }}" alt="Dr. Lou Vincent Baroro"
+                            class="w-full h-full object-cover">
+                        <div
+                            class="overlay absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent flex items-end p-3 md:p-6">
+                            <div class="hidden sm:flex gap-2">
+                                <span
+                                    class="px-3 py-1 bg-white/20 backdrop-blur-sm rounded-full text-white text-xs font-medium">MD</span>
+                                <span
+                                    class="px-3 py-1 bg-white/20 backdrop-blur-sm rounded-full text-white text-xs font-medium">General
+                                    Practice</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="p-3 md:p-6">
+                        <h4 class="text-sm md:text-lg font-bold text-gray-900">Dr. Lou Vincent Baroro</h4>
+                        <p class="text-primary-600 text-xs md:text-sm font-medium">Medical Officer</p>
+                    </div>
+                </div>
+
+                <div
+                    class="team-card bg-white rounded-2xl md:rounded-3xl overflow-hidden border border-gray-100 group reveal reveal-delay-2">
+                    <div class="aspect-[3/4] overflow-hidden bg-gradient-to-b from-emerald-100 to-emerald-50 relative">
+                        <img src="{{ url_for('static', filename='images/kath.png') }}" alt="Dr. Katherine Bicodo"
+                            class="w-full h-full object-cover">
+                        <div
+                            class="overlay absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent flex items-end p-3 md:p-6">
+                            <div class="hidden sm:flex gap-2">
+                                <span
+                                    class="px-3 py-1 bg-white/20 backdrop-blur-sm rounded-full text-white text-xs font-medium">MD</span>
+                                <span
+                                    class="px-3 py-1 bg-white/20 backdrop-blur-sm rounded-full text-white text-xs font-medium">General
+                                    Practice</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="p-3 md:p-6">
+                        <h4 class="text-sm md:text-lg font-bold text-gray-900">Dr. Katherine Bicodo</h4>
+                        <p class="text-emerald-600 text-xs md:text-sm font-medium">Medical Officer</p>
+                    </div>
+                </div>
+
+                <div
+                    class="team-card bg-white rounded-2xl md:rounded-3xl overflow-hidden border border-gray-100 group reveal reveal-delay-3">
+                    <div class="aspect-[3/4] overflow-hidden bg-gradient-to-b from-blue-100 to-blue-50 relative">
+                        <img src="{{ url_for('static', filename='images/jm.png') }}" alt="Dr. Jun Michael Hechanova"
+                            class="w-full h-full object-cover">
+                        <div
+                            class="overlay absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent flex items-end p-3 md:p-6">
+                            <div class="hidden sm:flex gap-2">
+                                <span
+                                    class="px-3 py-1 bg-white/20 backdrop-blur-sm rounded-full text-white text-xs font-medium">MD</span>
+                                <span
+                                    class="px-3 py-1 bg-white/20 backdrop-blur-sm rounded-full text-white text-xs font-medium">Internal
+                                    Medicine</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="p-3 md:p-6">
+                        <h4 class="text-sm md:text-lg font-bold text-gray-900">Dr. Jun Michael Hechanova</h4>
+                        <p class="text-blue-600 text-xs md:text-sm font-medium">University Physician</p>
+                    </div>
+                </div>
+
+                <div
+                    class="team-card bg-white rounded-2xl md:rounded-3xl overflow-hidden border border-gray-100 group reveal reveal-delay-1">
+                    <div class="aspect-[3/4] overflow-hidden bg-gradient-to-b from-cyan-100 to-cyan-50 relative">
+                        <img src="{{ url_for('static', filename='images/jerolle.png') }}" alt="Dr. Jerolle Cobrador"
+                            class="w-full h-full object-cover">
+                        <div
+                            class="overlay absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent flex items-end p-3 md:p-6">
+                            <div class="hidden sm:flex gap-2">
+                                <span
+                                    class="px-3 py-1 bg-white/20 backdrop-blur-sm rounded-full text-white text-xs font-medium">DMD</span>
+                                <span
+                                    class="px-3 py-1 bg-white/20 backdrop-blur-sm rounded-full text-white text-xs font-medium">Oral
+                                    Health</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="p-3 md:p-6">
+                        <h4 class="text-sm md:text-lg font-bold text-gray-900">Dr. Jerolle Cobrador</h4>
+                        <p class="text-cyan-600 text-xs md:text-sm font-medium">Dentist</p>
+                    </div>
+                </div>
+
+                <div
+                    class="team-card bg-white rounded-2xl md:rounded-3xl overflow-hidden border border-gray-100 group reveal reveal-delay-2">
+                    <div class="aspect-[3/4] overflow-hidden bg-gradient-to-b from-violet-100 to-violet-50 relative">
+                        <img src="{{ url_for('static', filename='images/lynden.png') }}" alt="Nurse Lynden Falalimpa"
+                            class="w-full h-full object-cover">
+                        <div
+                            class="overlay absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent flex items-end p-3 md:p-6">
+                            <div class="hidden sm:flex gap-2">
+                                <span
+                                    class="px-3 py-1 bg-white/20 backdrop-blur-sm rounded-full text-white text-xs font-medium">BSN,
+                                    RN</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="p-3 md:p-6">
+                        <h4 class="text-sm md:text-lg font-bold text-gray-900">Nurse Lynden Falalimpa</h4>
+                        <p class="text-violet-600 text-xs md:text-sm font-medium">Clinic Nurse</p>
+                    </div>
+                </div>
+
+                <div
+                    class="team-card bg-white rounded-2xl md:rounded-3xl overflow-hidden border border-gray-100 group reveal reveal-delay-3">
+                    <div class="aspect-[3/4] overflow-hidden bg-gradient-to-b from-rose-100 to-rose-50 relative">
+                        <img src="{{ url_for('static', filename='images/kyla.png') }}" alt="Nurse Kyla Perez"
+                            class="w-full h-full object-cover">
+                        <div
+                            class="overlay absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent flex items-end p-3 md:p-6">
+                            <div class="hidden sm:flex gap-2">
+                                <span
+                                    class="px-3 py-1 bg-white/20 backdrop-blur-sm rounded-full text-white text-xs font-medium">BSN,
+                                    RN</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="p-3 md:p-6">
+                        <h4 class="text-sm md:text-lg font-bold text-gray-900">Nurse Kyla Perez</h4>
+                        <p class="text-rose-600 text-xs md:text-sm font-medium">Clinic Nurse</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- ═══════════════════════ TESTIMONIALS ═══════════════════════ -->
+    <section class="py-24 bg-white">
+        <div class="max-w-7xl mx-auto px-6 lg:px-8">
+            <div class="text-center mb-16 reveal">
+                <span
+                    class="inline-block px-4 py-1.5 bg-amber-100/80 text-amber-700 text-xs font-bold rounded-full mb-4 uppercase tracking-wider">Student
+                    Feedback</span>
+                <h2 class="text-4xl sm:text-5xl font-extrabold text-primary-900 mb-4">What students <span
+                        class="gradient-text">are saying.</span></h2>
+                <p class="text-lg text-gray-500 max-w-xl mx-auto">Real experiences from ISUFST students who use CareHub.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8">
+                <div
+                    class="testimonial-card bg-white rounded-3xl p-8 border border-gray-100 shadow-sm reveal reveal-delay-1">
+                    <div class="flex text-amber-400 text-sm mb-4 gap-0.5">
+                        <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i
+                            class="fas fa-star"></i><i class="fas fa-star"></i>
+                    </div>
+                    <p class="text-gray-600 leading-relaxed mb-6 italic">"CareHub made booking clinic appointments so
+                        much easier. I reserved medicine online and just picked it up &mdash; no more waiting in long
+                        lines!"</p>
+                    <div class="flex items-center gap-3">
+                        <img src="{{ url_for('static', filename='images/image.png') }}"
+                            class="w-11 h-11 rounded-full object-cover ring-2 ring-gray-100" alt="">
+                        <div>
+                            <p class="text-sm font-bold text-gray-900">Lou Vincent Baroro</p>
+                            <p class="text-xs text-gray-500">BSIT &middot; 3rd Year</p>
                         </div>
                     </div>
                 </div>
-                <div class="p-6">
-                    <h4 class="text-lg font-bold text-gray-900">Dr. Jun Michael Hechanova</h4>
-                    <p class="text-blue-600 text-sm font-medium">University Physician</p>
-                </div>
-            </div>
 
-            <div class="team-card bg-white rounded-3xl overflow-hidden border border-gray-100 group reveal reveal-delay-1">
-                <div class="aspect-[3/4] overflow-hidden bg-gradient-to-b from-cyan-100 to-cyan-50 relative">
-                    <img src="{{ url_for('static', filename='images/jerolle.png') }}" alt="Dr. Jerolle Cobrador" class="w-full h-full object-cover">
-                    <div class="overlay absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent flex items-end p-6">
-                        <div class="flex gap-2">
-                            <span class="px-3 py-1 bg-white/20 backdrop-blur-sm rounded-full text-white text-xs font-medium">DMD</span>
-                            <span class="px-3 py-1 bg-white/20 backdrop-blur-sm rounded-full text-white text-xs font-medium">Oral Health</span>
+                <div
+                    class="testimonial-card bg-white rounded-3xl p-8 border border-gray-100 shadow-sm reveal reveal-delay-2">
+                    <div class="flex text-amber-400 text-sm mb-4 gap-0.5">
+                        <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i
+                            class="fas fa-star"></i><i class="fas fa-star"></i>
+                    </div>
+                    <p class="text-gray-600 leading-relaxed mb-6 italic">"The AI health assistant is amazing! I asked
+                        about my headache and it gave really helpful advice. Love how modern this clinic system is."</p>
+                    <div class="flex items-center gap-3">
+                        <div
+                            class="w-11 h-11 rounded-full bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center text-white font-bold text-sm">
+                            MR</div>
+                        <div>
+                            <p class="text-sm font-bold text-gray-900">Maria Reyes</p>
+                            <p class="text-xs text-gray-500">BSED &middot; 2nd Year</p>
                         </div>
                     </div>
                 </div>
-                <div class="p-6">
-                    <h4 class="text-lg font-bold text-gray-900">Dr. Jerolle Cobrador</h4>
-                    <p class="text-cyan-600 text-sm font-medium">Dentist</p>
-                </div>
-            </div>
 
-            <div class="team-card bg-white rounded-3xl overflow-hidden border border-gray-100 group reveal reveal-delay-2">
-                <div class="aspect-[3/4] overflow-hidden bg-gradient-to-b from-violet-100 to-violet-50 relative">
-                    <img src="{{ url_for('static', filename='images/lynden.png') }}" alt="Nurse Lynden Falalimpa" class="w-full h-full object-cover">
-                    <div class="overlay absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent flex items-end p-6">
-                        <div class="flex gap-2">
-                            <span class="px-3 py-1 bg-white/20 backdrop-blur-sm rounded-full text-white text-xs font-medium">BSN, RN</span>
+                <div
+                    class="testimonial-card bg-white rounded-3xl p-8 border border-gray-100 shadow-sm reveal reveal-delay-3">
+                    <div class="flex text-amber-400 text-sm mb-4 gap-0.5">
+                        <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i
+                            class="fas fa-star"></i><i class="fas fa-star"></i>
+                    </div>
+                    <p class="text-gray-600 leading-relaxed mb-6 italic">"No more missing appointments! The notification
+                        system reminds me, and I can see my entire health history. Best university service ever."</p>
+                    <div class="flex items-center gap-3">
+                        <div
+                            class="w-11 h-11 rounded-full bg-gradient-to-br from-violet-400 to-purple-500 flex items-center justify-center text-white font-bold text-sm">
+                            JC</div>
+                        <div>
+                            <p class="text-sm font-bold text-gray-900">Juan Carlos Santos</p>
+                            <p class="text-xs text-gray-500">BSA &middot; 4th Year</p>
                         </div>
                     </div>
                 </div>
-                <div class="p-6">
-                    <h4 class="text-lg font-bold text-gray-900">Nurse Lynden Falalimpa</h4>
-                    <p class="text-violet-600 text-sm font-medium">Clinic Nurse</p>
-                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- ═══════════════════════ FAQ ═══════════════════════ -->
+    <section id="faq" class="py-24 bg-gray-50/50">
+        <div class="max-w-3xl mx-auto px-6 lg:px-8">
+            <div class="text-center mb-16 reveal">
+                <span
+                    class="inline-block px-4 py-1.5 bg-violet-100/80 text-violet-700 text-xs font-bold rounded-full mb-4 uppercase tracking-wider">FAQ</span>
+                <h2 class="text-4xl sm:text-5xl font-extrabold text-primary-900 mb-4">Frequently asked <span
+                        class="gradient-text">questions.</span></h2>
+                <p class="text-lg text-gray-500">Everything you need to know about CareHub.</p>
             </div>
 
-            <div class="team-card bg-white rounded-3xl overflow-hidden border border-gray-100 group reveal reveal-delay-3">
-                <div class="aspect-[3/4] overflow-hidden bg-gradient-to-b from-rose-100 to-rose-50 relative">
-                    <img src="{{ url_for('static', filename='images/kyla.png') }}" alt="Nurse Kyla Perez" class="w-full h-full object-cover">
-                    <div class="overlay absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent flex items-end p-6">
-                        <div class="flex gap-2">
-                            <span class="px-3 py-1 bg-white/20 backdrop-blur-sm rounded-full text-white text-xs font-medium">BSN, RN</span>
+            <div class="space-y-3 reveal">
+                <div class="faq-item bg-white rounded-2xl border border-gray-100 overflow-hidden">
+                    <button onclick="toggleFaq(this)" class="w-full flex items-center justify-between p-6 text-left">
+                        <span class="font-semibold text-gray-900 text-[15px]">Is CareHub free for students?</span>
+                        <i class="faq-chevron fas fa-chevron-down text-gray-400 text-sm ml-4 flex-shrink-0"></i>
+                    </button>
+                    <div class="faq-answer px-6">
+                        <p class="text-gray-500 text-sm leading-relaxed pb-4">Yes! CareHub is completely free for all
+                            enrolled ISUFST students. This includes appointment booking, medicine reservations, health
+                            records access, and the AI health assistant.</p>
+                    </div>
+                </div>
+
+                <div class="faq-item bg-white rounded-2xl border border-gray-100 overflow-hidden">
+                    <button onclick="toggleFaq(this)" class="w-full flex items-center justify-between p-6 text-left">
+                        <span class="font-semibold text-gray-900 text-[15px]">How do I book an appointment?</span>
+                        <i class="faq-chevron fas fa-chevron-down text-gray-400 text-sm ml-4 flex-shrink-0"></i>
+                    </button>
+                    <div class="faq-answer px-6">
+                        <p class="text-gray-500 text-sm leading-relaxed pb-4">Simply create an account, go to "Book
+                            Appointment," select your preferred date and time slot, choose the service type, and
+                            confirm. You'll receive a notification with your appointment details.</p>
+                    </div>
+                </div>
+
+                <div class="faq-item bg-white rounded-2xl border border-gray-100 overflow-hidden">
+                    <button onclick="toggleFaq(this)" class="w-full flex items-center justify-between p-6 text-left">
+                        <span class="font-semibold text-gray-900 text-[15px]">Can I reserve medicines online?</span>
+                        <i class="faq-chevron fas fa-chevron-down text-gray-400 text-sm ml-4 flex-shrink-0"></i>
+                    </button>
+                    <div class="faq-answer px-6">
+                        <p class="text-gray-500 text-sm leading-relaxed pb-4">Absolutely! Browse the available medicines
+                            catalog, select what you need, and reserve them. Pick up at the clinic during operating
+                            hours (Mon-Fri, 9AM-5PM). All medicines provided by the clinic are free.</p>
+                    </div>
+                </div>
+
+                <div class="faq-item bg-white rounded-2xl border border-gray-100 overflow-hidden">
+                    <button onclick="toggleFaq(this)" class="w-full flex items-center justify-between p-6 text-left">
+                        <span class="font-semibold text-gray-900 text-[15px]">What are the clinic operating
+                            hours?</span>
+                        <i class="faq-chevron fas fa-chevron-down text-gray-400 text-sm ml-4 flex-shrink-0"></i>
+                    </button>
+                    <div class="faq-answer px-6">
+                        <p class="text-gray-500 text-sm leading-relaxed pb-4">The ISUFST Clinic at Dingle Campus is open
+                            Monday through Friday from 9:00 AM to 5:00 PM. CareHub online services (booking, AI
+                            assistant, records) are available 24/7.</p>
+                    </div>
+                </div>
+
+                <div class="faq-item bg-white rounded-2xl border border-gray-100 overflow-hidden">
+                    <button onclick="toggleFaq(this)" class="w-full flex items-center justify-between p-6 text-left">
+                        <span class="font-semibold text-gray-900 text-[15px]">Is my health data secure and
+                            private?</span>
+                        <i class="faq-chevron fas fa-chevron-down text-gray-400 text-sm ml-4 flex-shrink-0"></i>
+                    </button>
+                    <div class="faq-answer px-6">
+                        <p class="text-gray-500 text-sm leading-relaxed pb-4">Yes. CareHub uses encrypted databases,
+                            secure authentication, and role-based access control. Only authorized medical staff can view
+                            your records. Your data is never shared with third parties.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- ═══════════════════════ CTA BANNER ═══════════════════════ -->
+    <section class="py-24">
+        <div class="max-w-5xl mx-auto px-6 lg:px-8">
+            <div
+                class="relative cta-animated bg-gradient-to-br from-primary-800 via-primary-700 to-indigo-800 rounded-[2.5rem] p-12 md:p-16 overflow-hidden reveal">
+                <div
+                    class="absolute top-0 right-0 w-80 h-80 bg-white/[0.04] rounded-full -translate-y-1/2 translate-x-1/3">
+                </div>
+                <div
+                    class="absolute bottom-0 left-0 w-60 h-60 bg-accent/[0.08] rounded-full translate-y-1/2 -translate-x-1/3">
+                </div>
+                <div class="grain"></div>
+
+                <div class="relative z-10 text-center space-y-6">
+                    <h2 class="text-3xl sm:text-5xl font-extrabold text-white leading-tight">Ready to take control of
+                        <br class="hidden sm:block">your health?
+                    </h2>
+                    <p class="text-lg text-blue-200/70 max-w-xl mx-auto">Join hundreds of ISUFST students already using
+                        CareHub to manage their health smarter.</p>
+                    <div class="flex flex-col sm:flex-row justify-center gap-4 pt-4">
+                        <a href="{{ url_for('auth.register') }}"
+                            class="group relative px-10 py-4 bg-white text-primary-900 font-bold rounded-2xl transition-all shadow-2xl overflow-hidden text-center">
+                            <div
+                                class="absolute inset-0 bg-gradient-to-r from-blue-50 to-emerald-50 opacity-0 group-hover:opacity-100 transition-opacity">
+                            </div>
+                            <span class="relative z-10">Create Free Account</span>
+                        </a>
+                        <a href="{{ url_for('auth.login') }}"
+                            class="px-10 py-4 border-2 border-white/20 text-white font-semibold rounded-2xl hover:bg-white/10 transition-all text-center backdrop-blur-sm">Sign
+                            In <i class="fas fa-arrow-right ml-1.5"></i></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- ═══════════════════════ FOOTER ═══════════════════════ -->
+    <footer class="bg-primary-950 text-white pt-20 pb-8">
+        <div class="max-w-7xl mx-auto px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12 mb-16">
+                <div class="lg:col-span-1">
+                    <div class="flex items-center space-x-3 mb-5">
+                        <div
+                            class="w-10 h-10 bg-gradient-to-br from-primary-500 to-accent rounded-xl flex items-center justify-center">
+                            <i class="fas fa-heartbeat text-white text-lg"></i>
                         </div>
+                        <span class="text-xl font-bold">CareHub</span>
                     </div>
+                    <p class="text-blue-300/40 text-sm leading-relaxed max-w-xs">A modern clinic management system built
+                        for the ISUFST community. Your health, digitized.</p>
                 </div>
-                <div class="p-6">
-                    <h4 class="text-lg font-bold text-gray-900">Nurse Kyla Perez</h4>
-                    <p class="text-rose-600 text-sm font-medium">Clinic Nurse</p>
+
+                <div>
+                    <h4 class="font-bold text-sm text-white/90 uppercase tracking-wider mb-5">Platform</h4>
+                    <ul class="space-y-3">
+                        <li><a href="{{ url_for('appointments.book') }}"
+                                class="text-blue-300/50 hover:text-white transition-colors text-sm">Book Appointment</a>
+                        </li>
+                        <li><a href="{{ url_for('reservations.view_medicines') }}"
+                                class="text-blue-300/50 hover:text-white transition-colors text-sm">Reserve Medicine</a>
+                        </li>
+                        <li><a href="#features"
+                                class="text-blue-300/50 hover:text-white transition-colors text-sm">Features</a></li>
+                        <li><a href="#faq" class="text-blue-300/50 hover:text-white transition-colors text-sm">FAQ</a>
+                        </li>
+                    </ul>
                 </div>
+
+                <div>
+                    <h4 class="font-bold text-sm text-white/90 uppercase tracking-wider mb-5">Clinic Info</h4>
+                    <ul class="space-y-3 text-sm text-blue-300/50">
+                        <li class="flex items-center gap-2"><i class="fas fa-clock text-accent/60 w-4"></i>Mon-Fri: 9AM
+                            &ndash; 5PM</li>
+                        <li class="flex items-center gap-2"><i
+                                class="fas fa-map-marker-alt text-accent/60 w-4"></i>ISUFST Dingle Campus</li>
+                        <li class="flex items-center gap-2"><i
+                                class="fas fa-envelope text-accent/60 w-4"></i>clinic@isufst.edu.ph</li>
+                        <li class="flex items-center gap-2"><i class="fas fa-phone text-accent/60 w-4"></i>(033)
+                            337-XXXX</li>
+                    </ul>
+                </div>
+
+
+            </div>
+
+            <div class="border-t border-white/[0.06] pt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+                <p class="text-sm text-blue-400/30">&copy; 2026 ISUFST CareHub. All rights reserved.</p>
+                <p class="text-sm text-blue-400/30">Built with <i class="fas fa-heart text-red-400/50"></i> for students
+                </p>
             </div>
         </div>
-    </div>
-</section>
+    </footer>
 
 
-<!-- ═══════════════════════ TESTIMONIALS ═══════════════════════ -->
-<section class="py-24 bg-white">
-    <div class="max-w-7xl mx-auto px-6 lg:px-8">
-        <div class="text-center mb-16 reveal">
-            <span class="inline-block px-4 py-1.5 bg-amber-100/80 text-amber-700 text-xs font-bold rounded-full mb-4 uppercase tracking-wider">Student Feedback</span>
-            <h2 class="text-4xl sm:text-5xl font-extrabold text-primary-900 mb-4">What students <span class="gradient-text">are saying.</span></h2>
-            <p class="text-lg text-gray-500 max-w-xl mx-auto">Real experiences from ISUFST students who use CareHub.</p>
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8">
-            <div class="testimonial-card bg-white rounded-3xl p-8 border border-gray-100 shadow-sm reveal reveal-delay-1">
-                <div class="flex text-amber-400 text-sm mb-4 gap-0.5">
-                    <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
-                </div>
-                <p class="text-gray-600 leading-relaxed mb-6 italic">"CareHub made booking clinic appointments so much easier. I reserved medicine online and just picked it up &mdash; no more waiting in long lines!"</p>
-                <div class="flex items-center gap-3">
-                    <img src="{{ url_for('static', filename='images/image.png') }}" class="w-11 h-11 rounded-full object-cover ring-2 ring-gray-100" alt="">
-                    <div>
-                        <p class="text-sm font-bold text-gray-900">Lou Vincent Baroro</p>
-                        <p class="text-xs text-gray-500">BSIT &middot; 3rd Year</p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="testimonial-card bg-white rounded-3xl p-8 border border-gray-100 shadow-sm reveal reveal-delay-2">
-                <div class="flex text-amber-400 text-sm mb-4 gap-0.5">
-                    <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
-                </div>
-                <p class="text-gray-600 leading-relaxed mb-6 italic">"The AI health assistant is amazing! I asked about my headache and it gave really helpful advice. Love how modern this clinic system is."</p>
-                <div class="flex items-center gap-3">
-                    <div class="w-11 h-11 rounded-full bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center text-white font-bold text-sm">MR</div>
-                    <div>
-                        <p class="text-sm font-bold text-gray-900">Maria Reyes</p>
-                        <p class="text-xs text-gray-500">BSED &middot; 2nd Year</p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="testimonial-card bg-white rounded-3xl p-8 border border-gray-100 shadow-sm reveal reveal-delay-3">
-                <div class="flex text-amber-400 text-sm mb-4 gap-0.5">
-                    <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
-                </div>
-                <p class="text-gray-600 leading-relaxed mb-6 italic">"No more missing appointments! The notification system reminds me, and I can see my entire health history. Best university service ever."</p>
-                <div class="flex items-center gap-3">
-                    <div class="w-11 h-11 rounded-full bg-gradient-to-br from-violet-400 to-purple-500 flex items-center justify-center text-white font-bold text-sm">JC</div>
-                    <div>
-                        <p class="text-sm font-bold text-gray-900">Juan Carlos Santos</p>
-                        <p class="text-xs text-gray-500">BSA &middot; 4th Year</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
+    <!-- ═══════════════════════ BACK TO TOP ═══════════════════════ -->
+    <button id="back-to-top" onclick="window.scrollTo({top:0,behavior:'smooth'})"
+        class="fixed bottom-24 right-6 w-12 h-12 bg-primary-700 text-white rounded-xl shadow-xl shadow-primary-700/30 flex items-center justify-center hover:bg-primary-800 transition-all z-40 hover:scale-105">
+        <i class="fas fa-arrow-up"></i>
+    </button>
 
 
-<!-- ═══════════════════════ FAQ ═══════════════════════ -->
-<section id="faq" class="py-24 bg-gray-50/50">
-    <div class="max-w-3xl mx-auto px-6 lg:px-8">
-        <div class="text-center mb-16 reveal">
-            <span class="inline-block px-4 py-1.5 bg-violet-100/80 text-violet-700 text-xs font-bold rounded-full mb-4 uppercase tracking-wider">FAQ</span>
-            <h2 class="text-4xl sm:text-5xl font-extrabold text-primary-900 mb-4">Frequently asked <span class="gradient-text">questions.</span></h2>
-            <p class="text-lg text-gray-500">Everything you need to know about CareHub.</p>
-        </div>
-
-        <div class="space-y-3 reveal">
-            <div class="faq-item bg-white rounded-2xl border border-gray-100 overflow-hidden">
-                <button onclick="toggleFaq(this)" class="w-full flex items-center justify-between p-6 text-left">
-                    <span class="font-semibold text-gray-900 text-[15px]">Is CareHub free for students?</span>
-                    <i class="faq-chevron fas fa-chevron-down text-gray-400 text-sm ml-4 flex-shrink-0"></i>
-                </button>
-                <div class="faq-answer px-6">
-                    <p class="text-gray-500 text-sm leading-relaxed pb-4">Yes! CareHub is completely free for all enrolled ISUFST students. This includes appointment booking, medicine reservations, health records access, and the AI health assistant.</p>
-                </div>
-            </div>
-
-            <div class="faq-item bg-white rounded-2xl border border-gray-100 overflow-hidden">
-                <button onclick="toggleFaq(this)" class="w-full flex items-center justify-between p-6 text-left">
-                    <span class="font-semibold text-gray-900 text-[15px]">How do I book an appointment?</span>
-                    <i class="faq-chevron fas fa-chevron-down text-gray-400 text-sm ml-4 flex-shrink-0"></i>
-                </button>
-                <div class="faq-answer px-6">
-                    <p class="text-gray-500 text-sm leading-relaxed pb-4">Simply create an account, go to "Book Appointment," select your preferred date and time slot, choose the service type, and confirm. You'll receive a notification with your appointment details.</p>
-                </div>
-            </div>
-
-            <div class="faq-item bg-white rounded-2xl border border-gray-100 overflow-hidden">
-                <button onclick="toggleFaq(this)" class="w-full flex items-center justify-between p-6 text-left">
-                    <span class="font-semibold text-gray-900 text-[15px]">Can I reserve medicines online?</span>
-                    <i class="faq-chevron fas fa-chevron-down text-gray-400 text-sm ml-4 flex-shrink-0"></i>
-                </button>
-                <div class="faq-answer px-6">
-                    <p class="text-gray-500 text-sm leading-relaxed pb-4">Absolutely! Browse the available medicines catalog, select what you need, and reserve them. Pick up at the clinic during operating hours (Mon-Fri, 9AM-5PM). All medicines provided by the clinic are free.</p>
-                </div>
-            </div>
-
-            <div class="faq-item bg-white rounded-2xl border border-gray-100 overflow-hidden">
-                <button onclick="toggleFaq(this)" class="w-full flex items-center justify-between p-6 text-left">
-                    <span class="font-semibold text-gray-900 text-[15px]">What are the clinic operating hours?</span>
-                    <i class="faq-chevron fas fa-chevron-down text-gray-400 text-sm ml-4 flex-shrink-0"></i>
-                </button>
-                <div class="faq-answer px-6">
-                    <p class="text-gray-500 text-sm leading-relaxed pb-4">The ISUFST Clinic at Dingle Campus is open Monday through Friday from 9:00 AM to 5:00 PM. CareHub online services (booking, AI assistant, records) are available 24/7.</p>
-                </div>
-            </div>
-
-            <div class="faq-item bg-white rounded-2xl border border-gray-100 overflow-hidden">
-                <button onclick="toggleFaq(this)" class="w-full flex items-center justify-between p-6 text-left">
-                    <span class="font-semibold text-gray-900 text-[15px]">Is my health data secure and private?</span>
-                    <i class="faq-chevron fas fa-chevron-down text-gray-400 text-sm ml-4 flex-shrink-0"></i>
-                </button>
-                <div class="faq-answer px-6">
-                    <p class="text-gray-500 text-sm leading-relaxed pb-4">Yes. CareHub uses encrypted databases, secure authentication, and role-based access control. Only authorized medical staff can view your records. Your data is never shared with third parties.</p>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
-
-
-<!-- ═══════════════════════ CTA BANNER ═══════════════════════ -->
-<section class="py-24">
-    <div class="max-w-5xl mx-auto px-6 lg:px-8">
-        <div class="relative cta-animated bg-gradient-to-br from-primary-800 via-primary-700 to-indigo-800 rounded-[2.5rem] p-12 md:p-16 overflow-hidden reveal">
-            <div class="absolute top-0 right-0 w-80 h-80 bg-white/[0.04] rounded-full -translate-y-1/2 translate-x-1/3"></div>
-            <div class="absolute bottom-0 left-0 w-60 h-60 bg-accent/[0.08] rounded-full translate-y-1/2 -translate-x-1/3"></div>
-            <div class="grain"></div>
-
-            <div class="relative z-10 text-center space-y-6">
-                <h2 class="text-3xl sm:text-5xl font-extrabold text-white leading-tight">Ready to take control of <br class="hidden sm:block">your health?</h2>
-                <p class="text-lg text-blue-200/70 max-w-xl mx-auto">Join hundreds of ISUFST students already using CareHub to manage their health smarter.</p>
-                <div class="flex flex-col sm:flex-row justify-center gap-4 pt-4">
-                    <a href="{{ url_for('auth.register') }}" class="group relative px-10 py-4 bg-white text-primary-900 font-bold rounded-2xl transition-all shadow-2xl overflow-hidden text-center">
-                        <div class="absolute inset-0 bg-gradient-to-r from-blue-50 to-emerald-50 opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                        <span class="relative z-10">Create Free Account</span>
-                    </a>
-                    <a href="{{ url_for('auth.login') }}" class="px-10 py-4 border-2 border-white/20 text-white font-semibold rounded-2xl hover:bg-white/10 transition-all text-center backdrop-blur-sm">Sign In <i class="fas fa-arrow-right ml-1.5"></i></a>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
-
-
-<!-- ═══════════════════════ FOOTER ═══════════════════════ -->
-<footer class="bg-primary-950 text-white pt-20 pb-8">
-    <div class="max-w-7xl mx-auto px-6 lg:px-8">
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
-            <div class="lg:col-span-1">
-                <div class="flex items-center space-x-3 mb-5">
-                    <div class="w-10 h-10 bg-gradient-to-br from-primary-500 to-accent rounded-xl flex items-center justify-center">
-                        <i class="fas fa-heartbeat text-white text-lg"></i>
-                    </div>
-                    <span class="text-xl font-bold">CareHub</span>
-                </div>
-                <p class="text-blue-300/40 text-sm leading-relaxed max-w-xs">A modern clinic management system built for the ISUFST community. Your health, digitized.</p>
-            </div>
-
-            <div>
-                <h4 class="font-bold text-sm text-white/90 uppercase tracking-wider mb-5">Platform</h4>
-                <ul class="space-y-3">
-                    <li><a href="{{ url_for('appointments.book') }}" class="text-blue-300/50 hover:text-white transition-colors text-sm">Book Appointment</a></li>
-                    <li><a href="{{ url_for('reservations.view_medicines') }}" class="text-blue-300/50 hover:text-white transition-colors text-sm">Reserve Medicine</a></li>
-                    <li><a href="#features" class="text-blue-300/50 hover:text-white transition-colors text-sm">Features</a></li>
-                    <li><a href="#faq" class="text-blue-300/50 hover:text-white transition-colors text-sm">FAQ</a></li>
-                </ul>
-            </div>
-
-            <div>
-                <h4 class="font-bold text-sm text-white/90 uppercase tracking-wider mb-5">Clinic Info</h4>
-                <ul class="space-y-3 text-sm text-blue-300/50">
-                    <li class="flex items-center gap-2"><i class="fas fa-clock text-accent/60 w-4"></i>Mon-Fri: 9AM &ndash; 5PM</li>
-                    <li class="flex items-center gap-2"><i class="fas fa-map-marker-alt text-accent/60 w-4"></i>ISUFST Dingle Campus</li>
-                    <li class="flex items-center gap-2"><i class="fas fa-envelope text-accent/60 w-4"></i>clinic@isufst.edu.ph</li>
-                    <li class="flex items-center gap-2"><i class="fas fa-phone text-accent/60 w-4"></i>(033) 337-XXXX</li>
-                </ul>
-            </div>
-
-            <div>
-                <h4 class="font-bold text-sm text-white/90 uppercase tracking-wider mb-5">Tech Stack</h4>
-                <ul class="space-y-3 text-sm text-blue-300/50">
-                    <li class="flex items-center gap-2"><i class="fab fa-python text-accent/60 w-4"></i>Flask &middot; Python</li>
-                    <li class="flex items-center gap-2"><i class="fas fa-database text-accent/60 w-4"></i>Turso &middot; LibSQL</li>
-                    <li class="flex items-center gap-2"><i class="fas fa-robot text-accent/60 w-4"></i>Google Gemini AI</li>
-                    <li class="flex items-center gap-2"><i class="fas fa-paint-brush text-accent/60 w-4"></i>Tailwind CSS</li>
-                </ul>
-            </div>
-        </div>
-
-        <div class="border-t border-white/[0.06] pt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
-            <p class="text-sm text-blue-400/30">&copy; 2026 ISUFST CareHub. All rights reserved.</p>
-            <p class="text-sm text-blue-400/30">Built with <i class="fas fa-heart text-red-400/50"></i> for students</p>
-        </div>
-    </div>
-</footer>
-
-
-<!-- ═══════════════════════ BACK TO TOP ═══════════════════════ -->
-<button id="back-to-top" onclick="window.scrollTo({top:0,behavior:'smooth'})" class="fixed bottom-24 right-6 w-12 h-12 bg-primary-700 text-white rounded-xl shadow-xl shadow-primary-700/30 flex items-center justify-center hover:bg-primary-800 transition-all z-40 hover:scale-105">
-    <i class="fas fa-arrow-up"></i>
-</button>
-
-
-<!-- ═══════════════════════ SCRIPTS ═══════════════════════ -->
-<script>
-// Counter animation
-function animateCounter(el){
-    const target=parseInt(el.getAttribute('data-target')),dur=2000,inc=target/(dur/16);
-    let cur=0;
-    const update=()=>{cur+=inc;if(cur<target){el.textContent=Math.floor(cur);requestAnimationFrame(update)}else{el.textContent=target}};
-    update();
-}
-
-// Scroll reveal
-const observer=new IntersectionObserver(entries=>{
-    entries.forEach(e=>{
-        if(e.isIntersecting){
-            e.target.classList.add('visible');
-            e.target.querySelectorAll('.counter').forEach(c=>{if(!c.classList.contains('animated')){c.classList.add('animated');animateCounter(c)}});
+    <!-- ═══════════════════════ SCRIPTS ═══════════════════════ -->
+    <script>
+        // Counter animation
+        function animateCounter(el) {
+            const target = parseInt(el.getAttribute('data-target')), dur = 2000, inc = target / (dur / 16);
+            let cur = 0;
+            const update = () => { cur += inc; if (cur < target) { el.textContent = Math.floor(cur); requestAnimationFrame(update) } else { el.textContent = target } };
+            update();
         }
-    });
-},{threshold:.1,rootMargin:'0px 0px -50px 0px'});
-document.querySelectorAll('.reveal').forEach(el=>observer.observe(el));
 
-// Hero counters
-document.addEventListener('DOMContentLoaded',()=>{
-    document.querySelectorAll('.counter-hero').forEach(c=>animateCounter(c));
-});
+        // Scroll reveal
+        const observer = new IntersectionObserver(entries => {
+            entries.forEach(e => {
+                if (e.isIntersecting) {
+                    e.target.classList.add('visible');
+                    e.target.querySelectorAll('.counter').forEach(c => { if (!c.classList.contains('animated')) { c.classList.add('animated'); animateCounter(c) } });
+                }
+            });
+        }, { threshold: .1, rootMargin: '0px 0px -50px 0px' });
+        document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
 
-// Smooth scroll
-document.querySelectorAll('a[href^="#"]').forEach(a=>{
-    a.addEventListener('click',e=>{e.preventDefault();const t=document.querySelector(a.getAttribute('href'));if(t)t.scrollIntoView({behavior:'smooth',block:'start'})});
-});
+        // Hero counters
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('.counter-hero').forEach(c => animateCounter(c));
+        });
 
-// Scroll progress bar
-window.addEventListener('scroll',()=>{
-    const h=document.documentElement,pct=(h.scrollTop/(h.scrollHeight-h.clientHeight))*100;
-    document.getElementById('scroll-progress').style.width=pct+'%';
-    // Back to top visibility
-    document.getElementById('back-to-top').classList.toggle('visible',h.scrollTop>500);
-    // Nav scroll effect
-    document.getElementById('main-nav').classList.toggle('nav-scrolled',h.scrollTop>50);
-});
+        // Smooth scroll
+        document.querySelectorAll('a[href^="#"]').forEach(a => {
+            a.addEventListener('click', e => { e.preventDefault(); const t = document.querySelector(a.getAttribute('href')); if (t) t.scrollIntoView({ behavior: 'smooth', block: 'start' }) });
+        });
 
-// Mobile menu
-function toggleMobileMenu(){
-    document.getElementById('mobile-overlay').classList.toggle('active');
-    document.getElementById('mobile-drawer').classList.toggle('active');
-    document.body.classList.toggle('overflow-hidden');
-}
-document.getElementById('mobile-overlay').addEventListener('click',toggleMobileMenu);
+        // Scroll progress bar
+        window.addEventListener('scroll', () => {
+            const h = document.documentElement, pct = (h.scrollTop / (h.scrollHeight - h.clientHeight)) * 100;
+            document.getElementById('scroll-progress').style.width = pct + '%';
+            // Back to top visibility
+            document.getElementById('back-to-top').classList.toggle('visible', h.scrollTop > 500);
+            // Nav scroll effect
+            document.getElementById('main-nav').classList.toggle('nav-scrolled', h.scrollTop > 50);
+        });
 
-// FAQ accordion
-function toggleFaq(btn){
-    const item=btn.closest('.faq-item');
-    const wasActive=item.classList.contains('active');
-    document.querySelectorAll('.faq-item').forEach(i=>i.classList.remove('active'));
-    if(!wasActive)item.classList.add('active');
-}
+        // Mobile menu
+        function toggleMobileMenu() {
+            document.getElementById('mobile-overlay').classList.toggle('active');
+            document.getElementById('mobile-drawer').classList.toggle('active');
+            document.body.classList.toggle('overflow-hidden');
+        }
+        document.getElementById('mobile-overlay').addEventListener('click', toggleMobileMenu);
 
-// Hero text rotation
-const words=['Simplified.','Digitized.','Modernized.','Protected.'];
-let wordIdx=0;
-function rotateHeroText(){
-    wordIdx=(wordIdx+1)%words.length;
-    const el=document.getElementById('hero-rotating');
-    el.style.opacity='0';el.style.transform='translateY(10px)';
-    setTimeout(()=>{el.textContent=words[wordIdx];el.style.opacity='1';el.style.transform='translateY(0)'},300);
-}
-setInterval(rotateHeroText,3000);
-document.getElementById('hero-rotating').style.transition='opacity .3s, transform .3s';
-</script>
+        // FAQ accordion
+        function toggleFaq(btn) {
+            const item = btn.closest('.faq-item');
+            const wasActive = item.classList.contains('active');
+            document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('active'));
+            if (!wasActive) item.classList.add('active');
+        }
 
-{% include 'partials/chatbot_widget.html' %}
+        // Hero text rotation
+        const words = ['Simplified.', 'Digitized.', 'Modernized.', 'Protected.'];
+        let wordIdx = 0;
+        function rotateHeroText() {
+            wordIdx = (wordIdx + 1) % words.length;
+            const el = document.getElementById('hero-rotating');
+            el.style.opacity = '0'; el.style.transform = 'translateY(10px)';
+            setTimeout(() => { el.textContent = words[wordIdx]; el.style.opacity = '1'; el.style.transform = 'translateY(0)' }, 300);
+        }
+        setInterval(rotateHeroText, 3000);
+        document.getElementById('hero-rotating').style.transition = 'opacity .3s, transform .3s';
+    </script>
+
+    {% include 'partials/chatbot_widget.html' %}
 </body>
+
 </html>

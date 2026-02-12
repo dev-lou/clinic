@@ -60,8 +60,13 @@ def register():
         medical_conditions = request.form.get('medical_conditions')
         emergency_contact_name = request.form.get('emergency_contact_name')
         emergency_contact_number = request.form.get('emergency_contact_number')
+        signature_data = request.form.get('signature_data')
         
         # Validation
+        if not signature_data:
+            flash('Please draw your signature.', 'error')
+            return render_template('register.html')
+
         if password != confirm_password:
             flash('Passwords do not match.', 'error')
             return render_template('register.html')
@@ -79,7 +84,8 @@ def register():
             email=email,
             first_name=first_name,
             last_name=last_name,
-            role='student'
+            role='student',
+            signature_data=signature_data
         )
         user.set_password(password)
         db.session.add(user)

@@ -18,37 +18,40 @@
             <div class="w-9 h-9 lg:w-10 lg:h-10 bg-blue-100 rounded-xl flex items-center justify-center mb-3">
                 <i class="fas fa-user-injured text-primary-600 text-sm"></i>
             </div>
-            <p class="text-xl lg:text-2xl font-extrabold text-gray-900">{{ today_patients }}</p>
+            <p class="text-xl lg:text-2xl font-extrabold text-gray-900" id="stat-today-patients">{{ today_patients }}
+            </p>
             <p class="text-[11px] text-gray-500 font-medium mt-1">Today's Patients</p>
         </div>
         <div class="stat-card bg-white rounded-2xl border border-gray-100 p-4 lg:p-5">
             <div class="w-9 h-9 lg:w-10 lg:h-10 bg-amber-100 rounded-xl flex items-center justify-center mb-3">
                 <i class="fas fa-clock text-amber-600 text-sm"></i>
             </div>
-            <p class="text-xl lg:text-2xl font-extrabold text-gray-900">{{ queue_count }}</p>
+            <p class="text-xl lg:text-2xl font-extrabold text-gray-900" id="stat-queue-count">{{ queue_count }}</p>
             <p class="text-[11px] text-gray-500 font-medium mt-1">In Queue</p>
         </div>
         <div class="stat-card bg-white rounded-2xl border border-gray-100 p-4 lg:p-5">
             <div class="w-9 h-9 lg:w-10 lg:h-10 bg-emerald-100 rounded-xl flex items-center justify-center mb-3">
                 <i class="fas fa-calendar-check text-emerald-600 text-sm"></i>
             </div>
-            <p class="text-xl lg:text-2xl font-extrabold text-gray-900">{{ today_appointments }}</p>
+            <p class="text-xl lg:text-2xl font-extrabold text-gray-900" id="stat-today-appointments">{{
+                today_appointments }}</p>
             <p class="text-[11px] text-gray-500 font-medium mt-1">Appointments</p>
         </div>
         <div class="stat-card bg-white rounded-2xl border border-gray-100 p-4 lg:p-5">
             <div class="w-9 h-9 lg:w-10 lg:h-10 bg-red-100 rounded-xl flex items-center justify-center mb-3">
                 <i class="fas fa-exclamation-triangle text-red-500 text-sm"></i>
             </div>
-            <p
-                class="text-xl lg:text-2xl font-extrabold {% if low_stock_count > 0 %}text-red-600{% else %}text-gray-900{% endif %}">
-                {{ low_stock_count }}</p>
+            class="text-xl lg:text-2xl font-extrabold {% if low_stock_count > 0 %}text-red-600{% else %}text-gray-900{%
+            endif %}" id="stat-low-stock">
+            {{ low_stock_count }}</p>
             <p class="text-[11px] text-gray-500 font-medium mt-1">Low Stock</p>
         </div>
         <div class="stat-card bg-white rounded-2xl border border-gray-100 p-4 lg:p-5 col-span-2 sm:col-span-1">
             <div class="w-9 h-9 lg:w-10 lg:h-10 bg-violet-100 rounded-xl flex items-center justify-center mb-3">
                 <i class="fas fa-user-graduate text-violet-600 text-sm"></i>
             </div>
-            <p class="text-xl lg:text-2xl font-extrabold text-gray-900">{{ total_students }}</p>
+            <p class="text-xl lg:text-2xl font-extrabold text-gray-900" id="stat-total-students">{{ total_students }}
+            </p>
             <p class="text-[11px] text-gray-500 font-medium mt-1">Students</p>
         </div>
     </div>
@@ -64,7 +67,8 @@
                     </div>
                     Patient Queue
                 </h3>
-                <span class="px-3 py-1 bg-amber-50 text-amber-700 rounded-full text-xs font-bold">{{ queue_count }}
+                <span class="px-3 py-1 bg-amber-50 text-amber-700 rounded-full text-xs font-bold"><span
+                        id="stat-queue-count-badge">{{ queue_count }}</span>
                     waiting</span>
             </div>
             {% if next_patient %}
@@ -171,7 +175,8 @@
                     </div>
                     Pending Pickups
                 </h3>
-                <span class="px-3 py-1 bg-violet-50 text-violet-700 rounded-full text-xs font-bold">{{
+                <span class="px-3 py-1 bg-violet-50 text-violet-700 rounded-full text-xs font-bold"
+                    id="stat-pending-reservations">{{
                     pending_reservations|length }}</span>
             </div>
             {% if pending_reservations %}
@@ -290,4 +295,41 @@
         </div>
     </div>
 </div>
+</div>
+
+{% block extra_scripts %}
+<script>
+    function updateDashboardStats() {
+        fetch('{{ url_for("api_v1.admin_dashboard_stats") }}')
+            .then(response => {
+                if (!response.ok) throw new Error('Network response was not ok');
+                return response.json();
+            })
+            .then(data => {
+                // Update stats
+                document.getElementById('stat-today-patients').textContent = data.today_patients;
+                document.getElementById('stat-queue-count').textContent = data.queue_count;
+                document.getElementById('stat-queue-count-badge').textContent = data.queue_count;
+                document.getElementById('stat-today-appointments').textContent = data.today_appointments;
+                document.getElementById('stat-total-students').textContent = data.total_students;
+                document.getElementById('stat-pending-reservations').textContent = data.pending_reservations_count;
+
+                // Update low stock with color logic
+                const lowStockEl = document.getElementById('stat-low-stock');
+                lowStockEl.textContent = data.low_stock_count;
+                if (data.low_stock_count > 0) {
+                    lowStockEl.classList.remove('text-gray-900');
+                    lowStockEl.classList.add('text-red-600');
+                } else {
+                    lowStockEl.classList.remove('text-red-600');
+                    lowStockEl.classList.add('text-gray-900');
+                }
+            })
+            .catch(error => console.error('Error fetching dashboard stats:', error));
+    }
+
+    // Poll every 15 seconds
+    setInterval(updateDashboardStats, 15000);
+</script>
+{% endblock %}
 {% endblock %}

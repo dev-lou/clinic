@@ -40,6 +40,11 @@ def add():
     db.session.commit()
     
     flash(f'{student_name} added to queue.', 'success')
+    
+    # Broadcast update
+    from queue_display import broadcast_queue_update
+    broadcast_queue_update()
+    
     return redirect(url_for('admin'))
 
 
@@ -59,6 +64,11 @@ def call_next():
     db.session.commit()
     
     flash(f'Now serving: {next_patient.student_name}', 'success')
+    
+    # Broadcast update
+    from queue_display import broadcast_queue_update
+    broadcast_queue_update()
+    
     return redirect(url_for('admin'))
 
 
@@ -73,6 +83,11 @@ def mark_absent(queue_id):
     db.session.commit()
     
     flash(f'{patient.student_name} marked as absent.', 'info')
+    
+    # Broadcast update
+    from queue_display import broadcast_queue_update
+    broadcast_queue_update()
+    
     return redirect(url_for('admin'))
 
 

@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en" class="scroll-smooth">
+
 <head>
     <meta charset="UTF-8">
     <meta name="csrf-token" content="{{ csrf_token() }}">
@@ -8,7 +9,9 @@
     <title>{% block title %}ISUFST CareHub{% endblock %}</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/fontawesome.min.css') }}">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap"
+        rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/animations.css') }}">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
@@ -17,7 +20,7 @@
                 extend: {
                     fontFamily: { 'display': ['"Plus Jakarta Sans"', 'sans-serif'], 'body': ['Inter', 'sans-serif'] },
                     colors: {
-                        'primary': { 50:'#eff6ff',100:'#dbeafe',200:'#bfdbfe',300:'#93c5fd',400:'#60a5fa',500:'#3b82f6',600:'#2563eb',700:'#1d4ed8',800:'#1e3a5f',900:'#0f1d30',950:'#080d1a' },
+                        'primary': { 50: '#eff6ff', 100: '#dbeafe', 200: '#bfdbfe', 300: '#93c5fd', 400: '#60a5fa', 500: '#3b82f6', 600: '#2563eb', 700: '#1d4ed8', 800: '#1e3a5f', 900: '#0f1d30', 950: '#080d1a' },
                         'accent': '#10b981',
                     }
                 }
@@ -25,29 +28,159 @@
         }
     </script>
     <style>
-        *{font-family:'Inter',sans-serif}
-        h1,h2,h3,h4{font-family:'Plus Jakarta Sans',sans-serif}
-        .nav-blur{backdrop-filter:blur(20px) saturate(180%);-webkit-backdrop-filter:blur(20px) saturate(180%)}
+        * {
+            font-family: 'Inter', sans-serif
+        }
+
+        h1,
+        h2,
+        h3,
+        h4 {
+            font-family: 'Plus Jakarta Sans', sans-serif
+        }
+
+        .nav-blur {
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%)
+        }
+
         /* Legacy class compat */
-        .card{background:#fff;border-radius:1rem;border:1px solid #f3f4f6;padding:1.5rem;box-shadow:0 1px 3px rgba(0,0,0,.04)}
-        .card-header{font-weight:700;font-size:1.125rem;color:#111827;margin-bottom:1rem;padding-bottom:.75rem;border-bottom:1px solid #f3f4f6}
-        .btn-primary{display:inline-flex;align-items:center;justify-content:center;gap:.5rem;padding:.625rem 1.25rem;background:#1d4ed8;color:#fff;font-weight:600;font-size:.875rem;border-radius:.75rem;transition:all .2s;border:none;cursor:pointer}
-        .btn-primary:hover{background:#1e40af}
-        .btn-secondary{display:inline-flex;align-items:center;justify-content:center;gap:.5rem;padding:.625rem 1.25rem;background:#f3f4f6;color:#374151;font-weight:600;font-size:.875rem;border-radius:.75rem;transition:all .2s;border:none;cursor:pointer}
-        .btn-secondary:hover{background:#e5e7eb}
-        .btn-danger{background:#dc2626!important;color:#fff!important}.btn-danger:hover{background:#b91c1c!important}
-        .btn-success{background:#059669;color:#fff}.btn-success:hover{background:#047857}
-        .badge{display:inline-flex;align-items:center;padding:.25rem .75rem;font-size:.75rem;font-weight:600;border-radius:9999px}
-        .badge-success{background:#d1fae5;color:#065f46}.badge-warning{background:#fef3c7;color:#92400e}.badge-danger{background:#fee2e2;color:#991b1b}
-        .input-field{width:100%;padding:.625rem .875rem;border:1px solid #d1d5db;border-radius:.75rem;font-size:.875rem;transition:all .2s;outline:none}
-        .input-field:focus{border-color:#3b82f6;box-shadow:0 0 0 3px rgba(59,130,246,.1)}
-        .form-checkbox{border-radius:.25rem;border:1px solid #d1d5db;color:#2563eb}
-        ::-webkit-scrollbar{width:5px}
-        ::-webkit-scrollbar-track{background:transparent}
-        ::-webkit-scrollbar-thumb{background:#d1d5db;border-radius:100px}
+        .card {
+            background: #fff;
+            border-radius: 1rem;
+            border: 1px solid #f3f4f6;
+            padding: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, .04)
+        }
+
+        .card-header {
+            font-weight: 700;
+            font-size: 1.125rem;
+            color: #111827;
+            margin-bottom: 1rem;
+            padding-bottom: .75rem;
+            border-bottom: 1px solid #f3f4f6
+        }
+
+        .btn-primary {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: .5rem;
+            padding: .625rem 1.25rem;
+            background: #1d4ed8;
+            color: #fff;
+            font-weight: 600;
+            font-size: .875rem;
+            border-radius: .75rem;
+            transition: all .2s;
+            border: none;
+            cursor: pointer
+        }
+
+        .btn-primary:hover {
+            background: #1e40af
+        }
+
+        .btn-secondary {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: .5rem;
+            padding: .625rem 1.25rem;
+            background: #f3f4f6;
+            color: #374151;
+            font-weight: 600;
+            font-size: .875rem;
+            border-radius: .75rem;
+            transition: all .2s;
+            border: none;
+            cursor: pointer
+        }
+
+        .btn-secondary:hover {
+            background: #e5e7eb
+        }
+
+        .btn-danger {
+            background: #dc2626 !important;
+            color: #fff !important
+        }
+
+        .btn-danger:hover {
+            background: #b91c1c !important
+        }
+
+        .btn-success {
+            background: #059669;
+            color: #fff
+        }
+
+        .btn-success:hover {
+            background: #047857
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            padding: .25rem .75rem;
+            font-size: .75rem;
+            font-weight: 600;
+            border-radius: 9999px
+        }
+
+        .badge-success {
+            background: #d1fae5;
+            color: #065f46
+        }
+
+        .badge-warning {
+            background: #fef3c7;
+            color: #92400e
+        }
+
+        .badge-danger {
+            background: #fee2e2;
+            color: #991b1b
+        }
+
+        .input-field {
+            width: 100%;
+            padding: .625rem .875rem;
+            border: 1px solid #d1d5db;
+            border-radius: .75rem;
+            font-size: .875rem;
+            transition: all .2s;
+            outline: none
+        }
+
+        .input-field:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, .1)
+        }
+
+        .form-checkbox {
+            border-radius: .25rem;
+            border: 1px solid #d1d5db;
+            color: #2563eb
+        }
+
+        ::-webkit-scrollbar {
+            width: 5px
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #d1d5db;
+            border-radius: 100px
+        }
     </style>
     {% block extra_css %}{% endblock %}
 </head>
+
 <body class="bg-gray-50/80 min-h-screen">
     <!-- Navigation -->
     <nav class="fixed top-0 inset-x-0 z-50 nav-blur bg-white/90 border-b border-gray-100/80 transition-all">
@@ -55,7 +188,8 @@
             <div class="flex justify-between items-center h-16">
                 <div class="flex items-center space-x-4">
                     <a href="{{ url_for('index') }}" class="flex items-center space-x-2.5 group">
-                        <div class="w-9 h-9 bg-gradient-to-br from-primary-600 to-accent rounded-xl flex items-center justify-center shadow-md group-hover:shadow-primary-600/30 transition-all group-hover:scale-105">
+                        <div
+                            class="w-9 h-9 bg-gradient-to-br from-primary-600 to-accent rounded-xl flex items-center justify-center shadow-md group-hover:shadow-primary-600/30 transition-all group-hover:scale-105">
                             <i class="fas fa-heartbeat text-white text-sm"></i>
                         </div>
                         <span class="text-lg font-bold text-primary-900 tracking-tight">CareHub</span>
@@ -63,29 +197,40 @@
                 </div>
 
                 <!-- Mobile Hamburger -->
-                <button id="mobileMenuBtn" class="md:hidden w-10 h-10 flex items-center justify-center rounded-lg hover:bg-gray-100 transition text-gray-600">
+                <button id="mobileMenuBtn"
+                    class="md:hidden w-10 h-10 flex items-center justify-center rounded-lg hover:bg-gray-100 transition text-gray-600">
                     <i class="fas fa-bars text-lg"></i>
                 </button>
 
                 <div class="hidden md:flex items-center space-x-1">
+                    <a href="{{ url_for('index') }}"
+                        class="px-3.5 py-2 text-sm font-medium text-gray-600 hover:text-primary-700 rounded-lg hover:bg-primary-50/80 transition-all">
+                        <i class="fas fa-home mr-1.5 text-gray-400"></i>Home
+                    </a>
                     {% if current_user.is_authenticated %}
-                    <a href="{{ url_for('patient_dashboard.index') }}" class="px-3.5 py-2 text-sm font-medium text-gray-600 hover:text-primary-700 rounded-lg hover:bg-primary-50/80 transition-all">
+                    <a href="{{ url_for('patient_dashboard.index') }}"
+                        class="px-3.5 py-2 text-sm font-medium text-gray-600 hover:text-primary-700 rounded-lg hover:bg-primary-50/80 transition-all">
                         <i class="fas fa-th-large mr-1.5 text-gray-400"></i>Dashboard
                     </a>
-                    <a href="{{ url_for('appointments.my_appointments') }}" class="px-3.5 py-2 text-sm font-medium text-gray-600 hover:text-primary-700 rounded-lg hover:bg-primary-50/80 transition-all">
+                    <a href="{{ url_for('appointments.my_appointments') }}"
+                        class="px-3.5 py-2 text-sm font-medium text-gray-600 hover:text-primary-700 rounded-lg hover:bg-primary-50/80 transition-all">
                         <i class="fas fa-calendar-check mr-1.5 text-gray-400"></i>Appointments
                     </a>
-                    <a href="{{ url_for('reservations.my_reservations') }}" class="px-3.5 py-2 text-sm font-medium text-gray-600 hover:text-primary-700 rounded-lg hover:bg-primary-50/80 transition-all">
+                    <a href="{{ url_for('reservations.my_reservations') }}"
+                        class="px-3.5 py-2 text-sm font-medium text-gray-600 hover:text-primary-700 rounded-lg hover:bg-primary-50/80 transition-all">
                         <i class="fas fa-pills mr-1.5 text-gray-400"></i>Reservations
                     </a>
 
                     <!-- Notification Bell -->
                     <div class="relative ml-2">
-                        <button id="notificationBell" class="w-9 h-9 flex items-center justify-center rounded-lg hover:bg-gray-100 transition-all relative text-gray-500 hover:text-gray-700">
+                        <button id="notificationBell"
+                            class="w-9 h-9 flex items-center justify-center rounded-lg hover:bg-gray-100 transition-all relative text-gray-500 hover:text-gray-700">
                             <i class="fas fa-bell text-[15px]"></i>
-                            <span id="notifBadge" class="hidden absolute -top-0.5 -right-0.5 bg-red-500 text-white text-[10px] font-bold rounded-full h-4 min-w-[16px] flex items-center justify-center px-1 notif-pulse">0</span>
+                            <span id="notifBadge"
+                                class="hidden absolute -top-0.5 -right-0.5 bg-red-500 text-white text-[10px] font-bold rounded-full h-4 min-w-[16px] flex items-center justify-center px-1 notif-pulse">0</span>
                         </button>
-                        <div id="notificationDropdown" class="hidden absolute right-0 mt-2.5 w-80 bg-white rounded-2xl shadow-xl shadow-black/8 border border-gray-100 z-50">
+                        <div id="notificationDropdown"
+                            class="hidden absolute right-0 mt-2.5 w-80 bg-white rounded-2xl shadow-xl shadow-black/8 border border-gray-100 z-50">
                             <div class="p-4 border-b border-gray-100">
                                 <h3 class="font-bold text-sm text-gray-900">Notifications</h3>
                             </div>
@@ -95,34 +240,62 @@
 
                     <!-- User Menu -->
                     <div class="relative group ml-1">
-                        <button class="flex items-center space-x-2 px-3 py-2 rounded-xl hover:bg-gray-50 transition-all">
-                            <div class="w-8 h-8 bg-gradient-to-br from-primary-100 to-primary-200 rounded-lg flex items-center justify-center">
-                                <span class="text-xs font-bold text-primary-700">{{ current_user.first_name[0] }}{{ current_user.last_name[0] }}</span>
+                        <button
+                            class="flex items-center space-x-2 px-3 py-2 rounded-xl hover:bg-gray-50 transition-all">
+                            <div
+                                class="w-8 h-8 bg-gradient-to-br from-primary-100 to-primary-200 rounded-lg flex items-center justify-center">
+                                <span class="text-xs font-bold text-primary-700">{{ current_user.first_name[0] }}{{
+                                    current_user.last_name[0] }}</span>
                             </div>
                             <span class="text-sm font-semibold text-gray-700">{{ current_user.first_name }}</span>
                             <i class="fas fa-chevron-down text-[10px] text-gray-400"></i>
                         </button>
-                        <div class="absolute right-0 mt-2 w-56 bg-white rounded-2xl shadow-xl shadow-black/8 border border-gray-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
+                        <div
+                            class="absolute right-0 mt-2 w-56 bg-white rounded-2xl shadow-xl shadow-black/8 border border-gray-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
                             <div class="px-4 py-3 border-b border-gray-100">
-                                <p class="text-sm font-bold text-gray-900">{{ current_user.first_name }} {{ current_user.last_name }}</p>
+                                <p class="text-sm font-bold text-gray-900">{{ current_user.first_name }} {{
+                                    current_user.last_name }}</p>
                                 <p class="text-xs text-gray-500 truncate">{{ current_user.email }}</p>
                             </div>
                             <div class="py-1.5">
-                                <a href="{{ url_for('auth.profile') }}" class="flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition rounded-lg mx-1.5"><i class="fas fa-user-circle w-5 text-gray-400 mr-2"></i>Profile</a>
-                                <a href="{{ url_for('patient_dashboard.timeline') }}" class="flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition rounded-lg mx-1.5"><i class="fas fa-history w-5 text-gray-400 mr-2"></i>Health Timeline</a>
-                                <a href="{{ url_for('symptom_screening.index') }}" class="flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition rounded-lg mx-1.5"><i class="fas fa-stethoscope w-5 text-gray-400 mr-2"></i>Symptom Check</a>
+                                <a href="{{ url_for('patient_dashboard.index') }}"
+                                    class="flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition rounded-lg mx-1.5"><i
+                                        class="fas fa-th-large w-5 text-gray-400 mr-2"></i>Dashboard</a>
+                                <a href="{{ url_for('appointments.my_appointments') }}"
+                                    class="flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition rounded-lg mx-1.5"><i
+                                        class="fas fa-calendar-check w-5 text-gray-400 mr-2"></i>Appointments</a>
+                                <a href="{{ url_for('reservations.my_reservations') }}"
+                                    class="flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition rounded-lg mx-1.5"><i
+                                        class="fas fa-pills w-5 text-gray-400 mr-2"></i>Reservations</a>
+                                <div class="border-t border-gray-100 my-1 mx-4"></div>
+                                <a href="{{ url_for('auth.profile') }}"
+                                    class="flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition rounded-lg mx-1.5"><i
+                                        class="fas fa-user-circle w-5 text-gray-400 mr-2"></i>Profile</a>
+                                <a href="{{ url_for('patient_dashboard.timeline') }}"
+                                    class="flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition rounded-lg mx-1.5"><i
+                                        class="fas fa-history w-5 text-gray-400 mr-2"></i>Health Timeline</a>
+                                <a href="{{ url_for('symptom_screening.index') }}"
+                                    class="flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition rounded-lg mx-1.5"><i
+                                        class="fas fa-stethoscope w-5 text-gray-400 mr-2"></i>Symptom Check</a>
                                 {% if current_user.role in ['admin', 'staff'] %}
                                 <div class="border-t border-gray-100 my-1 mx-4"></div>
-                                <a href="{{ url_for('admin') }}" class="flex items-center px-4 py-2.5 text-sm text-primary-700 hover:bg-primary-50 transition rounded-lg mx-1.5"><i class="fas fa-user-shield w-5 text-primary-600 mr-2"></i>Admin</a>
+                                <a href="{{ url_for('admin') }}"
+                                    class="flex items-center px-4 py-2.5 text-sm text-primary-700 hover:bg-primary-50 transition rounded-lg mx-1.5"><i
+                                        class="fas fa-user-shield w-5 text-primary-600 mr-2"></i>Admin</a>
                                 {% endif %}
                                 <div class="border-t border-gray-100 my-1 mx-4"></div>
-                                <a href="{{ url_for('auth.logout') }}" class="flex items-center px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition rounded-lg mx-1.5"><i class="fas fa-sign-out-alt w-5 text-red-400 mr-2"></i>Logout</a>
+                                <a href="{{ url_for('auth.logout') }}"
+                                    class="flex items-center px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition rounded-lg mx-1.5"><i
+                                        class="fas fa-sign-out-alt w-5 text-red-400 mr-2"></i>Logout</a>
                             </div>
                         </div>
                     </div>
                     {% else %}
-                    <a href="{{ url_for('auth.login') }}" class="px-4 py-2 text-sm font-semibold text-primary-700 hover:text-primary-800 transition">Sign In</a>
-                    <a href="{{ url_for('auth.register') }}" class="px-5 py-2.5 bg-primary-700 text-white text-sm font-semibold rounded-xl hover:bg-primary-800 transition-all shadow-md shadow-primary-700/20">Register</a>
+                    <a href="{{ url_for('auth.login') }}"
+                        class="px-4 py-2 text-sm font-semibold text-primary-700 hover:text-primary-800 transition">Sign
+                        In</a>
+                    <a href="{{ url_for('auth.register') }}"
+                        class="px-5 py-2.5 bg-primary-700 text-white text-sm font-semibold rounded-xl hover:bg-primary-800 transition-all shadow-md shadow-primary-700/20">Register</a>
                     {% endif %}
                 </div>
             </div>
@@ -130,39 +303,89 @@
     </nav>
 
     <!-- Mobile Menu Drawer -->
-    <div id="mobileMenu" class="fixed inset-0 z-[100] hidden">
-        <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" onclick="closeMobileMenu()"></div>
-        <div class="absolute right-0 top-0 bottom-0 w-72 bg-white shadow-2xl transform translate-x-full transition-transform duration-300" id="mobileDrawer">
-            <div class="p-5 border-b border-gray-100 flex items-center justify-between">
-                <span class="font-bold text-gray-900">Menu</span>
-                <button onclick="closeMobileMenu()" class="w-9 h-9 flex items-center justify-center rounded-lg hover:bg-gray-100 transition"><i class="fas fa-times"></i></button>
-            </div>
+    <div id="mobile-overlay"
+        class="fixed inset-0 bg-black/50 backdrop-blur-sm z-[100] hidden transition-opacity duration-300 opacity-0"
+        onclick="toggleMobileMenu()"></div>
+    <aside id="mobile-drawer"
+        class="fixed inset-y-0 left-0 w-72 bg-white shadow-2xl z-[101] transform -translate-x-full transition-transform duration-300 flex flex-col">
+        <div class="p-5 border-b border-gray-100 flex items-center justify-between">
+            <span class="font-bold text-gray-900 text-lg">Menu</span>
+            <button onclick="toggleMobileMenu()"
+                class="w-9 h-9 flex items-center justify-center rounded-lg hover:bg-gray-100 transition text-gray-500">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+
+        <div class="flex-1 overflow-y-auto">
             {% if current_user.is_authenticated %}
-            <div class="px-4 py-3 border-b border-gray-100 bg-gray-50">
-                <p class="text-sm font-bold text-gray-900">{{ current_user.first_name }} {{ current_user.last_name }}</p>
-                <p class="text-xs text-gray-500">{{ current_user.email }}</p>
+            <div class="px-5 py-4 bg-gray-50 border-b border-gray-100">
+                <div class="flex items-center space-x-3">
+                    <div
+                        class="w-10 h-10 bg-gradient-to-br from-primary-100 to-primary-200 rounded-lg flex items-center justify-center text-primary-700 font-bold">
+                        {{ current_user.first_name[0] }}{{ current_user.last_name[0] }}
+                    </div>
+                    <div>
+                        <p class="font-bold text-gray-900">{{ current_user.first_name }} {{ current_user.last_name }}
+                        </p>
+                        <p class="text-xs text-gray-500">{{ current_user.email }}</p>
+                    </div>
+                </div>
             </div>
-            <nav class="py-3 space-y-1 px-3">
-                <a href="{{ url_for('patient_dashboard.index') }}" class="flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-gray-700 rounded-lg hover:bg-primary-50 transition"><i class="fas fa-th-large text-gray-400 w-5"></i>Dashboard</a>
-                <a href="{{ url_for('appointments.my_appointments') }}" class="flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-gray-700 rounded-lg hover:bg-primary-50 transition"><i class="fas fa-calendar-check text-gray-400 w-5"></i>Appointments</a>
-                <a href="{{ url_for('reservations.my_reservations') }}" class="flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-gray-700 rounded-lg hover:bg-primary-50 transition"><i class="fas fa-pills text-gray-400 w-5"></i>Reservations</a>
-                <a href="{{ url_for('symptom_screening.index') }}" class="flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-gray-700 rounded-lg hover:bg-primary-50 transition"><i class="fas fa-stethoscope text-gray-400 w-5"></i>Symptom Check</a>
-                <a href="{{ url_for('patient_dashboard.timeline') }}" class="flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-gray-700 rounded-lg hover:bg-primary-50 transition"><i class="fas fa-history text-gray-400 w-5"></i>Health Timeline</a>
-                <a href="{{ url_for('auth.profile') }}" class="flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-gray-700 rounded-lg hover:bg-primary-50 transition"><i class="fas fa-user-circle text-gray-400 w-5"></i>Profile</a>
+            <nav class="p-4 space-y-1">
+                <a href="{{ url_for('index') }}"
+                    class="flex items-center gap-3 px-4 py-3 text-sm font-medium text-gray-700 rounded-xl hover:bg-primary-50 hover:text-primary-700 transition">
+                    <i class="fas fa-home w-5 text-center text-gray-400"></i>Home
+                </a>
+                <a href="{{ url_for('patient_dashboard.index') }}"
+                    class="flex items-center gap-3 px-4 py-3 text-sm font-medium text-gray-700 rounded-xl hover:bg-primary-50 hover:text-primary-700 transition">
+                    <i class="fas fa-th-large w-5 text-center text-gray-400"></i>Dashboard
+                </a>
+                <a href="{{ url_for('appointments.my_appointments') }}"
+                    class="flex items-center gap-3 px-4 py-3 text-sm font-medium text-gray-700 rounded-xl hover:bg-primary-50 hover:text-primary-700 transition">
+                    <i class="fas fa-calendar-check w-5 text-center text-gray-400"></i>Appointments
+                </a>
+                <a href="{{ url_for('reservations.my_reservations') }}"
+                    class="flex items-center gap-3 px-4 py-3 text-sm font-medium text-gray-700 rounded-xl hover:bg-primary-50 hover:text-primary-700 transition">
+                    <i class="fas fa-capsules w-5 text-center text-gray-400"></i>Reservations
+                </a>
+                <a href="{{ url_for('symptom_screening.index') }}"
+                    class="flex items-center gap-3 px-4 py-3 text-sm font-medium text-gray-700 rounded-xl hover:bg-primary-50 hover:text-primary-700 transition">
+                    <i class="fas fa-stethoscope w-5 text-center text-gray-400"></i>Symptom Check
+                </a>
+                <a href="{{ url_for('patient_dashboard.timeline') }}"
+                    class="flex items-center gap-3 px-4 py-3 text-sm font-medium text-gray-700 rounded-xl hover:bg-primary-50 hover:text-primary-700 transition">
+                    <i class="fas fa-history w-5 text-center text-gray-400"></i>Health Timeline
+                </a>
+                <a href="{{ url_for('auth.profile') }}"
+                    class="flex items-center gap-3 px-4 py-3 text-sm font-medium text-gray-700 rounded-xl hover:bg-primary-50 hover:text-primary-700 transition">
+                    <i class="fas fa-user-circle w-5 text-center text-gray-400"></i>Profile
+                </a>
                 {% if current_user.role in ['admin', 'staff'] %}
-                <a href="{{ url_for('admin') }}" class="flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-primary-700 rounded-lg hover:bg-primary-50 transition"><i class="fas fa-user-shield text-primary-500 w-5"></i>Admin Panel</a>
+                <div class="my-2 border-t border-gray-100"></div>
+                <a href="{{ url_for('admin') }}"
+                    class="flex items-center gap-3 px-4 py-3 text-sm font-medium text-primary-700 rounded-xl hover:bg-primary-50 transition">
+                    <i class="fas fa-user-shield w-5 text-center text-primary-500"></i>Admin Panel
+                </a>
                 {% endif %}
-                <div class="border-t border-gray-100 my-2"></div>
-                <a href="{{ url_for('auth.logout') }}" class="flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-red-600 rounded-lg hover:bg-red-50 transition"><i class="fas fa-sign-out-alt text-red-400 w-5"></i>Logout</a>
+                <div class="my-2 border-t border-gray-100"></div>
+                <a href="{{ url_for('auth.logout') }}"
+                    class="flex items-center gap-3 px-4 py-3 text-sm font-medium text-red-600 rounded-xl hover:bg-red-50 transition">
+                    <i class="fas fa-sign-out-alt w-5 text-center text-red-400"></i>Logout
+                </a>
             </nav>
             {% else %}
-            <nav class="py-4 px-4 space-y-3">
-                <a href="{{ url_for('auth.login') }}" class="block w-full text-center px-4 py-3 border border-primary-700 text-primary-700 font-semibold rounded-xl hover:bg-primary-50 transition">Sign In</a>
-                <a href="{{ url_for('auth.register') }}" class="block w-full text-center px-4 py-3 bg-primary-700 text-white font-semibold rounded-xl hover:bg-primary-800 transition shadow-sm">Register</a>
-            </nav>
+            <div class="p-6 space-y-3">
+                <a href="{{ url_for('auth.login') }}"
+                    class="block w-full text-center px-4 py-3 border border-gray-200 text-gray-700 font-semibold rounded-xl hover:bg-gray-50 transition">Sign
+                    In</a>
+                <a href="{{ url_for('auth.register') }}"
+                    class="block w-full text-center px-4 py-3 bg-primary-600 text-white font-semibold rounded-xl hover:bg-primary-700 transition shadow-lg shadow-primary-600/20">Get
+                    Started</a>
+            </div>
             {% endif %}
         </div>
-    </div>
+    </aside>
+
     <!-- Flash Messages (SweetAlert Toasts) -->
     {% with messages = get_flashed_messages(with_categories=true) %}
     {% if messages %}
@@ -172,7 +395,7 @@
         {% endfor %}
     </div>
     <script>
-    document.addEventListener('DOMContentLoaded',()=>{const fc=document.getElementById('flash-messages');if(fc){fc.querySelectorAll('[data-category]').forEach(m=>{const c=m.getAttribute('data-category'),msg=m.getAttribute('data-message');Swal.fire({icon:c==='error'?'error':c==='warning'?'warning':'success',text:msg,toast:true,position:'top-end',showConfirmButton:false,timer:4000,timerProgressBar:true,customClass:{popup:'rounded-2xl shadow-2xl'}})})}});
+        document.addEventListener('DOMContentLoaded', () => { const fc = document.getElementById('flash-messages'); if (fc) { fc.querySelectorAll('[data-category]').forEach(m => { const c = m.getAttribute('data-category'), msg = m.getAttribute('data-message'); Swal.fire({ icon: c === 'error' ? 'error' : c === 'warning' ? 'warning' : 'success', text: msg, toast: true, position: 'top-end', showConfirmButton: false, timer: 4000, timerProgressBar: true, customClass: { popup: 'rounded-2xl shadow-2xl' } }) }) } });
     </script>
     {% endif %}
     {% endwith %}
@@ -188,7 +411,8 @@
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
                 <div>
                     <div class="flex items-center space-x-2.5 mb-4">
-                        <div class="w-9 h-9 bg-gradient-to-br from-primary-500 to-accent rounded-xl flex items-center justify-center">
+                        <div
+                            class="w-9 h-9 bg-gradient-to-br from-primary-500 to-accent rounded-xl flex items-center justify-center">
                             <i class="fas fa-heartbeat text-white text-sm"></i>
                         </div>
                         <span class="text-lg font-bold">CareHub</span>
@@ -198,8 +422,10 @@
                 <div>
                     <h4 class="font-bold text-sm text-white/80 uppercase tracking-wider mb-4">Quick Links</h4>
                     <ul class="space-y-2.5 text-sm text-blue-300/50">
-                        <li><a href="{{ url_for('appointments.book') }}" class="hover:text-white transition">Book Appointment</a></li>
-                        <li><a href="{{ url_for('reservations.view_medicines') }}" class="hover:text-white transition">Reserve Medicine</a></li>
+                        <li><a href="{{ url_for('appointments.book') }}" class="hover:text-white transition">Book
+                                Appointment</a></li>
+                        <li><a href="{{ url_for('reservations.view_medicines') }}"
+                                class="hover:text-white transition">Reserve Medicine</a></li>
                     </ul>
                 </div>
                 <div>
@@ -217,49 +443,80 @@
     </footer>
 
     <script>
-    document.addEventListener('DOMContentLoaded',function(){
-        const bell=document.getElementById('notificationBell');
-        const dropdown=document.getElementById('notificationDropdown');
-        if(bell){
-            bell.addEventListener('click',function(e){e.stopPropagation();dropdown.classList.toggle('hidden');loadNotifications()});
-            document.addEventListener('click',function(e){if(!dropdown.contains(e.target))dropdown.classList.add('hidden')});
-            updateNotificationCount();
-            setInterval(updateNotificationCount,30000);
-        }
-    });
-    function updateNotificationCount(){
-        fetch('{{ url_for("patient_dashboard.unread_notification_count") }}')
-        .then(r=>r.json()).then(data=>{
-            const badge=document.getElementById('notifBadge');
-            if(data.count>0){badge.textContent=data.count>9?'9+':data.count;badge.classList.remove('hidden')}
-            else{badge.classList.add('hidden')}
+        document.addEventListener('DOMContentLoaded', function () {
+            const bell = document.getElementById('notificationBell');
+            const dropdown = document.getElementById('notificationDropdown');
+            if (bell) {
+                bell.addEventListener('click', function (e) { e.stopPropagation(); dropdown.classList.toggle('hidden'); loadNotifications() });
+                document.addEventListener('click', function (e) { if (!dropdown.contains(e.target)) dropdown.classList.add('hidden') });
+                updateNotificationCount();
+                setInterval(updateNotificationCount, 30000);
+            }
         });
-    }
-    function loadNotifications(){
-        fetch('{{ url_for("api_v1.get_notifications") }}?unread_only=true')
-        .then(r=>r.json()).then(notifications=>{
-            const list=document.getElementById('notificationList');
-            if(notifications.length===0){list.innerHTML='<p class="p-6 text-gray-400 text-center text-sm">No new notifications</p>'}
-            else{list.innerHTML=notifications.map(n=>`
+
+        // Mobile Menu Logic
+        function toggleMobileMenu() {
+            const overlay = document.getElementById('mobile-overlay');
+            const drawer = document.getElementById('mobile-drawer');
+
+            if (overlay.classList.contains('hidden')) {
+                // Open
+                overlay.classList.remove('hidden');
+                // Small delay to allow display:block to apply before opacity transition
+                setTimeout(() => {
+                    overlay.classList.remove('opacity-0');
+                    drawer.classList.remove('-translate-x-full');
+                }, 10);
+                document.body.classList.add('overflow-hidden');
+            } else {
+                // Close
+                overlay.classList.add('opacity-0');
+                drawer.classList.add('-translate-x-full');
+                setTimeout(() => {
+                    overlay.classList.add('hidden');
+                }, 300); // Match transition duration
+                document.body.classList.remove('overflow-hidden');
+            }
+        }
+
+        // Attach to button in navbar
+        const mobileBtn = document.getElementById('mobileMenuBtn');
+        if (mobileBtn) {
+            mobileBtn.addEventListener('click', toggleMobileMenu);
+        }
+
+        function updateNotificationCount() {
+            fetch('{{ url_for("patient_dashboard.unread_notification_count") }}')
+                .then(r => r.json()).then(data => {
+                    const badge = document.getElementById('notifBadge');
+                    if (data.count > 0) { badge.textContent = data.count > 9 ? '9+' : data.count; badge.classList.remove('hidden') }
+                    else { badge.classList.add('hidden') }
+                });
+        }
+        function loadNotifications() {
+            fetch('{{ url_for("api_v1.get_notifications") }}?unread_only=true')
+                .then(r => r.json()).then(notifications => {
+                    const list = document.getElementById('notificationList');
+                    if (notifications.length === 0) { list.innerHTML = '<p class="p-6 text-gray-400 text-center text-sm">No new notifications</p>' }
+                    else {
+                        list.innerHTML = notifications.map(n => `
                 <div class="px-4 py-3 border-b border-gray-50 hover:bg-gray-50 cursor-pointer transition" onclick="markRead(${n.id})">
                     <h4 class="font-semibold text-sm text-gray-900">${n.title}</h4>
                     <p class="text-xs text-gray-500 mt-0.5">${n.message}</p>
                     <span class="text-[10px] text-gray-400 mt-1 block">${new Date(n.created_at).toLocaleString()}</span>
                 </div>
-            `).join('')}
-        });
-    }
-    function markRead(id){
-        fetch(`{{ url_for("patient_dashboard.mark_notification_read",notification_id=0) }}`.replace('0',id),{
-            method:'POST',headers:{'Content-Type':'application/json','X-CSRFToken':'{{ csrf_token() }}'}
-        }).then(()=>{updateNotificationCount();loadNotifications()});
-    }
-    // Mobile menu
-    function closeMobileMenu(){const m=document.getElementById('mobileMenu'),d=document.getElementById('mobileDrawer');d.style.transform='translateX(100%)';setTimeout(()=>m.classList.add('hidden'),300)}
-    const mb=document.getElementById('mobileMenuBtn');
-    if(mb){mb.addEventListener('click',()=>{const m=document.getElementById('mobileMenu'),d=document.getElementById('mobileDrawer');m.classList.remove('hidden');setTimeout(()=>d.style.transform='translateX(0)',10)})}
+            `).join('')
+                    }
+                });
+        }
+        function markRead(id) {
+            fetch(`{{ url_for("patient_dashboard.mark_notification_read",notification_id=0) }}`.replace('0', id), {
+                method: 'POST', headers: { 'Content-Type': 'application/json', 'X-CSRFToken': '{{ csrf_token() }}' }
+            }).then(() => { updateNotificationCount(); loadNotifications() });
+        }
     </script>
     {% block extra_js %}{% endblock %}
     {% include 'partials/chatbot_widget.html' %}
 </body>
+
 </html>

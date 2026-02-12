@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en" class="scroll-smooth">
+
 <head>
     <meta charset="UTF-8">
     <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
@@ -7,7 +8,9 @@
     <title>Sign In &mdash; ISUFST CareHub</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/fontawesome.min.css') }}">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap"
+        rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/animations.css') }}">
     <script>
         tailwind.config = {
@@ -15,7 +18,7 @@
                 extend: {
                     fontFamily: { 'display': ['"Plus Jakarta Sans"', 'sans-serif'], 'body': ['Inter', 'sans-serif'] },
                     colors: {
-                        'primary': { 50:'#eff6ff',100:'#dbeafe',200:'#bfdbfe',300:'#93c5fd',400:'#60a5fa',500:'#3b82f6',600:'#2563eb',700:'#1d4ed8',800:'#1e3a5f',900:'#0f1d30',950:'#080d1a' },
+                        'primary': { 50: '#eff6ff', 100: '#dbeafe', 200: '#bfdbfe', 300: '#93c5fd', 400: '#60a5fa', 500: '#3b82f6', 600: '#2563eb', 700: '#1d4ed8', 800: '#1e3a5f', 900: '#0f1d30', 950: '#080d1a' },
                         'accent': '#10b981',
                     }
                 }
@@ -23,20 +26,83 @@
         }
     </script>
     <style>
-        *{font-family:'Inter',sans-serif}
-        h1,h2,h3{font-family:'Plus Jakarta Sans',sans-serif}
-        .auth-bg{position:relative;overflow:hidden;background:url('https://images.unsplash.com/photo-1631217868264-e5b90bb7e133?auto=format&fit=crop&w=1200&q=80') center/cover no-repeat}
-        .auth-bg::before{content:'';position:absolute;inset:0;background:linear-gradient(180deg,rgba(8,13,26,.82) 0%,rgba(15,29,48,.78) 50%,rgba(8,13,26,.85) 100%);z-index:1}
-        .grid-lines{background-image:linear-gradient(rgba(255,255,255,.02) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.02) 1px,transparent 1px);background-size:64px 64px}
-        .grain{position:absolute;inset:0;opacity:.04;pointer-events:none;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E")}
-        .glass-card{background:rgba(255,255,255,.04);backdrop-filter:blur(24px) saturate(180%);border:1px solid rgba(255,255,255,.08)}
-        .input-premium{transition:all .3s cubic-bezier(.16,1,.3,1)}
-        .input-premium:focus{box-shadow:0 0 0 4px rgba(37,99,235,.1);border-color:#2563eb}
-        .btn-premium{position:relative;overflow:hidden;transition:all .3s}
-        .btn-premium::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.1),transparent);opacity:0;transition:opacity .3s}
-        .btn-premium:hover::before{opacity:1}
+        * {
+            font-family: 'Inter', sans-serif
+        }
+
+        h1,
+        h2,
+        h3 {
+            font-family: 'Plus Jakarta Sans', sans-serif
+        }
+
+        .auth-bg {
+            position: relative;
+            overflow: hidden;
+            background-color: #1e3a5f;
+            background-image: url('https://images.unsplash.com/photo-1579684385261-0b5c192d1140?auto=format&fit=crop&w=1200&q=80');
+            background-position: center;
+            background-size: cover;
+            background-repeat: no-repeat;
+        }
+
+        .auth-bg::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(180deg, rgba(8, 13, 26, .45) 0%, rgba(15, 29, 48, .35) 50%, rgba(8, 13, 26, .55) 100%);
+            z-index: 1
+        }
+
+        .grid-lines {
+            background-image: linear-gradient(rgba(255, 255, 255, .02) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, .02) 1px, transparent 1px);
+            background-size: 64px 64px
+        }
+
+        .grain {
+            position: absolute;
+            inset: 0;
+            opacity: .04;
+            pointer-events: none;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E")
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, .04);
+            backdrop-filter: blur(24px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, .08)
+        }
+
+        .input-premium {
+            transition: all .3s cubic-bezier(.16, 1, .3, 1)
+        }
+
+        .input-premium:focus {
+            box-shadow: 0 0 0 4px rgba(37, 99, 235, .1);
+            border-color: #2563eb
+        }
+
+        .btn-premium {
+            position: relative;
+            overflow: hidden;
+            transition: all .3s
+        }
+
+        .btn-premium::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(255, 255, 255, .1), transparent);
+            opacity: 0;
+            transition: opacity .3s
+        }
+
+        .btn-premium:hover::before {
+            opacity: 1
+        }
     </style>
 </head>
+
 <body class="min-h-screen flex">
     <!-- Left Panel -->
     <div class="hidden lg:flex lg:w-1/2 auth-bg flex-col justify-between p-12 relative">
@@ -45,7 +111,8 @@
 
         <div class="relative z-10">
             <a href="/" class="flex items-center space-x-3 group">
-                <div class="w-10 h-10 bg-gradient-to-br from-primary-500 to-accent rounded-xl flex items-center justify-center shadow-lg group-hover:scale-105 transition-transform">
+                <div
+                    class="w-10 h-10 bg-gradient-to-br from-primary-500 to-accent rounded-xl flex items-center justify-center shadow-lg group-hover:scale-105 transition-transform">
                     <i class="fas fa-heartbeat text-white text-lg"></i>
                 </div>
                 <span class="text-xl font-bold text-white">ISUFST CareHub</span>
@@ -55,7 +122,8 @@
         <div class="relative z-10 space-y-8 fade-in">
             <h2 class="text-5xl font-extrabold text-white leading-tight">
                 Welcome back to<br>
-                <span class="bg-gradient-to-r from-blue-400 via-cyan-300 to-emerald-400 bg-clip-text text-transparent">CareHub.</span>
+                <span
+                    class="bg-gradient-to-r from-blue-400 via-cyan-300 to-emerald-400 bg-clip-text text-transparent">CareHub.</span>
             </h2>
             <p class="text-lg text-blue-200/50 max-w-md leading-relaxed">
                 Sign in to manage your appointments, reserve medicines, and access your health records.
@@ -63,15 +131,18 @@
 
             <div class="glass-card rounded-2xl p-6 max-w-md">
                 <div class="flex items-center space-x-4 mb-4">
-                    <img src="{{ url_for('static', filename='images/image.png') }}" class="w-12 h-12 rounded-full border-2 border-white/10 object-cover" alt="">
+                    <img src="{{ url_for('static', filename='images/image.png') }}"
+                        class="w-12 h-12 rounded-full border-2 border-white/10 object-cover" alt="">
                     <div>
                         <p class="text-white font-semibold text-sm">Lou Vincent Baroro</p>
                         <p class="text-blue-300/50 text-xs">BSIT, 3rd Year</p>
                     </div>
                 </div>
-                <p class="text-blue-200/50 text-sm italic leading-relaxed">"CareHub made booking clinic appointments so much easier. I can reserve medicine online and just pick it up &mdash; no waiting!"</p>
+                <p class="text-blue-200/50 text-sm italic leading-relaxed">"CareHub made booking clinic appointments so
+                    much easier. I can reserve medicine online and just pick it up &mdash; no waiting!"</p>
                 <div class="flex mt-3 text-amber-400/80 text-xs gap-0.5">
-                    <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i
+                        class="fas fa-star"></i><i class="fas fa-star"></i>
                 </div>
             </div>
         </div>
@@ -83,7 +154,8 @@
     <div class="w-full lg:w-1/2 flex items-center justify-center bg-gray-50 p-6 sm:p-12">
         <div class="w-full max-w-md space-y-8 slide-in-right">
             <div class="lg:hidden flex items-center space-x-3 mb-4">
-                <div class="w-10 h-10 bg-gradient-to-br from-primary-600 to-accent rounded-xl flex items-center justify-center shadow-lg">
+                <div
+                    class="w-10 h-10 bg-gradient-to-br from-primary-600 to-accent rounded-xl flex items-center justify-center shadow-lg">
                     <i class="fas fa-heartbeat text-white text-lg"></i>
                 </div>
                 <span class="text-xl font-bold text-primary-900">ISUFST CareHub</span>
@@ -91,7 +163,9 @@
 
             <div>
                 <h1 class="text-3xl font-extrabold text-gray-900">Sign in</h1>
-                <p class="mt-2 text-gray-500">Don't have an account? <a href="{{ url_for('auth.register') }}" class="text-primary-700 font-semibold hover:text-primary-800 transition-colors">Create one free</a></p>
+                <p class="mt-2 text-gray-500">Don't have an account? <a href="{{ url_for('auth.register') }}"
+                        class="text-primary-700 font-semibold hover:text-primary-800 transition-colors">Create one
+                        free</a></p>
             </div>
 
             {% with messages = get_flashed_messages(with_categories=true) %}
@@ -101,7 +175,8 @@
                 {% if category == 'error' %}bg-red-50 text-red-700 border border-red-100
                 {% elif category == 'success' %}bg-emerald-50 text-emerald-700 border border-emerald-100
                 {% else %}bg-blue-50 text-blue-700 border border-blue-100{% endif %}">
-                <i class="fas {% if category == 'error' %}fa-exclamation-circle{% elif category == 'success' %}fa-check-circle{% else %}fa-info-circle{% endif %}"></i>
+                <i
+                    class="fas {% if category == 'error' %}fa-exclamation-circle{% elif category == 'success' %}fa-check-circle{% else %}fa-info-circle{% endif %}"></i>
                 {{ message }}
             </div>
             {% endfor %}
@@ -113,31 +188,40 @@
                 <div>
                     <label for="email" class="block text-sm font-semibold text-gray-700 mb-2">Email address</label>
                     <div class="relative">
-                        <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"><i class="fas fa-envelope text-sm"></i></span>
-                        <input type="email" name="email" id="email" required placeholder="you@isufst.edu.ph" class="input-premium w-full pl-11 pr-4 py-3.5 border border-gray-200 rounded-xl bg-white focus:border-primary-600 focus:outline-none text-sm">
+                        <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"><i
+                                class="fas fa-envelope text-sm"></i></span>
+                        <input type="email" name="email" id="email" required placeholder="you@isufst.edu.ph"
+                            class="input-premium w-full pl-11 pr-4 py-3.5 border border-gray-200 rounded-xl bg-white focus:border-primary-600 focus:outline-none text-sm">
                     </div>
                 </div>
 
                 <div>
                     <div class="flex items-center justify-between mb-2">
                         <label for="password" class="text-sm font-semibold text-gray-700">Password</label>
-                        <a href="#" class="text-xs text-primary-600 hover:text-primary-800 font-medium transition-colors">Forgot password?</a>
+                        <a href="#"
+                            class="text-xs text-primary-600 hover:text-primary-800 font-medium transition-colors">Forgot
+                            password?</a>
                     </div>
                     <div class="relative">
-                        <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"><i class="fas fa-lock text-sm"></i></span>
-                        <input type="password" name="password" id="password" required placeholder="Enter your password" class="input-premium w-full pl-11 pr-12 py-3.5 border border-gray-200 rounded-xl bg-white focus:border-primary-600 focus:outline-none text-sm">
-                        <button type="button" onclick="togglePassword()" class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors">
+                        <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"><i
+                                class="fas fa-lock text-sm"></i></span>
+                        <input type="password" name="password" id="password" required placeholder="Enter your password"
+                            class="input-premium w-full pl-11 pr-12 py-3.5 border border-gray-200 rounded-xl bg-white focus:border-primary-600 focus:outline-none text-sm">
+                        <button type="button" onclick="togglePassword()"
+                            class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors">
                             <i class="fas fa-eye text-sm" id="toggle-icon"></i>
                         </button>
                     </div>
                 </div>
 
                 <div class="flex items-center">
-                    <input type="checkbox" name="remember" id="remember" class="w-4 h-4 text-primary-600 border-gray-300 rounded focus:ring-primary-500">
+                    <input type="checkbox" name="remember" id="remember"
+                        class="w-4 h-4 text-primary-600 border-gray-300 rounded focus:ring-primary-500">
                     <label for="remember" class="ml-2 text-sm text-gray-600">Keep me signed in</label>
                 </div>
 
-                <button type="submit" class="btn-premium w-full py-4 bg-primary-700 text-white font-bold rounded-xl hover:bg-primary-800 shadow-lg shadow-primary-700/20 hover:shadow-primary-700/30 text-sm">
+                <button type="submit"
+                    class="btn-premium w-full py-4 bg-primary-700 text-white font-bold rounded-xl hover:bg-primary-800 shadow-lg shadow-primary-700/20 hover:shadow-primary-700/30 text-sm">
                     Sign In
                 </button>
 
@@ -148,27 +232,32 @@
                 </div>
 
                 <div class="grid grid-cols-2 gap-3">
-                    <a href="{{ url_for('reservations.view_medicines') }}" class="flex items-center justify-center px-4 py-3 border border-gray-200 rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-50 hover:border-gray-300 transition-all">
+                    <a href="{{ url_for('reservations.view_medicines') }}"
+                        class="flex items-center justify-center px-4 py-3 border border-gray-200 rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-50 hover:border-gray-300 transition-all">
                         <i class="fas fa-pills text-emerald-500 mr-2"></i>Medicines
                     </a>
-                    <a href="/" class="flex items-center justify-center px-4 py-3 border border-gray-200 rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-50 hover:border-gray-300 transition-all">
+                    <a href="/"
+                        class="flex items-center justify-center px-4 py-3 border border-gray-200 rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-50 hover:border-gray-300 transition-all">
                         <i class="fas fa-home text-primary-500 mr-2"></i>Home
                     </a>
                 </div>
             </form>
 
             <div class="text-center">
-                <p class="text-xs text-gray-400"><i class="fas fa-info-circle mr-1"></i>Demo: <span class="font-mono text-gray-500">admin@isufst.edu.ph</span> / <span class="font-mono text-gray-500">admin123</span></p>
+                <p class="text-xs text-gray-400"><i class="fas fa-info-circle mr-1"></i>Demo: <span
+                        class="font-mono text-gray-500">admin@isufst.edu.ph</span> / <span
+                        class="font-mono text-gray-500">admin123</span></p>
             </div>
         </div>
     </div>
 
     <script>
-    function togglePassword(){
-        const i=document.getElementById('password'),ic=document.getElementById('toggle-icon');
-        if(i.type==='password'){i.type='text';ic.classList.replace('fa-eye','fa-eye-slash')}
-        else{i.type='password';ic.classList.replace('fa-eye-slash','fa-eye')}
-    }
+        function togglePassword() {
+            const i = document.getElementById('password'), ic = document.getElementById('toggle-icon');
+            if (i.type === 'password') { i.type = 'text'; ic.classList.replace('fa-eye', 'fa-eye-slash') }
+            else { i.type = 'password'; ic.classList.replace('fa-eye-slash', 'fa-eye') }
+        }
     </script>
 </body>
+
 </html>

@@ -5,7 +5,7 @@ Provides JSON API for mobile app and third-party integrations.
 from flask import Blueprint, jsonify, request
 from flask_login import login_required, current_user
 from werkzeug.security import check_password_hash
-from models import db, User, Appointment, ClinicVisit, Inventory, MedicineReservation, Notification
+from models import db, User, Appointment, ClinicVisit, Inventory, MedicineReservation, Notification, Queue
 from models_extended import VisitFeedback, HealthCertificate
 from datetime import datetime, date, time
 from functools import wraps
@@ -109,7 +109,52 @@ def me():
             'blood_type': profile.blood_type
         }
     
+
     return jsonify(user_data)
+
+
+@api_v1.route('/admin/dashboard-stats', methods=['GET'])
+@api_required
+@staff_only
+def admin_dashboard_stats():
+    """Get real-time statistics for admin dashboard."""
+    from datetime import date
+    
+    # Queue count
+    queue_count = Queue.query.filter_by(status='Waiting').count()
+    
+    # Today's patients
+    today_patients = ClinicVisit.query.filter(
+        ClinicVisit.visit_date == date.today()
+    ).count()
+    
+    # Today's appointments
+    today_appointments = Appointment.query.filter(
+        Appointment.appointment_date == date.today()
+    ).count()
+    
+    # Low stock
+    low_stock_count = Inventory.query.filter(
+        Inventory.quantity < 10
+    ).count()
+    
+    # Pending reservations
+    pending_reservations_count = MedicineReservation.query.filter_by(
+        status='Reserved'
+    ).count()
+    
+    # Total students
+    total_students = User.query.filter_by(role='student').count()
+    
+    return jsonify({
+        'queue_count': queue_count,
+        'today_patients': today_patients,
+        'today_appointments': today_appointments,
+        'low_stock_count': low_stock_count,
+        'pending_reservations_count': pending_reservations_count,
+        'total_students': total_students
+    })
+
 
 
 # ──────────────────────────────────────────────
