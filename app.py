@@ -249,31 +249,33 @@ def create_app(config_name=None):
         else:
             print('Admin account already exists.')
 
-    # -- Create tables (dev convenience) ----------
+    # -- Create tables & seed admin ----------
     with app.app_context():
         try:
-            # Only create tables if they don't exist
-            # This prevents issues with existing Turso databases
-            from sqlalchemy import inspect
-            inspector = inspect(db.engine)
-            existing_tables = inspector.get_table_names()
+            print("📋 Creating database tables (if they don't exist)...")
+            db.create_all()
+            print("✅ Database tables ready")
             
-            if not existing_tables:
-                print("📋 Creating database tables...")
-                db.create_all()
-                print("✅ Database tables created successfully")
+            # Auto-seed admin account
+            from models import User
+            admin = User.query.filter_by(email='admin@isufst.edu.ph').first()
+            if not admin:
+                admin = User(
+                    email='admin@isufst.edu.ph',
+                    first_name='Admin',
+                    last_name='CareHub',
+                    role='admin'
+                )
+                admin.set_password('admin123')
+                db.session.add(admin)
+                db.session.commit()
+                print('🔑 Admin account created: admin@isufst.edu.ph / admin123')
             else:
-                print(f"✅ Database already initialized ({len(existing_tables)} tables found)")
+                print('✅ Admin account already exists')
         except Exception as e:
-            # Log the error but don't crash the app
-            # This allows the app to start even if table creation fails
             print(f"⚠️  Database initialization warning: {str(e)}")
-            if config_name == 'production':
-                # In production, assume tables already exist
-                print("ℹ️  Continuing in production mode (tables should already exist)")
-            else:
-                # In development, re-raise the error
-                raise
+            import traceback
+            traceback.print_exc()
 
     return app
 

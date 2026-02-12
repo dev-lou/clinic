@@ -9,9 +9,7 @@ services:
         value: production
       - key: SECRET_KEY
         generateValue: true
+      - key: DATABASE_URL
+        sync: false  # Set in Render dashboard: postgresql://postgres:FLbQcBZGlb1E2Dxm@db.jwzzuwhvngmqzdqbtscm.supabase.co:5432/postgres
       - key: PYTHON_VERSION
         value: "3.12.3"
-    # Optional: Add PostgreSQL database for production persistence
-    # databases:
-    #   - name: isufst-carehub-db
-    #     plan: free
