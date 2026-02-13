@@ -230,53 +230,9 @@ def create_app(config_name=None):
         return {'status': 'ok', 'app': 'ISUFST CareHub'}, 200
 
     # -- Seed demo admin account ------------------
-    @app.cli.command('seed-admin')
-    def seed_admin():
-        """Create a demo admin account."""
-        from models import User
-        admin = User.query.filter_by(email='admin@isufst.edu.ph').first()
-        if not admin:
-            admin = User(
-                email='admin@isufst.edu.ph',
-                first_name='Admin',
-                last_name='CareHub',
-                role='admin'
-            )
-            admin.set_password('admin123')
-            db.session.add(admin)
-            db.session.commit()
-            print('Demo admin created: admin@isufst.edu.ph / admin123')
-        else:
-            print('Admin account already exists.')
+
 
     # -- Create tables & seed admin ----------
-    with app.app_context():
-        try:
-            print("📋 Creating database tables (if they don't exist)...")
-            db.create_all()
-            print("✅ Database tables ready")
-            
-            # Auto-seed admin account
-            from models import User
-            admin = User.query.filter_by(email='admin@isufst.edu.ph').first()
-            if not admin:
-                admin = User(
-                    email='admin@isufst.edu.ph',
-                    first_name='Admin',
-                    last_name='CareHub',
-                    role='admin'
-                )
-                admin.set_password('admin123')
-                db.session.add(admin)
-                db.session.commit()
-                print('🔑 Admin account created: admin@isufst.edu.ph / admin123')
-            else:
-                print('✅ Admin account already exists')
-        except Exception as e:
-            print(f"⚠️  Database initialization warning: {str(e)}")
-            import traceback
-            traceback.print_exc()
-
     return app
 
 

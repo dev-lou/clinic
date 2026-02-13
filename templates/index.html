@@ -153,6 +153,24 @@
             box-shadow: 0 25px 60px -15px rgba(0, 0, 0, .12)
         }
 
+        /* Make white feature cards more visible by default and on hover */
+        .feature-card-premium.bg-white {
+            box-shadow: 0 8px 26px rgba(15, 23, 42, 0.06);
+            transition: box-shadow .18s ease, transform .12s ease, border-color .12s ease;
+            border-color: rgba(15, 23, 42, 0.06);
+        }
+
+        .feature-card-premium.bg-white:hover {
+            box-shadow: 0 20px 50px rgba(15, 23, 42, 0.10);
+            transform: translateY(-6px);
+            border-color: rgba(15, 23, 42, 0.08);
+        }
+
+        .feature-card-premium.bg-white:focus-visible {
+            outline: 2px solid rgba(59,130,246,0.12);
+            outline-offset: 4px;
+        }
+
         .feature-card-premium .icon-wrap {
             transition: transform .4s cubic-bezier(.16, 1, .3, 1)
         }
@@ -524,20 +542,25 @@
                 <div class="flex items-center space-x-3">
                     {% if current_user.is_authenticated %}
                     {% include 'partials/notification_bell.html' %}
-                    <div class="relative group">
-                        <button
+                    <div class="relative" id="indexUserMenuWrap">
+                        <button id="indexUserMenuBtn"
                             class="flex items-center space-x-2 px-3 py-2 rounded-xl hover:bg-gray-50 transition-all">
+                            {% if current_user.profile_image_url %}
+                            <img src="{{ current_user.profile_image_url }}" alt="" class="w-8 h-8 rounded-lg object-cover">
+                            {% else %}
                             <div
                                 class="w-8 h-8 bg-gradient-to-br from-primary-100 to-primary-200 rounded-lg flex items-center justify-center">
                                 <span class="text-xs font-bold text-primary-700">{{ current_user.first_name[0] }}{{
                                     current_user.last_name[0] }}</span>
                             </div>
+                            {% endif %}
                             <span class="hidden sm:block text-sm font-semibold text-gray-700">{{ current_user.first_name
                                 }}</span>
                             <i class="fas fa-chevron-down text-[10px] text-gray-400"></i>
                         </button>
-                        <div
-                            class="absolute right-0 mt-2 w-60 bg-white rounded-2xl shadow-xl shadow-black/8 border border-gray-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform group-hover:translate-y-0 translate-y-1">
+                        <div id="indexUserMenuDropdown"
+                            class="absolute right-0 pt-2 w-60 hidden z-50">
+                            <div class="bg-white rounded-2xl shadow-xl shadow-black/8 border border-gray-100">
                             <div class="px-4 py-3 border-b border-gray-100">
                                 <p class="text-sm font-bold text-gray-900">{{ current_user.first_name }} {{
                                     current_user.last_name }}</p>
@@ -572,6 +595,7 @@
                                 <a href="{{ url_for('auth.logout') }}"
                                     class="flex items-center px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors rounded-lg mx-1.5"><i
                                         class="fas fa-sign-out-alt w-5 text-red-400 mr-2.5"></i>Sign Out</a>
+                            </div>
                             </div>
                         </div>
                     </div>
@@ -1162,12 +1186,10 @@
                     <p class="text-gray-600 leading-relaxed mb-6 italic">"The AI health assistant is amazing! I asked
                         about my headache and it gave really helpful advice. Love how modern this clinic system is."</p>
                     <div class="flex items-center gap-3">
-                        <div
-                            class="w-11 h-11 rounded-full bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center text-white font-bold text-sm">
-                            MR</div>
+                        <img src="{{ url_for('static', filename='img/stud2.png') }}" class="w-11 h-11 rounded-full object-cover ring-2 ring-gray-100" alt="Jeff Martinez">
                         <div>
-                            <p class="text-sm font-bold text-gray-900">Maria Reyes</p>
-                            <p class="text-xs text-gray-500">BSED &middot; 2nd Year</p>
+                            <p class="text-sm font-bold text-gray-900">Jeff Martinez</p>
+                            <p class="text-xs text-gray-500">BSIT &middot; 3rd Year</p>
                         </div>
                     </div>
                 </div>
@@ -1181,12 +1203,10 @@
                     <p class="text-gray-600 leading-relaxed mb-6 italic">"No more missing appointments! The notification
                         system reminds me, and I can see my entire health history. Best university service ever."</p>
                     <div class="flex items-center gap-3">
-                        <div
-                            class="w-11 h-11 rounded-full bg-gradient-to-br from-violet-400 to-purple-500 flex items-center justify-center text-white font-bold text-sm">
-                            JC</div>
+                        <img src="{{ url_for('static', filename='img/stud1.png') }}" class="w-11 h-11 rounded-full object-cover ring-2 ring-gray-100" alt="Karl Calimotan">
                         <div>
-                            <p class="text-sm font-bold text-gray-900">Juan Carlos Santos</p>
-                            <p class="text-xs text-gray-500">BSA &middot; 4th Year</p>
+                            <p class="text-sm font-bold text-gray-900">Karl Calimotan</p>
+                            <p class="text-xs text-gray-500">BSIT &middot; 3rd Year</p>
                         </div>
                     </div>
                 </div>
@@ -1443,6 +1463,23 @@
         }
         setInterval(rotateHeroText, 3000);
         document.getElementById('hero-rotating').style.transition = 'opacity .3s, transform .3s';
+
+        // ── User Menu Dropdown (hover-friendly) ──
+        (function() {
+            const wrap = document.getElementById('indexUserMenuWrap');
+            const btn = document.getElementById('indexUserMenuBtn');
+            const dd = document.getElementById('indexUserMenuDropdown');
+            if (!wrap || !btn || !dd) return;
+            let timer = null;
+            function show() { clearTimeout(timer); dd.classList.remove('hidden'); }
+            function scheduleHide() { timer = setTimeout(() => dd.classList.add('hidden'), 200); }
+            btn.addEventListener('mouseenter', show);
+            btn.addEventListener('mouseleave', scheduleHide);
+            dd.addEventListener('mouseenter', show);
+            dd.addEventListener('mouseleave', scheduleHide);
+            btn.addEventListener('click', function(e) { e.stopPropagation(); dd.classList.toggle('hidden'); });
+            document.addEventListener('click', function(e) { if (!wrap.contains(e.target)) dd.classList.add('hidden'); });
+        })();
     </script>
 
     {% include 'partials/chatbot_widget.html' %}

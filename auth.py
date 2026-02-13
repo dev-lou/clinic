@@ -6,6 +6,7 @@ from flask import Blueprint, render_template, request, redirect, url_for, flash,
 from flask_login import login_user, logout_user, login_required, current_user
 from werkzeug.security import generate_password_hash
 from models import db, User, StudentProfile
+from supabase_storage import upload_profile_image, delete_profile_image
 
 auth = Blueprint('auth', __name__, url_prefix='/auth')
 
@@ -119,7 +120,7 @@ def logout():
     """Logout current user."""
     logout_user()
     flash('You have been logged out.', 'info')
-    return redirect(url_for('index'))
+    return redirect(url_for('auth.login'))
 
 
 @auth.route('/profile', methods=['GET', 'POST'])
@@ -187,6 +188,34 @@ def profile():
                 return jsonify({'success': False, 'message': 'No signature data provided'}), 400
             except Exception as e:
                 return jsonify({'success': False, 'message': str(e)}), 500
+
+        elif action == 'upload_avatar':
+            file = request.files.get('avatar')
+            if not file or not file.filename:
+                flash('No file selected.', 'error')
+                return redirect(url_for('auth.profile'))
+            try:
+                # Delete old image if exists
+                if current_user.profile_image_url:
+                    delete_profile_image(current_user.profile_image_url)
+                # Upload new image
+                url = upload_profile_image(file, current_user.id)
+                current_user.profile_image_url = url
+                db.session.commit()
+                flash('Profile photo updated!', 'success')
+            except ValueError as e:
+                flash(str(e), 'error')
+            except Exception as e:
+                flash('Failed to upload image. Please try again.', 'error')
+            return redirect(url_for('auth.profile'))
+
+        elif action == 'remove_avatar':
+            if current_user.profile_image_url:
+                delete_profile_image(current_user.profile_image_url)
+                current_user.profile_image_url = None
+                db.session.commit()
+                flash('Profile photo removed.', 'success')
+            return redirect(url_for('auth.profile'))
     
     return render_template('profile.html')
 

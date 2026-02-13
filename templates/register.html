@@ -327,7 +327,11 @@
                             <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"><i
                                     class="fas fa-lock text-sm"></i></span>
                             <input type="password" name="password" id="password" required placeholder="Min 6 chars"
-                                class="input-premium w-full pl-11 pr-4 py-3 border border-gray-200 rounded-xl bg-white focus:outline-none text-sm">
+                                class="input-premium w-full pl-11 pr-12 py-3 border border-gray-200 rounded-xl bg-white focus:outline-none text-sm">
+                            <button type="button" onclick="togglePasswordField('password', 'toggle-icon-password')"
+                                class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors">
+                                <i class="fas fa-eye text-sm" id="toggle-icon-password"></i>
+                            </button>
                         </div>
                     </div>
                     <div>
@@ -338,7 +342,11 @@
                                     class="fas fa-lock text-sm"></i></span>
                             <input type="password" name="confirm_password" id="confirm_password" required
                                 placeholder="Re-enter"
-                                class="input-premium w-full pl-11 pr-4 py-3 border border-gray-200 rounded-xl bg-white focus:outline-none text-sm">
+                                class="input-premium w-full pl-11 pr-12 py-3 border border-gray-200 rounded-xl bg-white focus:outline-none text-sm">
+                            <button type="button" onclick="togglePasswordField('confirm_password', 'toggle-icon-confirm')"
+                                class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors">
+                                <i class="fas fa-eye text-sm" id="toggle-icon-confirm"></i>
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -475,6 +483,18 @@
 
             document.getElementById('signatureData').value = canvas.toDataURL('image/png');
         });
+
+        function togglePasswordField(inputId, iconId) {
+            const input = document.getElementById(inputId);
+            const icon = document.getElementById(iconId);
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.classList.replace('fa-eye', 'fa-eye-slash');
+            } else {
+                input.type = 'password';
+                icon.classList.replace('fa-eye-slash', 'fa-eye');
+            }
+        }
     </script>
 </body>
 

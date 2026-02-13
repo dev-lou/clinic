@@ -10,8 +10,7 @@ from datetime import datetime
 queue_display = Blueprint('queue_display', __name__, url_prefix='/queue-display')
 
 # SocketIO will be initialized in app.py
-# Force threading mode (compatible with Python 3.13 + gunicorn, doesn't need eventlet)
-socketio = SocketIO(async_mode='threading')
+socketio = SocketIO()
 
 
 @queue_display.route('/')
