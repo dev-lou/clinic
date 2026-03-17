@@ -100,6 +100,16 @@
         .btn-premium:hover::before {
             opacity: 1
         }
+
+        /* Face Login Styles */
+        .face-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); z-index: 100; display: flex; align-items: center; justify-content: center; }
+        .face-modal { background: white; border-radius: 24px; padding: 32px; max-width: 420px; width: 90%; box-shadow: 0 25px 60px rgba(0,0,0,0.3); }
+        .face-video-container { position: relative; width: 100%; aspect-ratio: 4/3; border-radius: 16px; overflow: hidden; background: #0f172a; }
+        .face-video-container video { width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1); }
+        .face-video-container canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; transform: scaleX(-1); }
+        .face-scan-ring { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); width: 180px; height: 180px; border: 3px solid rgba(59,130,246,0.6); border-radius: 50%; animation: scanPulse 2s infinite; }
+        @keyframes scanPulse { 0%,100% { border-color: rgba(59,130,246,0.3); box-shadow: 0 0 0 0 rgba(59,130,246,0.2); } 50% { border-color: rgba(59,130,246,0.8); box-shadow: 0 0 20px 5px rgba(59,130,246,0.15); } }
+        .face-status { text-align: center; margin-top: 16px; font-size: 14px; font-weight: 600; }
     </style>
 </head>
 
@@ -109,13 +119,17 @@
         <div class="absolute inset-0 grid-lines" style="z-index:2"></div>
         <div class="grain" style="z-index:2"></div>
 
-        <div class="relative z-10">
+        <div class="relative z-10 flex items-center justify-between">
             <a href="/" class="flex items-center space-x-3 group">
                 <div
                     class="w-10 h-10 bg-gradient-to-br from-primary-500 to-accent rounded-xl flex items-center justify-center shadow-lg group-hover:scale-105 transition-transform">
                     <i class="fas fa-heartbeat text-white text-lg"></i>
                 </div>
                 <span class="text-xl font-bold text-white">ISUFST CareHub</span>
+            </a>
+            <a href="/" class="flex items-center gap-2 px-4 py-2 bg-white/10 hover:bg-white/20 text-white text-sm font-semibold rounded-xl transition-all border border-white/10 backdrop-blur-sm">
+                <i class="fas fa-home text-xs"></i>
+                <span>Home</span>
             </a>
         </div>
 
@@ -226,6 +240,16 @@
                     <hr class="flex-1 border-gray-200">
                 </div>
 
+                <!-- Face Login Button -->
+                <button type="button" onclick="openFaceLogin()"
+                    class="w-full flex items-center justify-center gap-3 py-3.5 border-2 border-indigo-100 rounded-xl text-sm font-semibold text-indigo-700 hover:bg-indigo-50 hover:border-indigo-200 transition-all group">
+                    <div class="w-8 h-8 bg-gradient-to-br from-indigo-500 to-violet-500 rounded-lg flex items-center justify-center shadow-sm group-hover:scale-105 transition-transform">
+                        <i class="fas fa-face-viewfinder text-white text-sm"></i>
+                    </div>
+                    Sign in with Face ID
+                    <span class="ml-auto px-2 py-0.5 bg-indigo-100 text-indigo-600 text-[10px] font-bold rounded-md uppercase">Biometric</span>
+                </button>
+
                 <div class="grid grid-cols-2 gap-3">
                     <a href="{{ url_for('reservations.view_medicines') }}"
                         class="flex items-center justify-center px-4 py-3 border border-gray-200 rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-50 hover:border-gray-300 transition-all">
@@ -240,11 +264,172 @@
         </div>
     </div>
 
+    <!-- Face Login Modal -->
+    <div id="faceLoginOverlay" class="face-overlay" style="display:none">
+        <div class="face-modal">
+            <div class="flex items-center justify-between mb-5">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-gradient-to-br from-indigo-500 to-violet-500 rounded-xl flex items-center justify-center">
+                        <i class="fas fa-face-viewfinder text-white"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-gray-900">Face ID Login</h3>
+                        <p class="text-xs text-gray-500">Look at the camera to sign in</p>
+                    </div>
+                </div>
+                <button onclick="closeFaceLogin()" class="w-8 h-8 bg-gray-100 hover:bg-gray-200 rounded-lg flex items-center justify-center transition">
+                    <i class="fas fa-times text-gray-500 text-sm"></i>
+                </button>
+            </div>
+
+            <div class="face-video-container" id="faceVideoContainer">
+                <video id="faceVideo" autoplay muted playsinline></video>
+                <canvas id="faceCanvas"></canvas>
+                <div class="face-scan-ring" id="faceScanRing"></div>
+            </div>
+
+            <div class="face-status" id="faceStatus">
+                <div class="flex items-center justify-center gap-2 text-gray-500">
+                    <div class="w-4 h-4 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin"></div>
+                    <span>Loading face recognition models...</span>
+                </div>
+            </div>
+
+            <button onclick="closeFaceLogin()" class="w-full mt-4 py-3 bg-gray-100 text-gray-700 text-sm font-semibold rounded-xl hover:bg-gray-200 transition">
+                Cancel
+            </button>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
     <script>
         function togglePassword() {
             const i = document.getElementById('password'), ic = document.getElementById('toggle-icon');
             if (i.type === 'password') { i.type = 'text'; ic.classList.replace('fa-eye', 'fa-eye-slash') }
             else { i.type = 'password'; ic.classList.replace('fa-eye-slash', 'fa-eye') }
+        }
+
+        // ═══════════════════════════════════════════
+        // FACE LOGIN
+        // ═══════════════════════════════════════════
+        const MODEL_URL = 'https://cdn.jsdelivr.net/npm/@vladmandic/face-api@1.7.12/model/';
+        let faceStream = null;
+        let faceDetectionInterval = null;
+        let modelsLoaded = false;
+
+        async function loadFaceModels() {
+            if (modelsLoaded) return;
+            try {
+                await Promise.all([
+                    faceapi.nets.ssdMobilenetv1.loadFromUri(MODEL_URL),
+                    faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL),
+                    faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL)
+                ]);
+                modelsLoaded = true;
+            } catch (e) {
+                console.error('Face model load error:', e);
+                throw new Error('Failed to load face recognition models');
+            }
+        }
+
+        async function openFaceLogin() {
+            const overlay = document.getElementById('faceLoginOverlay');
+            overlay.style.display = 'flex';
+            const status = document.getElementById('faceStatus');
+
+            try {
+                // Load models
+                status.innerHTML = '<div class="flex items-center justify-center gap-2 text-indigo-600"><div class="w-4 h-4 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin"></div><span>Loading AI models...</span></div>';
+                await loadFaceModels();
+
+                // Start camera
+                status.innerHTML = '<div class="flex items-center justify-center gap-2 text-indigo-600"><div class="w-4 h-4 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin"></div><span>Accessing camera...</span></div>';
+                faceStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user', width: { ideal: 640 }, height: { ideal: 480 } } });
+                const video = document.getElementById('faceVideo');
+                video.srcObject = faceStream;
+                await video.play();
+
+                status.innerHTML = '<div class="text-indigo-600"><i class="fas fa-eye mr-2"></i>Position your face in the circle...</div>';
+
+                // Start face detection loop
+                startFaceDetection(video);
+
+            } catch (e) {
+                console.error('Face login error:', e);
+                if (e.name === 'NotAllowedError') {
+                    status.innerHTML = '<div class="text-red-600"><i class="fas fa-exclamation-circle mr-2"></i>Camera access denied. Allow camera in browser settings.</div>';
+                } else {
+                    status.innerHTML = `<div class="text-red-600"><i class="fas fa-exclamation-circle mr-2"></i>${e.message || 'Failed to start camera'}</div>`;
+                }
+            }
+        }
+
+        function startFaceDetection(video) {
+            const canvas = document.getElementById('faceCanvas');
+            const ring = document.getElementById('faceScanRing');
+            let attemptCount = 0;
+            const MAX_ATTEMPTS = 30; // ~15 seconds at 2 checks/sec
+
+            faceDetectionInterval = setInterval(async () => {
+                attemptCount++;
+                if (attemptCount > MAX_ATTEMPTS) {
+                    clearInterval(faceDetectionInterval);
+                    document.getElementById('faceStatus').innerHTML = '<div class="text-amber-600"><i class="fas fa-exclamation-triangle mr-2"></i>No face recognized. Try again or use email/password.</div>';
+                    return;
+                }
+
+                try {
+                    const detection = await faceapi.detectSingleFace(video).withFaceLandmarks().withFaceDescriptor();
+
+                    if (detection) {
+                        // Face detected — update UI
+                        ring.style.borderColor = 'rgba(16,185,129,0.8)';
+                        ring.style.animation = 'none';
+
+                        document.getElementById('faceStatus').innerHTML = '<div class="flex items-center justify-center gap-2 text-emerald-600"><div class="w-4 h-4 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin"></div><span>Face detected! Verifying...</span></div>';
+
+                        clearInterval(faceDetectionInterval);
+
+                        // Send descriptor to server
+                        const descriptor = Array.from(detection.descriptor);
+                        const csrfInput = document.querySelector('input[name="csrf_token"]');
+                        const csrfToken = csrfInput ? csrfInput.value : '';
+
+                        const resp = await fetch('/auth/face-login', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json', 'X-CSRFToken': csrfToken, 'X-CSRF-Token': csrfToken },
+                            body: JSON.stringify({ descriptor })
+                        });
+                        const result = await resp.json();
+
+                        if (result.success) {
+                            document.getElementById('faceStatus').innerHTML = `<div class="text-emerald-600"><i class="fas fa-check-circle mr-2"></i>${result.message}<br><span class="text-xs text-gray-400">Confidence: ${result.confidence}%</span></div>`;
+                            setTimeout(() => { window.location.href = result.redirect; }, 1200);
+                        } else {
+                            ring.style.borderColor = 'rgba(239,68,68,0.8)';
+                            document.getElementById('faceStatus').innerHTML = `<div class="text-red-600"><i class="fas fa-times-circle mr-2"></i>${result.message}</div>`;
+                            // Restart detection after a pause
+                            setTimeout(() => {
+                                ring.style.borderColor = 'rgba(59,130,246,0.6)';
+                                ring.style.animation = 'scanPulse 2s infinite';
+                                attemptCount = 0;
+                                startFaceDetection(video);
+                            }, 3000);
+                        }
+                    }
+                } catch (e) {
+                    console.error('Detection error:', e);
+                }
+            }, 500);
+        }
+
+        function closeFaceLogin() {
+            if (faceDetectionInterval) { clearInterval(faceDetectionInterval); faceDetectionInterval = null; }
+            if (faceStream) { faceStream.getTracks().forEach(t => t.stop()); faceStream = null; }
+            document.getElementById('faceLoginOverlay').style.display = 'none';
+            const ring = document.getElementById('faceScanRing');
+            ring.style.borderColor = 'rgba(59,130,246,0.6)';
+            ring.style.animation = 'scanPulse 2s infinite';
         }
     </script>
 </body>

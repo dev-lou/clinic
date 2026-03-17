@@ -28,8 +28,8 @@ def create_app(config_name=None):
         config[config_name].init_app()
     
     # Always re-evaluate database URI to ensure env vars are loaded
-    from config import Config
-    app.config['SQLALCHEMY_DATABASE_URI'] = Config._get_database_uri()
+    from config import get_database_uri
+    app.config['SQLALCHEMY_DATABASE_URI'] = get_database_uri()
 
     # -- Init extensions --------------------------
     db.init_app(app)
@@ -131,7 +131,7 @@ def create_app(config_name=None):
         clinic_end = 17
         slot_duration = 30
         
-        slots = []
+        slots: list[dict] = []
         current = datetime.strptime(f'{clinic_start}:00', '%H:%M')
         end = datetime.strptime(f'{clinic_end}:00', '%H:%M')
         
@@ -158,10 +158,10 @@ def create_app(config_name=None):
             })
             current += timedelta(minutes=slot_duration)
         
-        available_count = sum(1 for s in slots if s['available'])
+        available_count: int = sum(1 for s in slots if s['available'])
         
         return render_template('index.html',
-                             today_slots=slots[:8],
+                             today_slots=slots,
                              available_count=available_count,
                              ph_time=ph_now.strftime('%I:%M %p'))
 
@@ -186,7 +186,7 @@ def create_app(config_name=None):
             Appointment.appointment_date == date.today()
         ).count()
 
-        expiring_items = []
+        expiring_items: list[Inventory] = []
         all_items = Inventory.query.filter(
             Inventory.category == 'Medicine',
             Inventory.quantity > 0

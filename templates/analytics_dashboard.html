@@ -22,6 +22,66 @@
         <div class="bg-white rounded-2xl border border-gray-100 p-5 animate-pulse"><div class="h-20 bg-gray-100 rounded-xl"></div></div>
     </div>
 
+    <!-- AI Predictions Section -->
+    <div class="bg-gradient-to-br from-indigo-50 to-violet-50 rounded-2xl border border-indigo-100 p-6 sm:p-8">
+        <div class="flex items-center justify-between mb-5">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-gradient-to-br from-indigo-600 to-violet-600 rounded-xl flex items-center justify-center shadow-md shadow-indigo-600/20">
+                    <i class="fas fa-brain text-white"></i>
+                </div>
+                <div>
+                    <h2 class="text-lg font-bold text-gray-900">AI Predictive Insights</h2>
+                    <p class="text-xs text-gray-500">Powered by Gemini AI — analyzes your clinic data for predictions</p>
+                </div>
+            </div>
+            <span class="px-2.5 py-1 bg-indigo-600 text-white text-[10px] font-bold rounded-lg uppercase tracking-wider">AI</span>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <!-- Peak Hours Prediction -->
+            <div class="bg-white rounded-2xl border border-gray-100 p-5">
+                <div class="flex items-center gap-2 mb-3">
+                    <div class="w-8 h-8 bg-blue-50 rounded-lg flex items-center justify-center"><i class="fas fa-clock text-blue-500 text-sm"></i></div>
+                    <h3 class="text-sm font-bold text-gray-900">Peak Hours Forecast</h3>
+                </div>
+                <div id="predictPeakHours" class="min-h-[100px]">
+                    <p class="text-xs text-gray-400 mb-3">Predict busiest hours and staffing needs</p>
+                    <button onclick="runPrediction('peak-hours', 'predictPeakHours')" class="w-full py-2.5 bg-blue-600 text-white text-xs font-bold rounded-xl hover:bg-blue-700 transition">
+                        <i class="fas fa-magic mr-1.5"></i>Generate Prediction
+                    </button>
+                </div>
+            </div>
+
+            <!-- Medicine Demand Prediction -->
+            <div class="bg-white rounded-2xl border border-gray-100 p-5">
+                <div class="flex items-center gap-2 mb-3">
+                    <div class="w-8 h-8 bg-emerald-50 rounded-lg flex items-center justify-center"><i class="fas fa-pills text-emerald-500 text-sm"></i></div>
+                    <h3 class="text-sm font-bold text-gray-900">Medicine Demand</h3>
+                </div>
+                <div id="predictMedicine" class="min-h-[100px]">
+                    <p class="text-xs text-gray-400 mb-3">Forecast restocking needs and expiry risks</p>
+                    <button onclick="runPrediction('medicine-demand', 'predictMedicine')" class="w-full py-2.5 bg-emerald-600 text-white text-xs font-bold rounded-xl hover:bg-emerald-700 transition">
+                        <i class="fas fa-magic mr-1.5"></i>Generate Prediction
+                    </button>
+                </div>
+            </div>
+
+            <!-- Health Trends Prediction -->
+            <div class="bg-white rounded-2xl border border-gray-100 p-5">
+                <div class="flex items-center gap-2 mb-3">
+                    <div class="w-8 h-8 bg-violet-50 rounded-lg flex items-center justify-center"><i class="fas fa-virus text-violet-500 text-sm"></i></div>
+                    <h3 class="text-sm font-bold text-gray-900">Health Trends</h3>
+                </div>
+                <div id="predictHealth" class="min-h-[100px]">
+                    <p class="text-xs text-gray-400 mb-3">Detect outbreak patterns and trending symptoms</p>
+                    <button onclick="runPrediction('health-trends', 'predictHealth')" class="w-full py-2.5 bg-violet-600 text-white text-xs font-bold rounded-xl hover:bg-violet-700 transition">
+                        <i class="fas fa-magic mr-1.5"></i>Generate Prediction
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Charts Row 1 -->
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
         <div class="bg-white rounded-2xl border border-gray-100 p-6">
@@ -46,14 +106,6 @@
                 Peak Hours
             </h3>
             <div style="position:relative;height:250px"><canvas id="peakHoursChart"></canvas></div>
-        </div>
-
-        <div id="doctorChartContainer" class="bg-white rounded-2xl border border-gray-100 p-6">
-            <h3 class="flex items-center gap-2 text-sm font-bold text-gray-900 mb-4">
-                <div class="w-7 h-7 bg-indigo-50 rounded-lg flex items-center justify-center"><i class="fas fa-user-md text-indigo-500 text-xs"></i></div>
-                Doctor & Dentist Workload
-            </h3>
-            <div style="position:relative;height:250px"><canvas id="doctorWorkloadChart"></canvas></div>
         </div>
 
         <div class="bg-white rounded-2xl border border-gray-100 p-6 lg:col-span-2">
@@ -173,19 +225,6 @@
         } catch(e) { console.error(e); }
     }
 
-    async function loadDoctorWorkload() {
-        try {
-            const r = await fetch('/analytics/api/doctor-workload');
-            const d = await r.json();
-            if(charts.doctorWorkload) charts.doctorWorkload.destroy();
-            if(!d.labels||d.labels.length===0){document.getElementById('doctorChartContainer').querySelector('div[style]').innerHTML='<div class="flex items-center justify-center h-full text-gray-400 text-sm"><div class="text-center"><i class="fas fa-user-md text-4xl mb-2 text-gray-200"></i><p>No data yet</p></div></div>';return}
-            charts.doctorWorkload = new Chart(document.getElementById('doctorWorkloadChart'), {
-                type:'bar', data:{ labels:d.labels, datasets:[{ label:'Appointments', data:d.values, backgroundColor:'rgba(99,102,241,.8)', borderRadius:8, borderSkipped:false }] },
-                options:{ ...chartDefaults, indexAxis:'y', plugins:{legend:{display:false}}, scales:{ x:{beginAtZero:true,ticks:{stepSize:1,font:chartFont},grid:{color:'rgba(0,0,0,.04)'}}, y:{grid:{display:false},ticks:{font:chartFont}} } }
-            });
-        } catch(e) { console.error(e); }
-    }
-
     async function loadSatisfactionTrend() {
         try {
             const r = await fetch('/analytics/api/satisfaction-trend?days=30');
@@ -231,10 +270,67 @@
         loadAppointmentsTrend();
         loadServiceDistribution();
         loadPeakHours();
-        loadDoctorWorkload();
+
         loadSatisfactionTrend();
         loadNoShowRate();
         loadInventoryConsumption();
     });
+
+    // AI Predictions
+    async function runPrediction(type, containerId) {
+        const container = document.getElementById(containerId);
+        container.innerHTML = `<div class="flex items-center gap-2 py-4 justify-center"><div class="w-5 h-5 border-2 border-indigo-600 border-t-transparent rounded-full animate-spin"></div><span class="text-xs font-medium text-indigo-600">AI is analyzing data...</span></div>`;
+
+        try {
+            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content || '';
+            const r = await fetch(`/analytics/api/predict/${type}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'X-CSRFToken': csrfToken, 'X-CSRF-Token': csrfToken }
+            });
+            const d = await r.json();
+
+            const typeColors = { warning: { bg: 'bg-amber-50', border: 'border-amber-100', text: 'text-amber-700', icon: 'text-amber-500' }, info: { bg: 'bg-blue-50', border: 'border-blue-100', text: 'text-blue-700', icon: 'text-blue-500' }, success: { bg: 'bg-emerald-50', border: 'border-emerald-100', text: 'text-emerald-700', icon: 'text-emerald-500' } };
+
+            let html = '<div class="text-left mt-2">';
+            if (d.summary) {
+                const conf = d.confidence || 'medium';
+                const confColor = conf === 'high' ? 'text-emerald-600 bg-emerald-50' : conf === 'low' ? 'text-red-600 bg-red-50' : 'text-amber-600 bg-amber-50';
+                html += `<div class="flex items-center justify-between mb-4"><p class="text-sm font-semibold text-gray-700">${d.summary}</p><span class="text-xs font-bold ${confColor} px-2.5 py-1 rounded-md uppercase">${conf} Confidence</span></div>`;
+            }
+            if (d.insights && d.insights.length > 0) {
+                html += '<div class="space-y-3">';
+                d.insights.forEach(insight => {
+                    const c = typeColors[insight.type] || typeColors.info;
+                    html += `<div class="${c.bg} ${c.border} border rounded-xl p-4"><div class="flex items-start gap-3"><i class="fas ${insight.icon || 'fa-lightbulb'} ${c.icon} mt-1 text-lg"></i><div><p class="text-sm font-bold ${c.text} mb-1">${insight.title}</p><p class="text-sm text-gray-700">${insight.description}</p></div></div></div>`;
+                });
+                html += '</div>';
+            }
+            html += '</div>';
+
+            const typeConfig = {
+                'peak-hours': { title: 'Peak Hours Prediction', icon: 'fa-chart-line', color: 'indigo' },
+                'medicine-demand': { title: 'Medicine Demand', icon: 'fa-pills', color: 'emerald' },
+                'health-trends': { title: 'Health Trends', icon: 'fa-virus', color: 'violet' }
+            };
+            const config = typeConfig[type] || { title: 'AI Analysis', icon: 'fa-magic', color: 'blue' };
+
+            Swal.fire({
+                title: `<div class="flex items-center justify-center gap-3"><i class="fas ${config.icon} text-${config.color}-500"></i><span class="text-xl font-bold">${config.title}</span></div>`,
+                html: html || '<p class="text-sm text-gray-500">No specific insights generated.</p>',
+                showConfirmButton: true,
+                confirmButtonText: 'Close',
+                customClass: {
+                    popup: 'rounded-2xl',
+                    confirmButton: 'bg-gray-200 text-gray-800 font-bold py-2.5 px-6 rounded-xl hover:bg-gray-300 transition w-full mt-4'
+                },
+                buttonsStyling: false
+            });
+            // Reset container button state
+            container.innerHTML = `<button onclick="runPrediction('${type}', '${containerId}')" class="w-full py-2.5 bg-${config.color}-600 text-white text-xs font-bold rounded-xl hover:bg-${config.color}-700 transition"><i class="fas fa-redo mr-1.5"></i>Regenerate Prediction</button>`;
+        } catch (e) {
+            container.innerHTML = `<p class="text-xs text-red-500 mb-2">Failed to generate prediction.</p><button onclick="runPrediction('${type}', '${containerId}')" class="w-full py-2 bg-gray-200 text-gray-700 text-xs font-bold rounded-xl hover:bg-gray-300 transition">Try Again</button>`;
+            console.error(e);
+        }
+    }
 </script>
 {% endblock %}

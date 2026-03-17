@@ -7,7 +7,7 @@ from flask_login import login_required, current_user
 from werkzeug.security import check_password_hash
 from models import db, User, Appointment, ClinicVisit, Inventory, MedicineReservation, Notification, Queue
 from models_extended import VisitFeedback, HealthCertificate
-from datetime import datetime, date, time
+from datetime import datetime, date, time, timedelta
 from functools import wraps
 
 api_v1 = Blueprint('api_v1', __name__, url_prefix='/api/v1')

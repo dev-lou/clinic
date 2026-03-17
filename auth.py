@@ -2,6 +2,8 @@
 Authentication blueprint for ISUFST CareHub.
 Handles login, registration, and logout.
 """
+import json
+import math
 from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify
 from flask_login import login_user, logout_user, login_required, current_user
 from werkzeug.security import generate_password_hash
@@ -305,6 +307,100 @@ def delete_user(user_id):
     db.session.commit()
     flash(f'{name} deleted successfully.', 'success')
     return redirect(url_for('auth.list_users'))
-def profile():
-    """User profile page."""
-    return render_template('profile.html', user=current_user)
+
+
+# ---------------------------------------------------------------------------
+# Face Recognition Login
+# ---------------------------------------------------------------------------
+def _euclidean_distance(desc1, desc2):
+    """Calculate euclidean distance between two face descriptor arrays."""
+    return math.sqrt(sum((a - b) ** 2 for a, b in zip(desc1, desc2)))
+
+
+@auth.route('/enable-face-login', methods=['POST'])
+@login_required
+def enable_face_login():
+    """Save face descriptor for face recognition login."""
+    data = request.get_json()
+    descriptor = data.get('descriptor')
+
+    if not descriptor or not isinstance(descriptor, list):
+        return jsonify({'success': False, 'message': 'Invalid face descriptor'}), 400
+
+    if len(descriptor) != 128:
+        return jsonify({'success': False, 'message': 'Invalid descriptor length (expected 128)'}), 400
+
+    current_user.face_descriptor = json.dumps(descriptor)
+    db.session.commit()
+    return jsonify({'success': True, 'message': 'Face login enabled successfully!'})
+
+
+@auth.route('/disable-face-login', methods=['POST'])
+@login_required
+def disable_face_login():
+    """Remove face descriptor to disable face login."""
+    current_user.face_descriptor = None
+    db.session.commit()
+    return jsonify({'success': True, 'message': 'Face login disabled.'})
+
+
+@auth.route('/face-login', methods=['POST'])
+def face_login():
+    """Authenticate user via face recognition."""
+    if current_user.is_authenticated:
+        return jsonify({'success': True, 'redirect': url_for('index')})
+
+    data = request.get_json()
+    descriptor = data.get('descriptor')
+
+    if not descriptor or not isinstance(descriptor, list) or len(descriptor) != 128:
+        return jsonify({'success': False, 'message': 'Invalid face data'}), 400
+
+    # Find all users with face descriptors
+    users_with_face = User.query.filter(
+        User.face_descriptor.isnot(None),
+        User.is_active == True
+    ).all()
+
+    if not users_with_face:
+        return jsonify({'success': False, 'message': 'No users have face login enabled'}), 404
+
+    best_match = None
+    best_distance = float('inf')
+    THRESHOLD = 0.6  # face-api.js recommended threshold
+
+    for user in users_with_face:
+        try:
+            stored = json.loads(user.face_descriptor)
+            distance = _euclidean_distance(descriptor, stored)
+            if distance < best_distance:
+                best_distance = distance
+                best_match = user
+        except (json.JSONDecodeError, TypeError):
+            continue
+
+    if best_match and best_distance < THRESHOLD:
+        login_user(best_match, remember=True)
+        redirect_url = url_for('admin') if best_match.role in ['admin', 'nurse'] else url_for('index')
+        return jsonify({
+            'success': True,
+            'message': f'Welcome back, {best_match.first_name}!',
+            'user': best_match.full_name,
+            'redirect': redirect_url,
+            'confidence': round((1 - best_distance) * 100, 1)
+        })
+
+    return jsonify({
+        'success': False,
+        'message': 'Face not recognized. Please use email and password to sign in.'
+    }), 401
+
+
+@auth.route('/face-login-status')
+@login_required
+def face_login_status():
+    """Check if current user has face login enabled."""
+    return jsonify({
+        'enabled': current_user.face_descriptor is not None,
+        'has_profile_image': current_user.profile_image_url is not None
+    })

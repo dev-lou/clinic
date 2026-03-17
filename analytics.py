@@ -2,11 +2,13 @@
 Analytics & Reporting Dashboard for ISUFST CareHub.
 Comprehensive analytics for administration and decision-making.
 """
+import os
+import json as json_mod
 from flask import Blueprint, render_template, jsonify, request
 from flask_login import login_required
 from rbac import require_permission, Permission
 from models import db, Appointment, ClinicVisit, Inventory, MedicineReservation, User, Queue, StudentProfile
-from models_extended import VisitFeedback, AppointmentExtended
+from models_extended import VisitFeedback, AppointmentExtended, SymptomScreening
 from datetime import datetime, timedelta, date, timezone
 from sqlalchemy import func, desc, extract
 from collections import defaultdict
@@ -239,31 +241,6 @@ def satisfaction_trend():
     })
 
 
-@analytics.route('/api/doctor-workload')
-@login_required
-@require_permission(Permission.VIEW_ANALYTICS)
-def doctor_workload():
-    """Analyze doctor and dentist workload distribution (nurses excluded as they are assistants only)."""
-    results = db.session.query(
-        User.first_name,
-        User.last_name,
-        func.count(AppointmentExtended.id).label('appointment_count')
-    ).outerjoin(
-        AppointmentExtended, User.id == AppointmentExtended.assigned_doctor_id
-    ).filter(
-        User.role.in_(['doctor']),  # Includes medical doctors and dentists (nurses are assistants only)
-        User.is_active == True
-    ).group_by(User.id, User.first_name, User.last_name).all()
-    
-    labels = [f'{r[0]} {r[1]}' for r in results]
-    values = [r[2] for r in results]
-    
-    return jsonify({
-        'labels': labels,
-        'values': values
-    })
-
-
 @analytics.route('/api/no-show-rate')
 @login_required
 @require_permission(Permission.VIEW_ANALYTICS)
@@ -312,3 +289,196 @@ def export_report():
     
     # TODO: Implement CSV export
     return jsonify(report_data)
+
+
+# ---------------------------------------------------------------------------
+# Predictive Analytics — Gemini AI-powered
+# ---------------------------------------------------------------------------
+_predict_model = None
+
+PREDICT_SYSTEM_PROMPT = """You are a healthcare analytics AI for the ISUFST University Clinic. You analyze clinic data and provide actionable predictions and insights.
+
+RULES:
+- Be data-driven and specific. Reference the numbers provided.
+- Use clear, professional language suitable for clinic administrators.
+- Provide actionable recommendations.
+- Keep responses concise (3-5 key insights max).
+- Format response as JSON with this structure:
+{
+  "insights": [
+    {"title": "Short title", "description": "Detailed insight", "type": "warning|info|success", "icon": "fa-icon-name"}
+  ],
+  "summary": "One-line overall summary",
+  "confidence": "high|medium|low"
+}
+- Return ONLY valid JSON. No markdown fences or extra text."""
+
+
+def _get_predict_model():
+    global _predict_model
+    if _predict_model is None:
+        import google.generativeai as genai
+        api_key = os.environ.get('GEMINI_API_KEY')
+        if not api_key:
+            raise RuntimeError('GEMINI_API_KEY environment variable is not set.')
+        genai.configure(api_key=api_key)
+        model_name = os.environ.get('GEMINI_MODEL', 'gemini-2.0-flash')
+        _predict_model = genai.GenerativeModel(
+            model_name=model_name,
+            system_instruction=PREDICT_SYSTEM_PROMPT,
+            generation_config={'temperature': 0.3, 'max_output_tokens': 1024},
+        )
+    return _predict_model
+
+
+def _clean_json_response(text):
+    """Strip markdown fences from Gemini response."""
+    text = text.strip()
+    if text.startswith('```'):
+        text = text.split('\n', 1)[1] if '\n' in text else text[3:]
+        if text.endswith('```'):
+            text = text[:-3]
+        text = text.strip()
+    return text
+
+
+@analytics.route('/api/predict/peak-hours', methods=['POST'])
+@login_required
+@require_permission(Permission.VIEW_ANALYTICS)
+def predict_peak_hours():
+    """AI prediction for peak clinic hours and staffing needs."""
+    try:
+        # Gather data
+        days = 60
+        start_date = date.today() - timedelta(days=days)
+        results = db.session.query(
+            extract('hour', Appointment.start_time).label('hour'),
+            func.count(Appointment.id).label('count'),
+            Appointment.service_type
+        ).filter(
+            Appointment.start_time.isnot(None),
+            Appointment.appointment_date >= start_date,
+            Appointment.status.in_(['Confirmed', 'Completed'])
+        ).group_by('hour', Appointment.service_type).all()
+
+        # Day-of-week distribution
+        dow_results = db.session.query(
+            extract('dow', Appointment.appointment_date).label('dow'),
+            func.count(Appointment.id).label('count')
+        ).filter(
+            Appointment.appointment_date >= start_date,
+            Appointment.status.in_(['Confirmed', 'Completed'])
+        ).group_by('dow').all()
+
+        data_summary = f"""Clinic appointment data for the past {days} days:
+
+Hourly distribution (confirmed/completed appointments):
+{chr(10).join(f'  Hour {int(r[0]):02d}:00 - {r[2]}: {r[1]} appointments' for r in results if r[0] is not None)}
+
+Day of week distribution:
+{chr(10).join(f'  Day {int(r[0])}: {r[1]} appointments' for r in dow_results if r[0] is not None)}
+(0=Sunday, 1=Monday, ... 6=Saturday)
+
+Predict: When are the busiest hours? Which days need more staff? Any patterns?"""
+
+        model = _get_predict_model()
+        response = model.generate_content(data_summary)
+        result = json_mod.loads(_clean_json_response(response.text))
+        return jsonify(result)
+    except Exception as e:
+        print(f'[Predict Peak Hours Error] {e}')
+        return jsonify({'insights': [{'title': 'Analysis Unavailable', 'description': 'AI prediction is temporarily unavailable. Please try again.', 'type': 'warning', 'icon': 'fa-exclamation-triangle'}], 'summary': 'Unable to generate prediction', 'confidence': 'low'})
+
+
+@analytics.route('/api/predict/medicine-demand', methods=['POST'])
+@login_required
+@require_permission(Permission.VIEW_ANALYTICS)
+def predict_medicine_demand():
+    """AI prediction for medicine demand and restocking needs."""
+    try:
+        # Current inventory
+        inventory = Inventory.query.filter(Inventory.category == 'Medicine', Inventory.quantity > 0).all()
+        inv_data = [{'name': i.name, 'quantity': i.quantity, 'expiry': str(i.expiry_date), 'batch': i.batch_number} for i in inventory]
+
+        # Reservation trends (past 60 days)
+        start_date = date.today() - timedelta(days=60)
+        res_results = db.session.query(
+            MedicineReservation.medicine_name,
+            func.count(MedicineReservation.id).label('count')
+        ).filter(
+            func.date(MedicineReservation.reserved_at) >= start_date
+        ).group_by(MedicineReservation.medicine_name).order_by(desc('count')).limit(15).all()
+
+        data_summary = f"""Medicine inventory and demand data:
+
+Current stock:
+{chr(10).join(f'  {i["name"]}: {i["quantity"]} units, expires {i["expiry"]}, batch {i["batch"]}' for i in inv_data[:20])}
+
+Reservation trends (past 60 days):
+{chr(10).join(f'  {r[0]}: {r[1]} reservations' for r in res_results)}
+
+Predict: Which medicines will run out first? Which need restocking? Any expiry concerns?"""
+
+        model = _get_predict_model()
+        response = model.generate_content(data_summary)
+        result = json_mod.loads(_clean_json_response(response.text))
+        return jsonify(result)
+    except Exception as e:
+        print(f'[Predict Medicine Error] {e}')
+        return jsonify({'insights': [{'title': 'Analysis Unavailable', 'description': 'AI prediction is temporarily unavailable.', 'type': 'warning', 'icon': 'fa-exclamation-triangle'}], 'summary': 'Unable to generate prediction', 'confidence': 'low'})
+
+
+@analytics.route('/api/predict/health-trends', methods=['POST'])
+@login_required
+@require_permission(Permission.VIEW_ANALYTICS)
+def predict_health_trends():
+    """AI prediction for health trends and potential outbreak detection."""
+    try:
+        # Symptom screening data (past 30 days)
+        start_date = date.today() - timedelta(days=30)
+        screenings = SymptomScreening.query.filter(
+            SymptomScreening.created_at >= datetime.combine(start_date, datetime.min.time())
+        ).order_by(SymptomScreening.created_at.desc()).limit(100).all()
+
+        symptom_counts = defaultdict(int)
+        service_counts = defaultdict(int)
+        severity_counts = defaultdict(int)
+        for s in screenings:
+            try:
+                symptoms = json_mod.loads(s.symptoms_json) if s.symptoms_json else []
+                for sym in symptoms:
+                    symptom_counts[sym] += 1
+            except Exception:
+                pass
+            if s.recommended_service:
+                service_counts[s.recommended_service] += 1
+            severity_counts[s.severity_level] += 1
+
+        # Visit chief complaints
+        visits = ClinicVisit.query.filter(
+            func.date(ClinicVisit.visit_date) >= start_date
+        ).all()
+        complaint_counts = defaultdict(int)
+        for v in visits:
+            if v.chief_complaint:
+                complaint_counts[v.chief_complaint.lower().strip()] += 1
+
+        data_summary = f"""Health data for the past 30 days:
+
+Symptom screening data ({len(screenings)} screenings):
+Top reported symptoms: {', '.join(f'{k}: {v}' for k, v in sorted(symptom_counts.items(), key=lambda x: -x[1])[:15])}
+Service recommendations: {', '.join(f'{k}: {v}' for k, v in service_counts.items())}
+Severity distribution: Emergency: {severity_counts.get(1, 0)}, Urgent: {severity_counts.get(2, 0)}, Routine: {severity_counts.get(3, 0)}
+
+Clinic visit data ({len(visits)} visits):
+Top complaints: {', '.join(f'{k}: {v}' for k, v in sorted(complaint_counts.items(), key=lambda x: -x[1])[:10])}
+
+Predict: Any trending symptoms suggesting an outbreak? Seasonal patterns? Concerning health trends among students?"""
+
+        model = _get_predict_model()
+        response = model.generate_content(data_summary)
+        result = json_mod.loads(_clean_json_response(response.text))
+        return jsonify(result)
+    except Exception as e:
+        print(f'[Predict Health Trends Error] {e}')
+        return jsonify({'insights': [{'title': 'Analysis Unavailable', 'description': 'AI prediction is temporarily unavailable.', 'type': 'warning', 'icon': 'fa-exclamation-triangle'}], 'summary': 'Unable to generate prediction', 'confidence': 'low'})

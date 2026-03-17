@@ -12,6 +12,9 @@
     <link
         href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap"
         rel="stylesheet">
+    <!-- UI Libraries (Tom Select & Flatpickr) -->
+    <link href="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/css/tom-select.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/animations.css') }}">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
@@ -196,16 +199,234 @@
             background: #d1d5db;
             border-radius: 100px
         }
+
+        /* Tom Select - No Search, Clean Dropdown */
+        .ts-wrapper {
+            border: none !important;
+            padding: 0 !important;
+            box-shadow: none !important;
+            background: transparent !important;
+            width: 100%;
+        }
+        .ts-control {
+            border: 1px solid #e5e7eb !important;
+            padding: 0 0.75rem !important;
+            border-radius: 0.75rem !important;
+            font-size: 0.875rem !important;
+            background-color: #fff !important;
+            transition: all 0.2s ease !important;
+            height: 40px !important;
+            display: flex !important;
+            align-items: center !important;
+            gap: 8px !important;
+            box-shadow: none !important;
+            outline: none !important;
+            cursor: pointer !important;
+        }
+        .ts-control > input { display: none !important; }
+        .ts-control .placeholder { color: #9ca3af !important; }
+        .ts-wrapper.focus .ts-control {
+            border-color: #3b82f6 !important;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15) !important;
+        }
+        .ts-control::after {
+            content: ''; border: solid #9ca3af; border-width: 0 2px 2px 0;
+            display: inline-block; padding: 3px; transform: rotate(45deg);
+            margin-left: auto; margin-top: -3px; flex-shrink: 0;
+        }
+        .ts-wrapper.is-open .ts-control::after { transform: rotate(-135deg); margin-top: 3px; }
+        .ts-dropdown {
+            border-radius: 0.75rem !important;
+            border: 1px solid #e5e7eb !important;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1) !important;
+            margin-top: 4px !important;
+            z-index: 1000 !important;
+            padding: 4px !important;
+            min-width: 150px !important;
+        }
+        .ts-dropdown .option {
+            padding: 9px 12px !important;
+            border-radius: 0.5rem !important;
+            font-size: 0.875rem !important;
+            cursor: pointer !important;
+        }
+        .ts-dropdown .option:hover, .ts-dropdown .active {
+            background-color: #eff6ff !important;
+            color: #1d4ed8 !important;
+        }
+
+        /* Flatpickr - Icon inside input */
+        .date-input-wrapper {
+            position: relative;
+            display: block;
+            width: 100%;
+        }
+        .date-input-wrapper .dp-icon {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #9ca3af;
+            pointer-events: none;
+            font-size: 0.875rem;
+            z-index: 5;
+        }
+        .flatpickr-input-styled {
+            width: 100% !important;
+            border: 1px solid #e5e7eb !important;
+            padding: 0 2.5rem 0 0.75rem !important;
+            border-radius: 0.75rem !important;
+            font-size: 0.875rem !important;
+            height: 40px !important;
+            background-color: #fff !important;
+            transition: border-color 0.2s !important;
+            outline: none !important;
+            box-shadow: none !important;
+            cursor: pointer !important;
+            color: #374151 !important;
+        }
+        .flatpickr-input-styled:focus {
+            border-color: #3b82f6 !important;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15) !important;
+        }
+        .flatpickr-input-styled::placeholder { color: #9ca3af !important; }
+        .flatpickr-calendar {
+            border-radius: 1rem !important;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1) !important;
+            border: 1px solid #e5e7eb !important;
+        }
+        @keyframes dropdownFadeIn {
+            from { opacity: 0; transform: translateY(-4px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Flatpickr Premium Overrides */
+        .flatpickr-calendar {
+            background: rgba(255, 255, 255, 0.98) !important;
+            backdrop-filter: blur(10px) !important;
+            border-radius: 1.25rem !important;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15) !important;
+            border: 1px solid rgba(0, 0, 0, 0.05) !important;
+            padding: 16px !important;
+            font-family: 'Inter', sans-serif !important;
+            width: 320px !important;
+            animation: dropdownFadeIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .flatpickr-calendar.arrowTop:before, .flatpickr-calendar.arrowTop:after,
+        .flatpickr-calendar.arrowBottom:before, .flatpickr-calendar.arrowBottom:after {
+            display: none !important;
+        }
+        .flatpickr-months {
+            padding: 0 4px 8px 4px !important;
+        }
+        .flatpickr-month {
+            height: 42px !important;
+            display: flex !important;
+            align-items: center !important;
+        }
+        .flatpickr-current-month {
+            font-size: 1rem !important;
+            font-weight: 700 !important;
+            font-family: 'Plus Jakarta Sans', sans-serif !important;
+            color: #111827 !important;
+        }
+        .flatpickr-weekday {
+            font-size: 0.75rem !important;
+            font-weight: 600 !important;
+            color: #9ca3af !important;
+            text-transform: uppercase !important;
+            letter-spacing: 0.05em !important;
+        }
+        .flatpickr-day {
+            border-radius: 0.75rem !important;
+            height: 38px !important;
+            line-height: 38px !important;
+            margin: 2px !important;
+            font-weight: 500 !important;
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+            border: none !important;
+        }
+        .flatpickr-day.today {
+            background: #eff6ff !important;
+            color: #2563eb !important;
+            font-weight: 700 !important;
+            border: none !important;
+        }
+        .flatpickr-day.selected, .flatpickr-day.selected:hover {
+            background: #2563eb !important;
+            color: #fff !important;
+            box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.4) !important;
+            transform: scale(1.05);
+        }
+        .flatpickr-day:hover:not(.selected) {
+            background: #f3f4f6 !important;
+            transform: translateY(-1px);
+        }
+        .flatpickr-prev-month, .flatpickr-next-month {
+            padding: 10px !important;
+            border-radius: 0.75rem !important;
+            transition: all 0.2s !important;
+        }
+        .flatpickr-prev-month:hover, .flatpickr-next-month:hover {
+            background: #f3f4f6 !important;
+        }
+        .flatpickr-time {
+            border-top: 1px solid #f3f4f6 !important;
+            margin-top: 8px !important;
+            padding-top: 12px !important;
+        }
+        .flatpickr-calendar.arrowTop:before, .flatpickr-calendar.arrowTop:after,
+        .flatpickr-calendar.arrowBottom:before, .flatpickr-calendar.arrowBottom:after {
+            display: none !important;
+        }
+        .flatpickr-months {
+            margin-bottom: 12px;
+        }
+        .flatpickr-month {
+            height: 38px !important;
+        }
+        .flatpickr-current-month {
+            font-size: 1.125rem !important;
+            font-weight: 700 !important;
+            padding-top: 4px !important;
+            font-family: 'Plus Jakarta Sans', sans-serif !important;
+        }
+        .flatpickr-day {
+            border-radius: 0.5rem !important;
+            font-weight: 500;
+            transition: all 0.15s;
+        }
+        .flatpickr-day.selected, .flatpickr-day.startRange, .flatpickr-day.endRange, .flatpickr-day.selected.inRange, .flatpickr-day.startRange.inRange, .flatpickr-day.endRange.inRange, .flatpickr-day.selected:focus, .flatpickr-day.startRange:focus, .flatpickr-day.endRange:focus, .flatpickr-day.selected:hover, .flatpickr-day.startRange:hover, .flatpickr-day.endRange:hover, .flatpickr-day.selected.prevMonthDay, .flatpickr-day.startRange.prevMonthDay, .flatpickr-day.endRange.prevMonthDay, .flatpickr-day.selected.nextMonthDay, .flatpickr-day.startRange.nextMonthDay, .flatpickr-day.endRange.nextMonthDay {
+            background: #2563eb !important;
+            border-color: #2563eb !important;
+            box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.3) !important;
+        }
+        .flatpickr-day:hover {
+            background: #f3f4f6 !important;
+            border-color: transparent !important;
+        }
+        .flatpickr-day.today {
+            border-color: #dbeafe !important;
+            background: #eff6ff !important;
+            color: #2563eb !important;
+            font-weight: 700;
+        }
+        .flatpickr-weekday {
+            font-size: 0.75rem !important;
+            font-weight: 700 !important;
+            color: #6b7280 !important;
+        }
     </style>
     {% block extra_css %}{% endblock %}
 </head>
 
-<body class="bg-gray-50/80 min-h-screen">
+<body class="bg-gray-50/80 min-h-screen overflow-x-hidden">
     <!-- Navigation -->
     <nav class="fixed top-0 inset-x-0 z-50 nav-blur bg-white/90 border-b border-gray-100/80 transition-all">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-16">
-                <div class="flex items-center space-x-4">
+                <!-- Logo Group -->
+                <div class="flex items-center">
                     <a href="{{ url_for('index') }}" class="flex items-center space-x-2.5 group">
                         <div
                             class="w-9 h-9 bg-gradient-to-br from-primary-600 to-accent rounded-xl flex items-center justify-center shadow-md group-hover:shadow-primary-600/30 transition-all group-hover:scale-105">
@@ -215,13 +436,8 @@
                     </a>
                 </div>
 
-                <!-- Mobile Hamburger -->
-                <button id="mobileMenuBtn"
-                    class="md:hidden w-10 h-10 flex items-center justify-center rounded-lg hover:bg-gray-100 transition text-gray-600">
-                    <i class="fas fa-bars text-lg"></i>
-                </button>
-
-                <div class="hidden md:flex items-center space-x-1">
+                <!-- Desktop Center Links (hidden on mobile) -->
+                <div class="hidden lg:flex items-center justify-center flex-1 px-8 space-x-1">
                     <a href="{{ url_for('index') }}"
                         class="px-3.5 py-2 text-sm font-medium text-gray-600 hover:text-primary-700 rounded-lg hover:bg-primary-50/80 transition-all">
                         <i class="fas fa-home mr-1.5 text-gray-400"></i>Home
@@ -239,9 +455,18 @@
                         class="px-3.5 py-2 text-sm font-medium text-gray-600 hover:text-primary-700 rounded-lg hover:bg-primary-50/80 transition-all">
                         <i class="fas fa-pills mr-1.5 text-gray-400"></i>Reservations
                     </a>
+                    <a href="{{ url_for('symptom_screening.index') }}"
+                        class="px-3.5 py-2 text-sm font-medium text-gray-600 hover:text-primary-700 rounded-lg hover:bg-primary-50/80 transition-all">
+                        <i class="fas fa-stethoscope mr-1.5 text-gray-400"></i>Symptom Checker
+                    </a>
+                    {% endif %}
+                </div>
 
-                    <!-- Notification Bell -->
-                    <div class="relative ml-2">
+                <!-- Right Side Actions -->
+                <div class="flex items-center space-x-3">
+                    {% if current_user.is_authenticated %}
+                    <!-- Notification Bell (Desktop) -->
+                    <div class="hidden lg:block relative">
                         <button id="notificationBell"
                             class="w-9 h-9 flex items-center justify-center rounded-lg hover:bg-gray-100 transition-all relative text-gray-500 hover:text-gray-700">
                             <i class="fas fa-bell text-[15px]"></i>
@@ -257,8 +482,8 @@
                         </div>
                     </div>
 
-                    <!-- User Menu -->
-                    <div class="relative ml-1" id="userMenuWrap">
+                    <!-- User Menu (Desktop) -->
+                    <div class="hidden lg:block relative" id="userMenuWrap">
                         <button id="userMenuBtn"
                             class="flex items-center space-x-2 px-3 py-2 rounded-xl hover:bg-gray-50 transition-all">
                             {% if current_user.profile_image_url %}
@@ -276,42 +501,37 @@
                         <div id="userMenuDropdown"
                             class="absolute right-0 pt-2 w-56 hidden z-50">
                             <div class="bg-white rounded-2xl shadow-xl shadow-black/8 border border-gray-100">
-                            <div class="px-4 py-3 border-b border-gray-100">
-                                <p class="text-sm font-bold text-gray-900">{{ current_user.first_name }} {{
-                                    current_user.last_name }}</p>
-                                <p class="text-xs text-gray-500 truncate">{{ current_user.email }}</p>
-                            </div>
-                            <div class="py-1.5">
-                                <a href="{{ url_for('patient_dashboard.index') }}"
-                                    class="flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition rounded-lg mx-1.5"><i
-                                        class="fas fa-th-large w-5 text-gray-400 mr-2"></i>Dashboard</a>
-                                <a href="{{ url_for('appointments.my_appointments') }}"
-                                    class="flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition rounded-lg mx-1.5"><i
-                                        class="fas fa-calendar-check w-5 text-gray-400 mr-2"></i>Appointments</a>
-                                <a href="{{ url_for('reservations.my_reservations') }}"
-                                    class="flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition rounded-lg mx-1.5"><i
-                                        class="fas fa-pills w-5 text-gray-400 mr-2"></i>Reservations</a>
-                                <div class="border-t border-gray-100 my-1 mx-4"></div>
-                                <a href="{{ url_for('auth.profile') }}"
-                                    class="flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition rounded-lg mx-1.5"><i
-                                        class="fas fa-user-circle w-5 text-gray-400 mr-2"></i>Profile</a>
-                                <a href="{{ url_for('patient_dashboard.timeline') }}"
-                                    class="flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition rounded-lg mx-1.5"><i
-                                        class="fas fa-history w-5 text-gray-400 mr-2"></i>Health Timeline</a>
-                                <a href="{{ url_for('symptom_screening.index') }}"
-                                    class="flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition rounded-lg mx-1.5"><i
-                                        class="fas fa-stethoscope w-5 text-gray-400 mr-2"></i>Symptom Check</a>
-                                {% if current_user.role in ['admin', 'staff'] %}
-                                <div class="border-t border-gray-100 my-1 mx-4"></div>
-                                <a href="{{ url_for('admin') }}"
-                                    class="flex items-center px-4 py-2.5 text-sm text-primary-700 hover:bg-primary-50 transition rounded-lg mx-1.5"><i
-                                        class="fas fa-user-shield w-5 text-primary-600 mr-2"></i>Admin</a>
-                                {% endif %}
-                                <div class="border-t border-gray-100 my-1 mx-4"></div>
-                                <a href="{{ url_for('auth.logout') }}"
-                                    class="flex items-center px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition rounded-lg mx-1.5"><i
-                                        class="fas fa-sign-out-alt w-5 text-red-400 mr-2"></i>Logout</a>
-                            </div>
+                                <div class="px-4 py-3 border-b border-gray-100">
+                                    <p class="text-sm font-bold text-gray-900">{{ current_user.first_name }} {{
+                                        current_user.last_name }}</p>
+                                    <p class="text-xs text-gray-500 truncate">{{ current_user.email }}</p>
+                                </div>
+                                <div class="py-1.5">
+                                    <a href="{{ url_for('patient_dashboard.index') }}"
+                                        class="flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition rounded-lg mx-1.5"><i
+                                            class="fas fa-th-large w-5 text-gray-400 mr-2"></i>Dashboard</a>
+                                    <a href="{{ url_for('appointments.my_appointments') }}"
+                                        class="flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition rounded-lg mx-1.5"><i
+                                            class="fas fa-calendar-check w-5 text-gray-400 mr-2"></i>Appointments</a>
+                                    <a href="{{ url_for('reservations.my_reservations') }}"
+                                        class="flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition rounded-lg mx-1.5"><i
+                                            class="fas fa-pills w-5 text-gray-400 mr-2"></i>Reservations</a>
+                                    <div class="border-t border-gray-100 my-1 mx-4"></div>
+                                    <a href="{{ url_for('auth.profile') }}"
+                                        class="flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition rounded-lg mx-1.5"><i
+                                            class="fas fa-user-circle w-5 text-gray-400 mr-2"></i>Profile</a>
+
+                                    {% if current_user.role in ['admin', 'staff'] %}
+                                    <div class="border-t border-gray-100 my-1 mx-4"></div>
+                                    <a href="{{ url_for('admin') }}"
+                                        class="flex items-center px-4 py-2.5 text-sm text-primary-700 hover:bg-primary-50 transition rounded-lg mx-1.5"><i
+                                            class="fas fa-user-shield w-5 text-primary-600 mr-2"></i>Admin</a>
+                                    {% endif %}
+                                    <div class="border-t border-gray-100 my-1 mx-4"></div>
+                                    <a href="{{ url_for('auth.logout') }}"
+                                        class="flex items-center px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition rounded-lg mx-1.5"><i
+                                            class="fas fa-sign-out-alt w-5 text-red-400 mr-2"></i>Logout</a>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -322,6 +542,12 @@
                     <a href="{{ url_for('auth.register') }}"
                         class="px-5 py-2.5 bg-primary-700 text-white text-sm font-semibold rounded-xl hover:bg-primary-800 transition-all shadow-md shadow-primary-700/20">Register</a>
                     {% endif %}
+
+                    <!-- Mobile Burger Menu Button -->
+                    <button id="mobileMenuBtn" onclick="toggleMobileMenu()"
+                        class="lg:hidden w-10 h-10 flex items-center justify-center rounded-xl hover:bg-gray-100 transition text-gray-600 ring-1 ring-gray-100">
+                        <i class="fas fa-bars text-lg"></i>
+                    </button>
                 </div>
             </div>
         </div>
@@ -375,12 +601,9 @@
                 </a>
                 <a href="{{ url_for('symptom_screening.index') }}"
                     class="flex items-center gap-3 px-4 py-3 text-sm font-medium text-gray-700 rounded-xl hover:bg-primary-50 hover:text-primary-700 transition">
-                    <i class="fas fa-stethoscope w-5 text-center text-gray-400"></i>Symptom Check
+                    <i class="fas fa-stethoscope w-5 text-center text-gray-400"></i>Symptom Checker
                 </a>
-                <a href="{{ url_for('patient_dashboard.timeline') }}"
-                    class="flex items-center gap-3 px-4 py-3 text-sm font-medium text-gray-700 rounded-xl hover:bg-primary-50 hover:text-primary-700 transition">
-                    <i class="fas fa-history w-5 text-center text-gray-400"></i>Health Timeline
-                </a>
+
                 <a href="{{ url_for('auth.profile') }}"
                     class="flex items-center gap-3 px-4 py-3 text-sm font-medium text-gray-700 rounded-xl hover:bg-primary-50 hover:text-primary-700 transition">
                     <i class="fas fa-user-circle w-5 text-center text-gray-400"></i>Profile
@@ -564,6 +787,73 @@
         })();
     </script>
     {% block extra_js %}{% endblock %}
+    <script src="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/js/tom-select.complete.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script>
+        // ── Global config ──
+        const studentInitOptions = {
+            dropdown: {
+                placeholder: 'Select...',
+                onInitialize: function() {
+                    const w = this.wrapper;
+                    const toRemove = [];
+                    w.classList.forEach(cls => {
+                        if (/\b(border-\S+|rounded-\S+|shadow-\S+|p-\d|px-\d|py-\d|ring-\S+|outline-\S+)/.test(cls)) toRemove.push(cls);
+                    });
+                    toRemove.forEach(cls => w.classList.remove(cls));
+                    w.style.cssText += '; border: none !important; padding: 0 !important; box-shadow: none !important;';
+                }
+            },
+            date:     { altInput: true, altFormat: "F j, Y",      dateFormat: "Y-m-d",      static: true },
+            time:     { enableTime: true, noCalendar: true,        dateFormat: "H:i",         time_24hr: true, static: true },
+            datetime: { enableTime: true, altInput: true, altFormat: "F j, Y H:i", dateFormat: "Y-m-d H:i", static: true }
+        };
+
+        function studentMakeDropdown(el) {
+            if (!el || el.classList.contains('tomselected')) return;
+            const placeholder = el.getAttribute('placeholder') ||
+                (el.options[0] && el.options[0].value === '' ? el.options[0].text : 'Select...');
+            new TomSelect(el, { plugins: [], ...studentInitOptions.dropdown, placeholder, dropdownParent: 'body' });
+        }
+
+        function studentMakeDatePicker(el) {
+            if (!el || el.classList.contains('flatpickr-input')) return;
+            const placeholder = el.getAttribute('placeholder') ||
+                (el.type === 'time' ? 'Select time...' : 'Select date...');
+            const iconClass = el.type === 'time' ? 'fas fa-clock' : 'fas fa-calendar-alt';
+
+            let config = {...studentInitOptions.date};
+            if (el.type === 'time')           config = {...studentInitOptions.time};
+            if (el.type === 'datetime-local') config = {...studentInitOptions.datetime};
+
+            config.onReady = function(_, __, instance) {
+                const visibleInput = instance.altInput || el;
+                visibleInput.placeholder = placeholder;
+                visibleInput.classList.add('flatpickr-input-styled');
+                if (!visibleInput.parentElement.classList.contains('date-input-wrapper')) {
+                    const wrap = document.createElement('div');
+                    wrap.className = 'date-input-wrapper';
+                    visibleInput.parentNode.insertBefore(wrap, visibleInput);
+                    wrap.appendChild(visibleInput);
+                    const icon = document.createElement('i');
+                    icon.className = iconClass + ' dp-icon';
+                    wrap.appendChild(icon);
+                }
+            };
+            flatpickr(el, config);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('select').forEach(studentMakeDropdown);
+            document.querySelectorAll('input[type="date"], input[type="time"], input[type="datetime-local"]').forEach(studentMakeDatePicker);
+        });
+
+        window.initCustomUI = function(container = document) {
+            container.querySelectorAll('select:not(.tomselected)').forEach(studentMakeDropdown);
+            container.querySelectorAll('input[type="date"]:not(.flatpickr-input), input[type="time"]:not(.flatpickr-input), input[type="datetime-local"]:not(.flatpickr-input)').forEach(studentMakeDatePicker);
+        };
+    </script>
+    
     {% include 'partials/chatbot_widget.html' %}
 </body>
 

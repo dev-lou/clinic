@@ -1,21 +1,179 @@
 {% extends "student_base.html" %}
 {% block title %}Symptom Checker &mdash; ISUFST CareHub{% endblock %}
 
+{% block extra_css %}
+<style>
+    .body-region { cursor: pointer; transition: all 0.3s ease; fill: #e2e8f0; stroke: #94a3b8; stroke-width: 1.5; }
+    .body-region:hover { fill: #bfdbfe; stroke: #3b82f6; stroke-width: 2; }
+    .body-region.active { fill: #93c5fd; stroke: #2563eb; stroke-width: 2.5; animation: regionPulse 2s infinite; }
+    @keyframes regionPulse { 0%,100% { opacity: 1; } 50% { opacity: 0.7; } }
+    .body-region-label { pointer-events: none; font-size: 9px; fill: #475569; font-weight: 600; text-anchor: middle; }
+    .body-region.active + .body-region-label, .body-region.active ~ .body-region-label { fill: #1e40af; }
+    .region-badge { position: absolute; top: -6px; right: -6px; min-width: 18px; height: 18px; background: #2563eb; color: white; font-size: 10px; font-weight: 700; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+
+    /* Voice UI */
+    .mic-btn { width: 64px; height: 64px; border-radius: 50%; border: none; cursor: pointer; transition: all 0.3s; display: flex; align-items: center; justify-content: center; }
+    .mic-btn.idle { background: linear-gradient(135deg, #3b82f6, #2563eb); color: white; box-shadow: 0 4px 15px rgba(37,99,235,0.3); }
+    .mic-btn.idle:hover { transform: scale(1.08); box-shadow: 0 6px 20px rgba(37,99,235,0.4); }
+    .mic-btn.recording { background: linear-gradient(135deg, #ef4444, #dc2626); color: white; animation: micPulse 1.5s infinite; box-shadow: 0 0 0 0 rgba(239,68,68,0.5); }
+    @keyframes micPulse { 0% { box-shadow: 0 0 0 0 rgba(239,68,68,0.5); } 70% { box-shadow: 0 0 0 16px rgba(239,68,68,0); } 100% { box-shadow: 0 0 0 0 rgba(239,68,68,0); } }
+    .voice-wave { display: flex; align-items: center; gap: 3px; height: 32px; }
+    .voice-wave span { width: 3px; background: #3b82f6; border-radius: 2px; animation: wave 1s ease-in-out infinite; }
+    .voice-wave span:nth-child(2) { animation-delay: 0.1s; }
+    .voice-wave span:nth-child(3) { animation-delay: 0.2s; }
+    .voice-wave span:nth-child(4) { animation-delay: 0.3s; }
+    .voice-wave span:nth-child(5) { animation-delay: 0.4s; }
+    @keyframes wave { 0%,100% { height: 8px; } 50% { height: 28px; } }
+
+    .view-toggle { display: inline-flex; background: #f1f5f9; border-radius: 12px; padding: 4px; }
+    .view-toggle button { padding: 8px 16px; border-radius: 8px; border: none; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s; background: transparent; color: #64748b; }
+    .view-toggle button.active { background: white; color: #1e40af; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+</style>
+{% endblock %}
+
 {% block content %}
-<div class="max-w-4xl mx-auto space-y-6 fade-in">
+<div class="max-w-5xl mx-auto space-y-6 fade-in">
     <!-- Header -->
     <div class="relative bg-gradient-to-br from-violet-800 via-violet-700 to-indigo-800 rounded-3xl p-8 sm:p-10 overflow-hidden">
         <div class="absolute top-0 right-0 w-72 h-72 bg-white/[0.04] rounded-full -translate-y-1/3 translate-x-1/4"></div>
         <div class="relative z-10">
             <h1 class="text-3xl sm:text-4xl font-extrabold text-white mb-2">Symptom Checker</h1>
-            <p class="text-violet-200/50 text-sm">Tell us what you're experiencing, and we'll recommend the right service.</p>
+            <p class="text-violet-200/50 text-sm">Tell us what you're experiencing using voice, body map, or checklist.</p>
         </div>
     </div>
 
-    <!-- Form -->
+    <!-- =================== VOICE AI TRIAGE =================== -->
+    <div class="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl border border-blue-100 p-6 sm:p-8">
+        <div class="flex items-center gap-3 mb-4">
+            <div class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center shadow-md shadow-blue-600/20">
+                <i class="fas fa-microphone text-white"></i>
+            </div>
+            <div>
+                <h2 class="text-lg font-bold text-gray-900">Voice AI Triage</h2>
+                <p class="text-xs text-gray-500">Describe your symptoms by speaking — AI will analyze and recommend services</p>
+            </div>
+            <span class="ml-auto px-2.5 py-1 bg-blue-600 text-white text-[10px] font-bold rounded-lg uppercase tracking-wider">AI Powered</span>
+        </div>
+
+        <div class="flex flex-col items-center py-6">
+            <button id="micButton" class="mic-btn idle" onclick="toggleVoice()">
+                <i class="fas fa-microphone text-2xl" id="micIcon"></i>
+            </button>
+            <p id="voiceStatus" class="mt-3 text-sm font-medium text-gray-500">Tap to start speaking</p>
+
+            <!-- Waveform -->
+            <div id="voiceWave" class="voice-wave hidden mt-3">
+                <span></span><span></span><span></span><span></span><span></span>
+            </div>
+
+            <!-- Live Transcript -->
+            <div id="transcriptBox" class="hidden mt-4 w-full max-w-lg">
+                <div class="bg-white rounded-xl border border-gray-200 p-4">
+                    <p class="text-xs font-bold text-gray-400 uppercase tracking-wide mb-2"><i class="fas fa-closed-captioning mr-1"></i>Live Transcript</p>
+                    <p id="transcriptText" class="text-sm text-gray-800 min-h-[40px]"></p>
+                </div>
+            </div>
+
+            <!-- Analyzing spinner -->
+            <div id="voiceAnalyzing" class="hidden mt-4 flex items-center gap-2">
+                <div class="w-5 h-5 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+                <span class="text-sm font-medium text-blue-600">AI is analyzing your symptoms...</span>
+            </div>
+        </div>
+
+        <!-- Divider -->
+    <div class="flex items-center gap-4">
+        <hr class="flex-1 border-gray-200">
+        <span class="text-xs text-gray-400 uppercase tracking-wider font-medium">or use manual checker</span>
+        <hr class="flex-1 border-gray-200">
+    </div>
+
+    <!-- =================== VIEW TOGGLE =================== -->
+    <div class="flex justify-center">
+        <div class="view-toggle">
+            <button id="bodyMapToggle" class="active" onclick="switchView('bodymap')"><i class="fas fa-person mr-1.5"></i>Body Map</button>
+            <button id="checklistToggle" onclick="switchView('checklist')"><i class="fas fa-list-check mr-1.5"></i>Checklist</button>
+        </div>
+    </div>
+
+    <!-- =================== MANUAL FORM =================== -->
     <div class="bg-white rounded-2xl border border-gray-100 p-6 sm:p-8">
         <form id="symptomForm" class="space-y-6">
-            <div id="symptomCategories" class="space-y-5"></div>
+
+            <!-- 3D Body Map View -->
+            <div id="bodyMapView">
+                <div class="flex flex-col lg:flex-row gap-6">
+                    <!-- SVG Body -->
+                    <div class="flex-shrink-0 flex justify-center">
+                        <div class="relative" style="width:220px">
+                            <svg viewBox="0 0 220 480" width="220" height="480" xmlns="http://www.w3.org/2000/svg">
+                                <!-- Head -->
+                                <ellipse class="body-region" data-region="Neurological" cx="110" cy="42" rx="30" ry="36"/>
+                                <text class="body-region-label" x="110" y="46">Head</text>
+
+                                <!-- Mouth/Jaw -->
+                                <ellipse class="body-region" data-region="Dental" cx="110" cy="68" rx="16" ry="10"/>
+                                <text class="body-region-label" x="110" y="71">Jaw</text>
+
+                                <!-- Neck -->
+                                <rect class="body-region" data-region="General" x="98" y="78" width="24" height="18" rx="6"/>
+
+                                <!-- Chest -->
+                                <path class="body-region" data-region="Respiratory" d="M68,96 Q110,90 152,96 L158,170 Q110,178 62,170 Z"/>
+                                <text class="body-region-label" x="110" y="140">Chest</text>
+
+                                <!-- Abdomen -->
+                                <path class="body-region" data-region="Gastrointestinal" d="M62,170 Q110,178 158,170 L155,240 Q110,248 65,240 Z"/>
+                                <text class="body-region-label" x="110" y="210">Abdomen</text>
+
+                                <!-- Left Arm -->
+                                <path class="body-region" data-region="Musculoskeletal" d="M62,100 L38,105 L22,190 L10,260 L24,264 L40,196 L56,140 Z"/>
+                                <text class="body-region-label" x="30" y="180" style="font-size:8px">Arm</text>
+
+                                <!-- Right Arm -->
+                                <path class="body-region" data-region="Musculoskeletal" d="M158,100 L182,105 L198,190 L210,260 L196,264 L180,196 L164,140 Z"/>
+                                <text class="body-region-label" x="190" y="180" style="font-size:8px">Arm</text>
+
+                                <!-- Left Hand -->
+                                <ellipse class="body-region" data-region="Skin" cx="14" cy="274" rx="12" ry="16"/>
+
+                                <!-- Right Hand -->
+                                <ellipse class="body-region" data-region="Skin" cx="206" cy="274" rx="12" ry="16"/>
+
+                                <!-- Left Leg -->
+                                <path class="body-region" data-region="Musculoskeletal" d="M72,244 L78,360 L70,430 L62,450 L90,450 L88,430 L96,360 L98,244 Z"/>
+                                <text class="body-region-label" x="82" y="350" style="font-size:8px">Leg</text>
+
+                                <!-- Right Leg -->
+                                <path class="body-region" data-region="Musculoskeletal" d="M122,244 L124,360 L132,430 L130,450 L158,450 L150,430 L142,360 L148,244 Z"/>
+                                <text class="body-region-label" x="138" y="350" style="font-size:8px">Leg</text>
+
+                                <!-- Brain icon (mental health overlay) -->
+                                <circle class="body-region" data-region="Mental Health" cx="110" cy="22" r="12" style="fill:rgba(139,92,246,0.15);stroke:#8b5cf6"/>
+                                <text class="body-region-label" x="110" y="25" style="fill:#7c3aed;font-size:8px">Mind</text>
+                            </svg>
+                        </div>
+                    </div>
+
+                    <!-- Selected Regions Panel -->
+                    <div class="flex-1 min-w-0">
+                        <h3 class="font-bold text-sm text-gray-900 mb-3">Selected Body Regions</h3>
+                        <div id="selectedRegions" class="space-y-2 mb-4">
+                            <p class="text-sm text-gray-400 italic" id="noRegionsMsg">Tap on the body map to select affected areas</p>
+                        </div>
+
+                        <div id="regionSymptoms" class="space-y-4 hidden">
+                            <h3 class="font-bold text-sm text-gray-900">Related Symptoms</h3>
+                            <div id="regionSymptomsList" class="space-y-3"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Checklist View (hidden initially) -->
+            <div id="checklistView" class="hidden">
+                <div id="symptomCategories" class="space-y-5"></div>
+            </div>
 
             <div>
                 <label class="block text-sm font-bold text-gray-700 mb-2">Additional Information <span class="text-gray-400 font-normal">(optional)</span></label>
@@ -26,25 +184,6 @@
                 <i class="fas fa-search mr-2"></i>Analyze Symptoms
             </button>
         </form>
-
-        <!-- Results -->
-        <div id="resultsSection" class="hidden mt-8 p-6 bg-gray-50 rounded-2xl border border-gray-100">
-            <h2 class="text-xl font-bold text-gray-900 mb-4">Analysis Results</h2>
-            <div class="mb-4"><span id="severityBadge" class="px-4 py-1.5 rounded-full text-sm font-bold"></span></div>
-            <div class="bg-white p-5 rounded-xl border border-gray-100 mb-4">
-                <h3 class="font-bold text-sm text-gray-900 mb-1"><i class="fas fa-lightbulb text-amber-500 mr-1.5"></i>Recommendation</h3>
-                <p id="recommendedService" class="text-primary-700 font-semibold text-sm"></p>
-                <p id="suggestions" class="text-gray-600 text-sm mt-1.5"></p>
-            </div>
-            <div class="flex gap-3">
-                <a id="bookButton" href="#" class="flex-1 py-3 bg-primary-700 text-white text-sm font-bold rounded-xl text-center hover:bg-primary-800 transition">
-                    <i class="fas fa-calendar-plus mr-1.5"></i>Book Appointment
-                </a>
-                <button onclick="location.reload()" class="flex-1 py-3 bg-gray-100 text-gray-700 text-sm font-bold rounded-xl hover:bg-gray-200 transition">
-                    <i class="fas fa-redo mr-1.5"></i>Check Again
-                </button>
-            </div>
-        </div>
     </div>
 
     <!-- Disclaimer -->
@@ -57,7 +196,347 @@
 
 {% block extra_js %}
 <script>
-fetch('{{ url_for("symptom_screening.get_symptom_categories") }}').then(r=>r.json()).then(cats=>{const c=document.getElementById('symptomCategories');for(const[cat,symptoms]of Object.entries(cats)){const d=document.createElement('div');d.innerHTML=`<h3 class="font-bold text-sm text-gray-900 mb-2">${cat}</h3><div class="grid grid-cols-2 md:grid-cols-3 gap-2">${symptoms.map(s=>`<label class="flex items-center space-x-2 p-2.5 hover:bg-primary-50 rounded-xl cursor-pointer transition text-sm"><input type="checkbox" name="symptoms" value="${s}" class="rounded border-gray-300 text-primary-600 focus:ring-primary-500"><span class="text-gray-700">${s}</span></label>`).join('')}</div>`;c.appendChild(d)}});
-document.getElementById('symptomForm').addEventListener('submit',function(e){e.preventDefault();const checked=Array.from(document.querySelectorAll('input[name="symptoms"]:checked')).map(c=>c.value);if(checked.length===0){alert('Please select at least one symptom');return}fetch('{{ url_for("symptom_screening.analyze") }}',{method:'POST',headers:{'Content-Type':'application/json','X-CSRFToken':'{{ csrf_token() }}'},body:JSON.stringify({symptoms:checked,additional_info:document.getElementById('additionalInfo').value})}).then(r=>r.json()).then(d=>{document.getElementById('resultsSection').classList.remove('hidden');const b=document.getElementById('severityBadge');b.textContent=d.severity_label;b.className='px-4 py-1.5 rounded-full text-sm font-bold ';if(d.severity===1)b.classList.add('bg-red-100','text-red-700');else if(d.severity===2)b.classList.add('bg-amber-100','text-amber-700');else b.classList.add('bg-emerald-100','text-emerald-700');document.getElementById('recommendedService').textContent=`Recommended: ${d.recommended_service} Service`;document.getElementById('suggestions').textContent=d.suggestions;const bb=document.getElementById('bookButton');if(d.severity===1){bb.textContent='Go to Emergency Room';bb.className='flex-1 py-3 bg-red-600 text-white text-sm font-bold rounded-xl text-center hover:bg-red-700 transition'}else{bb.href='{{ url_for("appointments.book") }}?service='+encodeURIComponent(d.recommended_service)}document.getElementById('resultsSection').scrollIntoView({behavior:'smooth'})}).catch(()=>{alert('Error analyzing symptoms. Try again.')})});
+// ═══════════════════════════════════════════
+// SYMPTOM CATEGORIES DATA
+// ═══════════════════════════════════════════
+const BODY_REGION_MAP = {
+    'Neurological': { icon: 'fa-brain', color: 'violet' },
+    'Dental': { icon: 'fa-tooth', color: 'pink' },
+    'Respiratory': { icon: 'fa-lungs', color: 'blue' },
+    'Gastrointestinal': { icon: 'fa-stomach', color: 'amber' },
+    'Musculoskeletal': { icon: 'fa-bone', color: 'orange' },
+    'Skin': { icon: 'fa-hand-dots', color: 'rose' },
+    'Mental Health': { icon: 'fa-brain', color: 'purple' },
+    'General': { icon: 'fa-thermometer-half', color: 'red' }
+};
+
+let allCategories = {};
+let selectedRegions = new Set();
+let currentView = 'bodymap';
+
+// Load categories
+fetch('{{ url_for("symptom_screening.get_symptom_categories") }}').then(r => r.json()).then(cats => {
+    allCategories = cats;
+    buildChecklist(cats);
+});
+
+function buildChecklist(cats) {
+    const c = document.getElementById('symptomCategories');
+    for (const [cat, symptoms] of Object.entries(cats)) {
+        const d = document.createElement('div');
+        d.innerHTML = `<h3 class="font-bold text-sm text-gray-900 mb-2">${cat}</h3><div class="grid grid-cols-2 md:grid-cols-3 gap-2">${symptoms.map(s => `<label class="flex items-center space-x-2 p-2.5 hover:bg-primary-50 rounded-xl cursor-pointer transition text-sm"><input type="checkbox" name="symptoms" value="${s}" class="rounded border-gray-300 text-primary-600 focus:ring-primary-500 symptom-checkbox" data-category="${cat}"><span class="text-gray-700">${s}</span></label>`).join('')}</div>`;
+        c.appendChild(d);
+    }
+}
+
+// ═══════════════════════════════════════════
+// VIEW TOGGLE
+// ═══════════════════════════════════════════
+function switchView(view) {
+    currentView = view;
+    document.getElementById('bodyMapView').classList.toggle('hidden', view !== 'bodymap');
+    document.getElementById('checklistView').classList.toggle('hidden', view !== 'checklist');
+    document.getElementById('bodyMapToggle').classList.toggle('active', view === 'bodymap');
+    document.getElementById('checklistToggle').classList.toggle('active', view === 'checklist');
+}
+
+// ═══════════════════════════════════════════
+// 3D BODY MAP
+// ═══════════════════════════════════════════
+document.querySelectorAll('.body-region').forEach(region => {
+    region.addEventListener('click', () => {
+        const cat = region.dataset.region;
+        if (!cat) return;
+
+        // Toggle all regions with same category
+        const isActive = region.classList.contains('active');
+        document.querySelectorAll(`.body-region[data-region="${cat}"]`).forEach(r => {
+            r.classList.toggle('active', !isActive);
+        });
+
+        if (isActive) {
+            selectedRegions.delete(cat);
+            // Uncheck all checkboxes for this category
+            document.querySelectorAll(`.symptom-checkbox[data-category="${cat}"]`).forEach(cb => { cb.checked = false; });
+        } else {
+            selectedRegions.add(cat);
+        }
+        updateSelectedRegionsUI();
+    });
+});
+
+function updateSelectedRegionsUI() {
+    const container = document.getElementById('selectedRegions');
+    const noMsg = document.getElementById('noRegionsMsg');
+    const regionSympDiv = document.getElementById('regionSymptoms');
+    const regionSympList = document.getElementById('regionSymptomsList');
+
+    if (selectedRegions.size === 0) {
+        container.innerHTML = '<p class="text-sm text-gray-400 italic" id="noRegionsMsg">Tap on the body map to select affected areas</p>';
+        regionSympDiv.classList.add('hidden');
+        return;
+    }
+
+    let html = '';
+    selectedRegions.forEach(cat => {
+        const info = BODY_REGION_MAP[cat] || { icon: 'fa-circle', color: 'gray' };
+        html += `<div class="flex items-center justify-between p-2.5 bg-${info.color}-50 rounded-xl border border-${info.color}-100">
+            <div class="flex items-center gap-2">
+                <i class="fas ${info.icon} text-${info.color}-500 text-xs"></i>
+                <span class="text-sm font-semibold text-${info.color}-800">${cat}</span>
+            </div>
+            <button type="button" onclick="removeRegion('${cat}')" class="text-${info.color}-400 hover:text-${info.color}-600 transition"><i class="fas fa-times text-xs"></i></button>
+        </div>`;
+    });
+    container.innerHTML = html;
+
+    // Show related symptoms for selected regions
+    regionSympDiv.classList.remove('hidden');
+    let sympHtml = '';
+    selectedRegions.forEach(cat => {
+        const symptoms = allCategories[cat] || [];
+        if (symptoms.length === 0) return;
+        sympHtml += `<div>
+            <p class="text-xs font-bold text-gray-500 uppercase tracking-wide mb-1.5">${cat}</p>
+            <div class="grid grid-cols-2 gap-1.5">
+                ${symptoms.map(s => `<label class="flex items-center space-x-2 p-2 hover:bg-primary-50 rounded-lg cursor-pointer transition text-sm">
+                    <input type="checkbox" name="symptoms" value="${s}" class="rounded border-gray-300 text-primary-600 focus:ring-primary-500 symptom-checkbox" data-category="${cat}">
+                    <span class="text-gray-700">${s}</span>
+                </label>`).join('')}
+            </div>
+        </div>`;
+    });
+    regionSympList.innerHTML = sympHtml;
+}
+
+function removeRegion(cat) {
+    selectedRegions.delete(cat);
+    document.querySelectorAll(`.body-region[data-region="${cat}"]`).forEach(r => r.classList.remove('active'));
+    document.querySelectorAll(`.symptom-checkbox[data-category="${cat}"]`).forEach(cb => { cb.checked = false; });
+    updateSelectedRegionsUI();
+}
+
+// ═══════════════════════════════════════════
+// MANUAL FORM SUBMIT
+// ═══════════════════════════════════════════
+document.getElementById('symptomForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const checked = Array.from(document.querySelectorAll('input[name="symptoms"]:checked')).map(c => c.value);
+    if (checked.length === 0) {
+        alert('Please select at least one symptom');
+        return;
+    }
+    fetch('{{ url_for("symptom_screening.analyze") }}', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-CSRFToken': '{{ csrf_token() }}' },
+        body: JSON.stringify({ symptoms: checked, additional_info: document.getElementById('additionalInfo').value })
+    }).then(r => r.json()).then(d => {
+        let badgeClass = 'px-4 py-1.5 rounded-full text-sm font-bold ';
+        if (d.severity === 1) badgeClass += 'bg-red-100 text-red-700';
+        else if (d.severity === 2) badgeClass += 'bg-amber-100 text-amber-700';
+        else badgeClass += 'bg-emerald-100 text-emerald-700';
+
+        let bookBtnHtml = '';
+        if (d.severity === 1) {
+            bookBtnHtml = `<a href="#" class="w-full inline-block py-3 bg-red-600 text-white text-sm font-bold rounded-xl text-center hover:bg-red-700 transition mt-4">Go to Emergency Room</a>`;
+        } else {
+            bookBtnHtml = `<a href="{{ url_for("appointments.book") }}?service=${encodeURIComponent(d.recommended_service || 'Medical')}" class="w-full inline-block py-3 bg-primary-700 text-white text-sm font-bold rounded-xl text-center hover:bg-primary-800 transition mt-4"><i class="fas fa-calendar-plus mr-1.5"></i>Book ${d.recommended_service || 'Medical'} Appointment</a>`;
+        }
+
+        Swal.fire({
+            title: '<div class="flex items-center justify-center gap-3"><i class="fas fa-stethoscope text-primary-500"></i><span class="text-xl font-bold">Analysis Results</span></div>',
+            html: `
+                <div class="text-left mt-2">
+                    <div class="mb-4 text-center">
+                        <span class="${badgeClass}">${d.severity_label}</span>
+                    </div>
+                    <div class="bg-gray-50 p-4 rounded-xl border border-gray-100">
+                        <h3 class="font-bold text-sm text-gray-900 mb-1"><i class="fas fa-lightbulb text-amber-500 mr-1.5"></i>Recommendation</h3>
+                        <p class="text-primary-700 font-semibold text-sm mb-1">Recommended: ${d.recommended_service} Service</p>
+                        <p class="text-gray-600 text-sm">${d.suggestions}</p>
+                    </div>
+                    ${bookBtnHtml}
+                </div>
+            `,
+            showConfirmButton: true,
+            confirmButtonText: 'Close',
+            customClass: {
+                popup: 'rounded-2xl',
+                confirmButton: 'bg-gray-200 text-gray-800 font-bold py-2.5 px-6 rounded-xl hover:bg-gray-300 transition w-full mt-2'
+            },
+            buttonsStyling: false
+        });
+    }).catch(() => { alert('Error analyzing symptoms. Try again.'); });
+});
+
+// ═══════════════════════════════════════════
+// VOICE AI TRIAGE
+// ═══════════════════════════════════════════
+let recognition = null;
+let isRecording = false;
+let fullTranscript = '';
+
+const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+function toggleVoice() {
+    if (!SpeechRecognition) {
+        alert('Voice recognition is not supported in your browser. Please use Chrome, Edge, or Safari.');
+        return;
+    }
+
+    if (isRecording) {
+        stopVoice();
+    } else {
+        startVoice();
+    }
+}
+
+function startVoice() {
+    recognition = new SpeechRecognition();
+    recognition.continuous = true;
+    recognition.interimResults = true;
+    recognition.lang = 'en-US';
+
+    fullTranscript = '';
+    isRecording = true;
+
+    const btn = document.getElementById('micButton');
+    const icon = document.getElementById('micIcon');
+    btn.className = 'mic-btn recording';
+    icon.className = 'fas fa-stop text-2xl';
+    document.getElementById('voiceStatus').textContent = 'Listening... Tap to stop';
+    document.getElementById('voiceWave').classList.remove('hidden');
+    document.getElementById('transcriptBox').classList.remove('hidden');
+    document.getElementById('voiceResults').classList.add('hidden');
+
+    recognition.onresult = (e) => {
+        let interim = '';
+        let final = '';
+        for (let i = e.resultIndex; i < e.results.length; i++) {
+            if (e.results[i].isFinal) {
+                final += e.results[i][0].transcript;
+            } else {
+                interim += e.results[i][0].transcript;
+            }
+        }
+        if (final) fullTranscript += final + ' ';
+        document.getElementById('transcriptText').innerHTML = fullTranscript + '<span class="text-gray-400 italic">' + interim + '</span>';
+    };
+
+    recognition.onerror = (e) => {
+        console.error('Speech error:', e.error);
+        if (e.error === 'not-allowed') {
+            alert('Microphone access denied. Please allow microphone access in your browser settings.');
+        }
+        stopVoice();
+    };
+
+    recognition.onend = () => {
+        if (isRecording) {
+            // Auto-restart if still recording (browser sometimes stops)
+            try { recognition.start(); } catch(e) {}
+        }
+    };
+
+    recognition.start();
+}
+
+function stopVoice() {
+    isRecording = false;
+    if (recognition) { recognition.stop(); recognition = null; }
+
+    const btn = document.getElementById('micButton');
+    const icon = document.getElementById('micIcon');
+    btn.className = 'mic-btn idle';
+    icon.className = 'fas fa-microphone text-2xl';
+    document.getElementById('voiceWave').classList.add('hidden');
+
+    const transcript = fullTranscript.trim();
+    if (transcript.length > 5) {
+        analyzeVoice(transcript);
+    } else {
+        document.getElementById('voiceStatus').textContent = 'Too short. Tap to try again.';
+    }
+}
+
+async function analyzeVoice(transcript) {
+    document.getElementById('voiceStatus').textContent = '';
+    document.getElementById('voiceAnalyzing').classList.remove('hidden');
+
+    try {
+        const r = await fetch('{{ url_for("symptom_screening.voice_analyze") }}', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'X-CSRFToken': '{{ csrf_token() }}' },
+            body: JSON.stringify({ transcript })
+        });
+        const d = await r.json();
+        document.getElementById('voiceAnalyzing').classList.add('hidden');
+
+        if (d.error) {
+            document.getElementById('voiceStatus').textContent = d.error;
+            return;
+        }
+
+        // Show results
+        document.getElementById('voiceStatus').textContent = 'Analysis complete';
+
+        let badgeClass = 'px-3 py-1 rounded-full text-xs font-bold ';
+        if (d.severity === 1) badgeClass += 'bg-red-100 text-red-700';
+        else if (d.severity === 2) badgeClass += 'bg-amber-100 text-amber-700';
+        else badgeClass += 'bg-emerald-100 text-emerald-700';
+
+        let detectedSymptomsHtml = (d.detected_symptoms || []).map(s =>
+            `<span class="px-2.5 py-1 bg-blue-50 text-blue-700 text-xs font-semibold rounded-lg m-0.5 inline-block">${s}</span>`
+        ).join('');
+
+        let bookBtnHtml = '';
+        if (d.severity === 1) {
+            bookBtnHtml = `<a href="#" class="w-full inline-block py-3 bg-red-600 text-white text-sm font-bold rounded-xl text-center hover:bg-red-700 transition mt-4">Go to Emergency Room</a>`;
+        } else {
+            bookBtnHtml = `<a href="{{ url_for("appointments.book") }}?service=${encodeURIComponent(d.recommended_service || 'Medical')}" class="w-full inline-block py-3 bg-primary-700 text-white text-sm font-bold rounded-xl text-center hover:bg-primary-800 transition mt-4"><i class="fas fa-calendar-plus mr-1.5"></i>Book ${d.recommended_service || 'Medical'} Appointment</a>`;
+        }
+
+        Swal.fire({
+            title: '<div class="flex items-center justify-center gap-3"><i class="fas fa-stethoscope text-primary-500"></i><span class="text-xl font-bold">AI Analysis</span></div>',
+            html: `
+                <div class="text-left mt-2">
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="${badgeClass}">${d.severity_label || 'Routine'}</span>
+                    </div>
+                    <p class="text-sm text-gray-600 italic mb-3">${d.summary || ''}</p>
+                    <div class="mb-4">
+                        ${detectedSymptomsHtml}
+                    </div>
+                    <div class="bg-gray-50 p-4 rounded-xl border border-gray-100">
+                        <h3 class="font-bold text-sm text-gray-900 mb-1"><i class="fas fa-lightbulb text-amber-500 mr-1.5"></i>Recommendation</h3>
+                        <p class="text-primary-700 font-semibold text-sm mb-1">Recommended: General Service</p>
+                        <p class="text-gray-600 text-sm mt-1">${d.suggestions || ''}</p>
+                    </div>
+                    ${bookBtnHtml}
+                </div>
+            `,
+            showConfirmButton: true,
+            confirmButtonText: 'Close',
+            customClass: {
+                popup: 'rounded-2xl',
+                confirmButton: 'bg-gray-200 text-gray-800 font-bold py-2.5 px-6 rounded-xl hover:bg-gray-300 transition w-full mt-2'
+            },
+            buttonsStyling: false
+        }).then(() => resetVoice());
+
+    } catch (e) {
+        document.getElementById('voiceAnalyzing').classList.add('hidden');
+        document.getElementById('voiceStatus').textContent = 'Error analyzing. Tap to try again.';
+        console.error(e);
+    }
+}
+
+function resetVoice() {
+    fullTranscript = '';
+    document.getElementById('transcriptBox').classList.add('hidden');
+    document.getElementById('transcriptText').textContent = '';
+    document.getElementById('voiceResults').classList.add('hidden');
+    document.getElementById('voiceStatus').textContent = 'Tap to start speaking';
+}
 </script>
 {% endblock %}

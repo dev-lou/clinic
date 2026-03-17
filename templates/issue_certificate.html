@@ -13,6 +13,7 @@
     </div>
 
     <form method="POST" class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         <!-- Student Search -->
         <div class="mb-6">
             <label for="student_search" class="block text-sm font-semibold text-gray-700 mb-2">
@@ -144,8 +145,10 @@ searchInput.addEventListener('input', function() {
                     return;
                 }
                 
-                resultsDiv.innerHTML = students.map(s => `
-                    <div class="p-3 hover:bg-gray-50 cursor-pointer border-b border-gray-100 last:border-0" onclick="selectStudent(${s.id}, '${s.name}', '${s.student_id}', '${s.course}', ${s.year_level}, ${JSON.stringify(s.latest_visit).replace(/'/g, "&#39;")})">
+                window.studentSearchData = students; // Store the array globally for the onclick handler
+                
+                resultsDiv.innerHTML = students.map((s, idx) => `
+                    <div class="p-3 hover:bg-gray-50 cursor-pointer border-b border-gray-100 last:border-0" onclick="selectStudentByIndex(${idx})">
                         <p class="font-medium text-gray-900">${s.name}</p>
                         <p class="text-xs text-gray-600">${s.student_id} • ${s.course} - ${s.year_level ? s.year_level + (s.year_level == 1 ? 'st' : s.year_level == 2 ? 'nd' : s.year_level == 3 ? 'rd' : 'th') + ' Year' : 'N/A'}</p>
                         ${s.latest_visit ? `<p class="text-xs text-blue-600 mt-1"><i class="fas fa-check-circle mr-1"></i>Has completed visit</p>` : '<p class="text-xs text-amber-600 mt-1"><i class="fas fa-exclamation-triangle mr-1"></i>No completed visits</p>'}
@@ -156,7 +159,15 @@ searchInput.addEventListener('input', function() {
     }, 300);
 });
 
-function selectStudent(id, name, studentId, course, year, visitData) {
+function selectStudentByIndex(index) {
+    const s = window.studentSearchData[index];
+    const id = s.id;
+    const name = s.name;
+    const studentId = s.student_id;
+    const course = s.course;
+    const year = s.year_level;
+    const visitData = s.latest_visit;
+    
     studentIdInput.value = id;
     searchInput.value = name;
     resultsDiv.classList.add('hidden');

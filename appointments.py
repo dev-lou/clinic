@@ -21,7 +21,10 @@ CLINIC_END_HOUR = 17
 SLOT_DURATION_MINUTES = 30
 MAX_APPOINTMENTS_PER_SLOT = {
     'Dental': 2,
-    'Medical': 3
+    'Medical': 3,
+    'Mental Health': 2,
+    'Physical Therapy': 2,
+    'Laboratory': 4
 }
 
 def generate_time_slots():
@@ -103,26 +106,48 @@ def check_date_availability():
     max_per_slot = MAX_APPOINTMENTS_PER_SLOT.get(service_type, 2)
     time_slots = generate_time_slots()
     
-    for day in range(1, days_in_month + 1):
+    # Optimize: Query all appointments for the month grouped by date
+    start_date = date(year, month, 1)
+    if start_date < date.today():
+        start_date = date.today()
+    end_date = date(year, month, days_in_month)
+    
+    # Get frequency of appointments grouped by date and time
+    # This avoids doing hundreds of queries!
+    month_appointments = db.session.query(
+        Appointment.appointment_date,
+        Appointment.start_time,
+        func.count(Appointment.id)
+    ).filter(
+        Appointment.appointment_date >= start_date,
+        Appointment.appointment_date <= end_date,
+        Appointment.service_type == service_type,
+        Appointment.status.in_(['Pending', 'Confirmed'])
+    ).group_by(
+        Appointment.appointment_date,
+        Appointment.start_time
+    ).all()
+    
+    # Build a structure: { date: { time: count } }
+    bookings_by_date = {}
+    for appt_date, start_time, count in month_appointments:
+        if appt_date not in bookings_by_date:
+            bookings_by_date[appt_date] = {}
+        bookings_by_date[appt_date][start_time] = count
+    
+    for day in range(start_date.day, days_in_month + 1):
         check_date = date(year, month, day)
         
-        # Skip past dates
-        if check_date < date.today():
-            continue
+        # Count available slots for this date using our pre-fetched data
+        available_count: int = 0
+        date_bookings = bookings_by_date.get(check_date, {})
         
-        # Count available slots for this date
-        available_count = 0
         for slot in time_slots:
             slot_time = datetime.strptime(slot['value'], '%H:%M').time()
-            existing_count = Appointment.query.filter(
-                Appointment.appointment_date == check_date,
-                Appointment.start_time == slot_time,
-                Appointment.service_type == service_type,
-                Appointment.status.in_(['Pending', 'Confirmed'])
-            ).count()
+            existing_count = date_bookings.get(slot_time, 0)
             
             if existing_count < max_per_slot:
-                available_count += 1
+                available_count = int(available_count) + 1
         
         # If no slots available, mark as fully booked
         if available_count == 0:
@@ -334,16 +359,9 @@ def admin_list():
         Appointment.start_time.desc()
     ).all()
     
-    # Get all active doctors for assignment dropdown
-    doctors = User.query.filter(
-        User.role == 'doctor',
-        User.is_active == True
-    ).order_by(User.first_name, User.last_name).all()
-    
     return render_template('admin_appointments.html', 
                          appointments=appointments_list, 
-                         filter_status=filter_status,
-                         doctors=doctors)
+                         filter_status=filter_status)
 
 
 @appointments.route('/admin/<int:appointment_id>/update-status', methods=['POST'])
@@ -420,47 +438,6 @@ def admin_update_status(appointment_id):
     
     return redirect(url_for('appointments.admin_list'))
 
-
-@appointments.route('/admin/<int:appointment_id>/assign-doctor', methods=['POST'])
-@login_required
-@require_staff
-def admin_assign_doctor(appointment_id):
-    """Admin route to assign or change doctor for an appointment."""
-    appointment = Appointment.query.get_or_404(appointment_id)
-    new_doctor_id = request.form.get('doctor_id')
-    
-    if not new_doctor_id:
-        flash('Please select a doctor.', 'error')
-        return redirect(url_for('appointments.admin_list'))
-    
-    # Check if doctor exists and is active
-    doctor = User.query.filter(
-        User.id == new_doctor_id,
-        User.role == 'doctor',
-        User.is_active == True
-    ).first()
-    
-    if not doctor:
-        flash('Invalid doctor selection.', 'error')
-        return redirect(url_for('appointments.admin_list'))
-    
-    # Get or create appointment extension
-    appointment_ext = AppointmentExtended.query.filter_by(appointment_id=appointment.id).first()
-    if appointment_ext:
-        old_doctor_name = appointment_ext.assigned_doctor.first_name + ' ' + appointment_ext.assigned_doctor.last_name if appointment_ext.assigned_doctor else 'None'
-        appointment_ext.assigned_doctor_id = new_doctor_id
-    else:
-        appointment_ext = AppointmentExtended(
-            appointment_id=appointment.id,
-            assigned_doctor_id=new_doctor_id
-        )
-        db.session.add(appointment_ext)
-        old_doctor_name = 'None'
-    
-    db.session.commit()
-    
-    flash(f'Doctor assigned successfully: {doctor.first_name} {doctor.last_name}', 'success')
-    return redirect(url_for('appointments.admin_list'))
 
 
 @appointments.route('/api/get-qr/<int:appointment_id>')

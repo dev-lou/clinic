@@ -60,7 +60,7 @@
                 </div>
                 {% if res.status == 'Reserved' %}
                 <div class="flex items-start gap-2">
-                    <button onclick="viewReservationQRCode({{ res.id }})" class="px-4 py-2.5 bg-primary-50 text-primary-700 rounded-xl hover:bg-primary-100 transition text-sm font-semibold">
+                    <button data-id="{{ res.id }}" onclick="viewReservationQRCode(this.getAttribute('data-id'))" class="px-4 py-2.5 bg-primary-50 text-primary-700 rounded-xl hover:bg-primary-100 transition text-sm font-semibold">
                         <i class="fas fa-qrcode mr-1.5"></i>QR
                     </button>
                     <form method="POST" action="{{ url_for('reservations.cancel_reservation', reservation_id=res.id) }}" onsubmit="return confirmCancelReservation(event);">

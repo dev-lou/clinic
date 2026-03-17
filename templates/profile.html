@@ -3,6 +3,9 @@
 
 {% block extra_css %}
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<style>
+    @keyframes scanPulse { 0%,100% { border-color: rgba(99,102,241,0.3); box-shadow: 0 0 0 0 rgba(99,102,241,0.2); } 50% { border-color: rgba(99,102,241,0.8); box-shadow: 0 0 20px 5px rgba(99,102,241,0.15); } }
+</style>
 {% endblock %}
 
 {% block content %}
@@ -160,7 +163,7 @@
         <div id="savedSignatureView" class="mb-4">
             <div class="p-4 bg-gray-50 rounded-xl border border-gray-200 mb-3">
                 <p class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Current Signature:</p>
-                <img src="{{ current_user.signature_data }}" alt="Current Signature" class="border border-gray-300 rounded-lg bg-white max-w-md">
+                <img src="{{ current_user.signature_data }}" alt="Current Signature" class="border border-gray-300 rounded-lg bg-white max-w-full h-auto">
             </div>
             <button type="button" id="updateSignatureBtn" class="w-full py-2.5 bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-700 transition text-sm">
                 <i class="fas fa-edit mr-2"></i>Update Signature
@@ -171,18 +174,57 @@
         <!-- Signature Canvas (hidden if signature exists) -->
         <div id="signatureCanvasContainer" class="border-2 border-dashed border-gray-300 rounded-xl p-4 bg-gray-50 {% if current_user.signature_data %}hidden{% endif %}">
             <canvas id="signatureCanvas" class="w-full bg-white border border-gray-200 rounded-lg cursor-crosshair" height="200" style="touch-action: none;"></canvas>
-            <div class="flex gap-2 mt-4">
-                <button type="button" id="clearSignature" class="flex-1 py-2.5 bg-gray-200 text-gray-700 font-semibold rounded-xl hover:bg-gray-300 transition text-sm">
+            <div class="flex flex-wrap gap-2 mt-4">
+                <button type="button" id="clearSignature" class="flex-1 min-w-[120px] py-2.5 bg-gray-200 text-gray-700 font-semibold rounded-xl hover:bg-gray-300 transition text-sm">
                     <i class="fas fa-eraser mr-2"></i>Clear
                 </button>
-                <button type="button" id="saveSignature" class="flex-1 py-2.5 bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-700 transition text-sm">
+                <button type="button" id="saveSignature" class="flex-1 min-w-[120px] py-2.5 bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-700 transition text-sm">
                     <i class="fas fa-save mr-2"></i>Save Signature
                 </button>
                 {% if current_user.signature_data %}
-                <button type="button" id="cancelUpdateBtn" class="flex-1 py-2.5 bg-gray-200 text-gray-700 font-semibold rounded-xl hover:bg-gray-300 transition text-sm">
+                <button type="button" id="cancelUpdateBtn" class="flex-1 min-w-[120px] py-2.5 bg-gray-200 text-gray-700 font-semibold rounded-xl hover:bg-gray-300 transition text-sm">
                     <i class="fas fa-times mr-2"></i>Cancel
                 </button>
                 {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Face Recognition Login -->
+    <div class="bg-white rounded-2xl border border-gray-100 p-6 sm:p-8">
+        <h2 class="flex items-center gap-2 text-lg font-bold text-gray-900 mb-2">
+            <div class="w-8 h-8 bg-indigo-50 rounded-lg flex items-center justify-center"><i class="fas fa-face-viewfinder text-indigo-600 text-sm"></i></div>
+            Face Recognition Login
+            <span class="ml-auto px-2 py-0.5 bg-indigo-100 text-indigo-600 text-[10px] font-bold rounded-md uppercase">Biometric</span>
+        </h2>
+        <p class="text-sm text-gray-600 mb-5">Enable face login to sign in without typing your email or password. Your face data is stored securely as a mathematical descriptor.</p>
+
+        <div id="faceEnrollSection">
+            <!-- Status will be loaded dynamically -->
+            <div id="faceEnrollStatus" class="mb-4">
+                <div class="flex items-center gap-2 text-gray-400 text-sm">
+                    <div class="w-4 h-4 border-2 border-gray-300 border-t-transparent rounded-full animate-spin"></div>
+                    <span>Checking face login status...</span>
+                </div>
+            </div>
+
+            <!-- Webcam container for enrollment -->
+            <div id="faceEnrollCamera" class="hidden">
+                <div class="relative w-full max-w-sm mx-auto" style="aspect-ratio:4/3">
+                    <div class="w-full h-full rounded-2xl overflow-hidden bg-gray-900 border-2 border-indigo-200">
+                        <video id="enrollVideo" autoplay muted playsinline class="w-full h-full object-cover" style="transform:scaleX(-1)"></video>
+                    </div>
+                    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-40 h-40 border-3 border-indigo-400/60 rounded-full" style="border-width:3px;animation:scanPulse 2s infinite"></div>
+                </div>
+                <p id="enrollCameraStatus" class="text-center text-sm font-medium text-indigo-600 mt-3">Position your face in the circle</p>
+                <div class="flex gap-3 mt-4">
+                    <button type="button" onclick="captureEnrollFace()" id="enrollCaptureBtn" class="flex-1 py-3 bg-indigo-600 text-white font-bold rounded-xl hover:bg-indigo-700 transition text-sm">
+                        <i class="fas fa-camera mr-2"></i>Capture & Save
+                    </button>
+                    <button type="button" onclick="cancelEnroll()" class="flex-1 py-3 bg-gray-200 text-gray-700 font-bold rounded-xl hover:bg-gray-300 transition text-sm">
+                        Cancel
+                    </button>
+                </div>
             </div>
         </div>
     </div>
@@ -401,5 +443,186 @@ if (cancelUpdateBtn) {
 document.addEventListener('DOMContentLoaded',()=>{const fc=document.getElementById('flash-messages');if(fc){fc.querySelectorAll('[data-category]').forEach(m=>{const c=m.getAttribute('data-category'),msg=m.getAttribute('data-message');Swal.fire({icon:c==='error'?'error':'success',text:msg,toast:true,position:'top-end',showConfirmButton:false,timer:4000,timerProgressBar:true,customClass:{popup:'rounded-2xl shadow-2xl'}})})}});
 document.getElementById('infoForm').addEventListener('submit',function(e){e.preventDefault();Swal.fire({title:'Update Profile?',text:'Save changes?',icon:'question',showCancelButton:true,confirmButtonText:'Yes, update',cancelButtonText:'Cancel',customClass:{popup:'rounded-2xl',confirmButton:'bg-primary-600 text-white font-bold py-3 px-6 rounded-xl ml-2',cancelButton:'bg-gray-200 text-gray-800 font-bold py-3 px-6 rounded-xl mr-2'},buttonsStyling:false,reverseButtons:true}).then(r=>{if(r.isConfirmed)this.submit()})});
 document.getElementById('passwordForm').addEventListener('submit',function(e){e.preventDefault();const np=this.querySelector('[name="new_password"]').value,cp=this.querySelector('[name="confirm_password"]').value;if(np!==cp){Swal.fire({icon:'error',title:'Error',text:'Passwords do not match!',customClass:{popup:'rounded-2xl'}});return}Swal.fire({title:'Change Password?',icon:'warning',showCancelButton:true,confirmButtonText:'Yes',cancelButtonText:'Cancel',customClass:{popup:'rounded-2xl',confirmButton:'bg-red-600 text-white font-bold py-3 px-6 rounded-xl ml-2',cancelButton:'bg-gray-200 text-gray-800 font-bold py-3 px-6 rounded-xl mr-2'},buttonsStyling:false,reverseButtons:true}).then(r=>{if(r.isConfirmed)this.submit()})});
+</script>
+
+<!-- Face Recognition Scripts -->
+<script src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
+<script>
+const FACE_MODEL_URL = 'https://cdn.jsdelivr.net/npm/@vladmandic/face-api@1.7.12/model/';
+let enrollStream = null;
+let faceModelsLoaded = false;
+
+// Check face login status on page load
+document.addEventListener('DOMContentLoaded', loadFaceStatus);
+
+async function loadFaceStatus() {
+    try {
+        const r = await fetch('{{ url_for("auth.face_login_status") }}');
+        const d = await r.json();
+        const container = document.getElementById('faceEnrollStatus');
+
+        if (d.enabled) {
+            container.innerHTML = `
+                <div class="flex items-center gap-3 p-4 bg-emerald-50 rounded-xl border border-emerald-100 mb-4">
+                    <div class="w-10 h-10 bg-emerald-100 rounded-xl flex items-center justify-center flex-shrink-0">
+                        <i class="fas fa-check-circle text-emerald-600"></i>
+                    </div>
+                    <div>
+                        <p class="text-sm font-bold text-emerald-800">Face Login is Active</p>
+                        <p class="text-xs text-emerald-600">You can sign in using your face on the login page</p>
+                    </div>
+                </div>
+                <div class="flex gap-3">
+                    <button type="button" onclick="startEnroll()" class="flex-1 py-3 bg-indigo-600 text-white font-bold rounded-xl hover:bg-indigo-700 transition text-sm">
+                        <i class="fas fa-sync mr-2"></i>Re-scan Face
+                    </button>
+                    <button type="button" onclick="disableFaceLogin()" class="flex-1 py-3 bg-red-100 text-red-700 font-bold rounded-xl hover:bg-red-200 transition text-sm">
+                        <i class="fas fa-times mr-2"></i>Disable
+                    </button>
+                </div>`;
+        } else {
+            container.innerHTML = `
+                <div class="flex items-center gap-3 p-4 bg-gray-50 rounded-xl border border-gray-200 mb-4">
+                    <div class="w-10 h-10 bg-gray-100 rounded-xl flex items-center justify-center flex-shrink-0">
+                        <i class="fas fa-face-viewfinder text-gray-400"></i>
+                    </div>
+                    <div>
+                        <p class="text-sm font-bold text-gray-700">Face Login is Not Set Up</p>
+                        <p class="text-xs text-gray-500">Scan your face to enable quick biometric sign-in</p>
+                    </div>
+                </div>
+                <button type="button" onclick="startEnroll()" class="w-full py-3 bg-indigo-600 text-white font-bold rounded-xl hover:bg-indigo-700 transition text-sm">
+                    <i class="fas fa-camera mr-2"></i>Set Up Face Login
+                </button>`;
+        }
+    } catch (e) {
+        console.error('Face status error:', e);
+        document.getElementById('faceEnrollStatus').innerHTML = '<p class="text-xs text-gray-400">Unable to check face login status</p>';
+    }
+}
+
+async function loadFaceModels() {
+    if (faceModelsLoaded) return;
+    await Promise.all([
+        faceapi.nets.ssdMobilenetv1.loadFromUri(FACE_MODEL_URL),
+        faceapi.nets.faceLandmark68Net.loadFromUri(FACE_MODEL_URL),
+        faceapi.nets.faceRecognitionNet.loadFromUri(FACE_MODEL_URL)
+    ]);
+    faceModelsLoaded = true;
+}
+
+async function startEnroll() {
+    const cameraDiv = document.getElementById('faceEnrollCamera');
+    const statusText = document.getElementById('enrollCameraStatus');
+    cameraDiv.classList.remove('hidden');
+
+    try {
+        statusText.textContent = 'Loading AI models...';
+        await loadFaceModels();
+
+        statusText.textContent = 'Accessing camera...';
+        enrollStream = await navigator.mediaDevices.getUserMedia({
+            video: { facingMode: 'user', width: { ideal: 640 }, height: { ideal: 480 } }
+        });
+        const video = document.getElementById('enrollVideo');
+        video.srcObject = enrollStream;
+        await video.play();
+        statusText.textContent = 'Position your face in the circle, then click Capture';
+    } catch (e) {
+        console.error('Enroll camera error:', e);
+        if (e.name === 'NotAllowedError') {
+            statusText.textContent = 'Camera access denied. Allow camera in browser settings.';
+        } else {
+            statusText.textContent = e.message || 'Failed to access camera';
+        }
+        statusText.classList.replace('text-indigo-600', 'text-red-600');
+    }
+}
+
+async function captureEnrollFace() {
+    const video = document.getElementById('enrollVideo');
+    const statusText = document.getElementById('enrollCameraStatus');
+    const captureBtn = document.getElementById('enrollCaptureBtn');
+
+    captureBtn.disabled = true;
+    captureBtn.innerHTML = '<div class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin inline-block mr-2"></div>Scanning...';
+    statusText.textContent = 'Detecting face...';
+
+    try {
+        const detection = await faceapi.detectSingleFace(video).withFaceLandmarks().withFaceDescriptor();
+
+        if (!detection) {
+            statusText.textContent = 'No face detected. Make sure your face is clearly visible.';
+            statusText.className = 'text-center text-sm font-medium text-red-600 mt-3';
+            captureBtn.disabled = false;
+            captureBtn.innerHTML = '<i class="fas fa-camera mr-2"></i>Capture & Save';
+            return;
+        }
+
+        statusText.textContent = 'Saving face data...';
+        const descriptor = Array.from(detection.descriptor);
+        const csrfToken = document.querySelector('input[name="csrf_token"]').value;
+
+        const r = await fetch('{{ url_for("auth.enable_face_login") }}', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'X-CSRFToken': csrfToken, 'X-CSRF-Token': csrfToken },
+            body: JSON.stringify({ descriptor })
+        });
+        const result = await r.json();
+
+        if (result.success) {
+            cancelEnroll();
+            Swal.fire({
+                icon: 'success',
+                title: 'Face Login Enabled!',
+                text: 'You can now sign in using your face from the login page.',
+                customClass: { popup: 'rounded-2xl' }
+            });
+            loadFaceStatus();
+        } else {
+            statusText.textContent = result.message || 'Failed to save face data';
+            statusText.className = 'text-center text-sm font-medium text-red-600 mt-3';
+        }
+    } catch (e) {
+        console.error('Capture error:', e);
+        statusText.textContent = 'Error capturing face. Try again.';
+        statusText.className = 'text-center text-sm font-medium text-red-600 mt-3';
+    }
+
+    captureBtn.disabled = false;
+    captureBtn.innerHTML = '<i class="fas fa-camera mr-2"></i>Capture & Save';
+}
+
+function cancelEnroll() {
+    if (enrollStream) { enrollStream.getTracks().forEach(t => t.stop()); enrollStream = null; }
+    document.getElementById('faceEnrollCamera').classList.add('hidden');
+    const statusText = document.getElementById('enrollCameraStatus');
+    statusText.textContent = 'Position your face in the circle';
+    statusText.className = 'text-center text-sm font-medium text-indigo-600 mt-3';
+}
+
+async function disableFaceLogin() {
+    const result = await Swal.fire({
+        title: 'Disable Face Login?',
+        text: 'You will need to use email and password to sign in.',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Yes, disable',
+        cancelButtonText: 'Cancel',
+        customClass: { popup: 'rounded-2xl', confirmButton: 'bg-red-600 text-white font-bold py-3 px-6 rounded-xl ml-2', cancelButton: 'bg-gray-200 text-gray-800 font-bold py-3 px-6 rounded-xl mr-2' },
+        buttonsStyling: false,
+        reverseButtons: true
+    });
+
+    if (result.isConfirmed) {
+        const csrfToken = document.querySelector('input[name="csrf_token"]').value;
+        await fetch('{{ url_for("auth.disable_face_login") }}', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'X-CSRFToken': csrfToken, 'X-CSRF-Token': csrfToken }
+        });
+        loadFaceStatus();
+        Swal.fire({ icon: 'success', title: 'Disabled', text: 'Face login has been disabled.', customClass: { popup: 'rounded-2xl' } });
+    }
+}
 </script>
 {% endblock %}

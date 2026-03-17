@@ -212,7 +212,7 @@ def analyze_symptoms(symptoms_text):
         return 'Physical Therapy', 3, 'Your symptoms may benefit from physical therapy.'
     
     if any(symptom in symptoms_lower for symptom in SYMPTOM_RULES['laboratory']):
-        return 'Laboratory', 3, 'You may need laboratory tests. Book a medical appointment.'
+        return 'Laboratory', 3, 'You may need laboratory tests. Book a laboratory appointment.'
     
     # Default to medical
     return 'Medical', 3, 'Please book a general medical consultation.'

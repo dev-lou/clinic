@@ -6,18 +6,26 @@
 {% block page_subtitle %}Medicines and equipment stock{% endblock %}
 
 {% block extra_style %}
+<style>
 .expiring-soon { background-color: #FEE2E2; border-left: 4px solid #DC2626; }
+</style>
 {% endblock %}
 
 {% block content %}
 <div class="space-y-6">
     <!-- Header -->
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <p class="text-sm text-gray-500">{{ items|length }} item(s) in inventory</p>
-        <a href="{{ url_for('inventory.add') }}"
-            class="inline-flex items-center justify-center px-5 py-2.5 bg-primary-700 text-white rounded-xl font-semibold text-sm hover:bg-primary-800 transition-all shadow-sm">
+        <div class="relative w-full sm:w-80">
+            <span class="absolute inset-y-0 left-0 flex items-center pl-3">
+                <i class="fas fa-search text-gray-400"></i>
+            </span>
+            <input type="text" id="inventorySearch" placeholder="Search medicines and equipment..." 
+                class="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all text-sm outline-none bg-white">
+        </div>
+        <button onclick="openAddModal()"
+            class="inline-flex items-center justify-center px-5 py-2.5 bg-primary-700 text-white rounded-xl font-semibold text-sm hover:bg-primary-800 transition-all shadow-sm shrink-0">
             <i class="fas fa-plus mr-2"></i>Add Item
-        </a>
+        </button>
     </div>
 
     <!-- Table -->
@@ -58,9 +66,19 @@
                                 {{ item.category }}
                             </span>
                         </td>
-                        <td
-                            class="px-5 py-4 text-sm font-medium {% if item.quantity < 10 %}text-red-600{% else %}text-gray-700{% endif %}">
-                            {{ item.quantity }}</td>
+                        <td class="px-5 py-4 text-sm font-medium">
+                            <div class="flex items-center space-x-2">
+                                <button onclick="adjustQuantity({{ item.id }}, -1)" class="w-6 h-6 rounded-md bg-gray-100 text-gray-600 hover:bg-gray-200 flex items-center justify-center transition" title="Decrease">
+                                    <i class="fas fa-minus text-[10px]"></i>
+                                </button>
+                                <span id="qty-{{ item.id }}" class="w-8 text-center {% if item.quantity < 10 %}text-red-600 font-bold{% else %}text-gray-700{% endif %}">
+                                    {{ item.quantity }}
+                                </span>
+                                <button onclick="adjustQuantity({{ item.id }}, 1)" class="w-6 h-6 rounded-md bg-gray-100 text-gray-600 hover:bg-gray-200 flex items-center justify-center transition" title="Increase">
+                                    <i class="fas fa-plus text-[10px]"></i>
+                                </button>
+                            </div>
+                        </td>
                         <td class="px-5 py-4 text-gray-500 text-sm hidden sm:table-cell">{{
                             item.expiry_date.strftime('%b %d, %Y') if item.expiry_date else '—' }}</td>
                         <td class="px-5 py-4">
@@ -77,10 +95,10 @@
                         </td>
                         <td class="px-5 py-4">
                             <div class="flex items-center space-x-3">
-                                <a href="{{ url_for('inventory.edit', item_id=item.id) }}"
-                                    class="text-primary-600 hover:text-primary-800 transition-colors">
+                                <button onclick="openEditModal({{ item.id }}, '{{ item.name|replace('\'', '\\\'') }}', '{{ item.batch_number|default('', true) }}', '{{ item.category }}', {{ item.quantity }}, '{{ item.expiry_date.strftime('%Y-%m-%d') if item.expiry_date else '' }}')"
+                                    class="text-primary-600 hover:text-primary-800 transition-colors" title="Edit">
                                     <i class="fas fa-edit"></i>
-                                </a>
+                                </button>
                                 <form method="POST" action="{{ url_for('inventory.delete', item_id=item.id) }}"
                                     class="inline" onsubmit="return confirmDeleteItem(event);">
                                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
@@ -99,10 +117,10 @@
                                 <i class="fas fa-box-open text-gray-300 text-xl"></i>
                             </div>
                             <p class="text-sm text-gray-400 font-medium">No inventory items found</p>
-                            <a href="{{ url_for('inventory.add') }}"
-                                class="mt-3 inline-flex items-center px-4 py-2 bg-primary-50 text-primary-700 rounded-lg text-sm font-semibold hover:bg-primary-100 transition-colors">
+                            <button onclick="openAddModal()"
+                                class="inline-flex items-center px-4 py-2 bg-primary-50 text-primary-700 rounded-lg text-sm font-semibold hover:bg-primary-100 transition-colors mt-3">
                                 <i class="fas fa-plus mr-2"></i>Add your first item
-                            </a>
+                            </button>
                         </td>
                     </tr>
                     {% endfor %}
@@ -140,6 +158,216 @@
         });
         
         return false;
+    }
+</script>
+
+<!-- Inventory Modal -->
+<div id="inventoryModal" class="fixed inset-0 z-[100] hidden">
+    <!-- Overlay -->
+    <div class="absolute inset-0 bg-gray-900/60 backdrop-blur-sm transition-opacity" onclick="closeModal()"></div>
+    
+    <!-- Modal Panel -->
+    <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:p-0">
+        <div class="relative bg-white rounded-2xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:max-w-lg w-full border border-gray-100"
+            role="dialog" aria-modal="true" aria-labelledby="modal-title">
+            
+            <div class="bg-gradient-to-r from-primary-700 to-indigo-800 px-6 py-4 flex items-center justify-between">
+                <h3 class="text-lg font-bold text-white flex items-center gap-2" id="modalTitle">
+                    <i class="fas fa-pills opacity-80"></i>
+                    <span>Add Inventory Item</span>
+                </h3>
+                <button type="button" onclick="closeModal()" class="text-white/70 hover:text-white transition-colors">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+
+            <form id="inventoryForm" method="POST" action="{{ url_for('inventory.add') }}" class="p-6">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                
+                <div class="space-y-5">
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1.5">Item Name <span class="text-red-500">*</span></label>
+                        <input type="text" name="name" id="modalName" required 
+                            class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 outline-none transition-all text-sm"
+                            placeholder="e.g. Paracetamol 500mg">
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-1.5">Batch Number</label>
+                            <input type="text" name="batch_number" id="modalBatch"
+                                class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 outline-none transition-all text-sm font-mono"
+                                placeholder="BATCH-123">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-1.5">Category <span class="text-red-500">*</span></label>
+                            <select name="category" id="modalCategory" required
+                                class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 outline-none transition-all text-sm bg-white">
+                                <option value="Medicine">Medicine</option>
+                                <option value="Equipment">Equipment</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-1.5">Quantity <span class="text-red-500">*</span></label>
+                            <input type="number" name="quantity" id="modalQty" required min="0" value="0"
+                                class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 outline-none transition-all text-sm">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-1.5">Expiry Date <span class="text-gray-400 font-normal">(optional)</span></label>
+                            <input type="date" name="expiry_date" id="modalExpiry"
+                                class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 outline-none transition-all text-sm">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-8 flex gap-3">
+                    <button type="submit" id="modalSubmitBtn"
+                        class="flex-1 px-4 py-2.5 bg-primary-700 text-white rounded-xl text-sm font-bold shadow-sm hover:shadow-md hover:bg-primary-800 transition-all focus:ring-4 focus:ring-primary-500/30">
+                        <i class="fas fa-save mr-2"></i>Save Item
+                    </button>
+                    <button type="button" onclick="closeModal()" 
+                        class="px-5 py-2.5 bg-gray-100 text-gray-700 rounded-xl text-sm font-bold hover:bg-gray-200 transition-all focus:ring-4 focus:ring-gray-200">
+                        Cancel
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Live Search Functionality
+    document.getElementById('inventorySearch').addEventListener('input', function(e) {
+        const searchTerm = e.target.value.toLowerCase();
+        const rows = document.querySelectorAll('tbody tr');
+        
+        // Skip handling if it's the "No inventory items" row
+        if(rows.length === 1 && rows[0].querySelector('td[colspan]')) return;
+        
+        rows.forEach(row => {
+            const textContent = row.textContent.toLowerCase();
+            if (textContent.includes(searchTerm)) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+    });
+
+    // Modal Functions
+    const modal = document.getElementById('inventoryModal');
+    const form = document.getElementById('inventoryForm');
+    
+    function openAddModal() {
+        document.getElementById('modalTitle').innerHTML = '<i class="fas fa-pills opacity-80"></i><span>Add Inventory Item</span>';
+        document.getElementById('modalSubmitBtn').innerHTML = '<i class="fas fa-plus mr-2"></i>Add Item';
+        form.action = "{{ url_for('inventory.add') }}";
+        form.reset();
+        
+        // Set today + 1 year as default expiry for new items
+        const nextYear = new Date();
+        nextYear.setFullYear(nextYear.getFullYear() + 1);
+        document.getElementById('modalExpiry').value = nextYear.toISOString().split('T')[0];
+        
+        modal.classList.remove('hidden');
+        document.body.classList.add('overflow-hidden');
+    }
+    
+    function openEditModal(id, name, batch, category, qty, expiry) {
+        document.getElementById('modalTitle').innerHTML = '<i class="fas fa-edit opacity-80"></i><span>Edit Inventory Item</span>';
+        document.getElementById('modalSubmitBtn').innerHTML = '<i class="fas fa-save mr-2"></i>Save Changes';
+        form.action = `/inventory/${id}/edit`;
+        
+        document.getElementById('modalName').value = name;
+        document.getElementById('modalBatch').value = batch;
+        document.getElementById('modalCategory').value = category;
+        document.getElementById('modalQty').value = qty;
+        document.getElementById('modalExpiry').value = expiry;
+        
+        modal.classList.remove('hidden');
+        document.body.classList.add('overflow-hidden');
+    }
+    
+    function closeModal() {
+        modal.classList.add('hidden');
+        document.body.classList.remove('overflow-hidden');
+    }
+
+    // Quick Quantity Adjustment
+    async function adjustQuantity(id, change) {
+        const qtySpan = document.getElementById(`qty-${id}`);
+        const currentQty = parseInt(qtySpan.textContent);
+        const newQty = Math.max(0, currentQty + change);
+        
+        if (currentQty === newQty) return; // Prevent negative stock
+        
+        // Optimistic UI update
+        qtySpan.textContent = newQty;
+        if (newQty < 10) {
+            qtySpan.classList.add('text-red-600', 'font-bold');
+            qtySpan.classList.remove('text-gray-700');
+        } else {
+            qtySpan.classList.remove('text-red-600', 'font-bold');
+            qtySpan.classList.add('text-gray-700');
+        }
+        
+        // We'll use a silent fetch to update backend.
+        // It uses the same edit route but only patches the quantity via form data
+        try {
+            const formData = new FormData();
+            formData.append('csrf_token', '{{ csrf_token() }}');
+            formData.append('quantity', newQty);
+            // We need to pass the other fields as they exist currently since the backend route expects them
+            // In a true REST API we would use PATCH, but we'll adapt to the existing architecture
+            
+            // To make this robust without modifying backend right now, we will 
+            // trigger a complete reload of the page to signify stock was adjusted,
+            // but for a better UX, a dedicated API endpoint like `/api/inventory/${id}/adjust` 
+            // would be cleaner.
+            
+            // For now, let's show a toast
+            Swal.fire({
+                icon: 'success',
+                title: 'Quantity Adjusted',
+                text: `Item stock has been ${change > 0 ? 'increased' : 'decreased'}!`,
+                toast: true,
+                position: 'bottom-end',
+                showConfirmButton: false,
+                timer: 2000
+            });
+            
+            // Submitting a hidden form to actually update it correctly according to the current backend
+            const updateForm = document.createElement('form');
+            updateForm.method = 'POST';
+            updateForm.action = `/inventory/${id}/edit`;
+            updateForm.style.display = 'none';
+            
+            // Add required fields by scraping the DOM context
+            const row = qtySpan.closest('tr');
+            const name = row.querySelector('td:nth-child(1)').textContent.trim();
+            const batch = row.querySelector('td:nth-child(2)').textContent.trim();
+            const cat = row.querySelector('td:nth-child(3)').textContent.trim();
+            
+            // Create inputs
+            updateForm.innerHTML = `
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <input type="hidden" name="name" value="${name}">
+                <input type="hidden" name="batch_number" value="${batch === '—' ? '' : batch}">
+                <input type="hidden" name="category" value="${cat}">
+                <input type="hidden" name="quantity" value="${newQty}">
+            `;
+            
+            document.body.appendChild(updateForm);
+            updateForm.submit();
+            
+        } catch (err) {
+            console.error(err);
+            // Revert on failure
+            qtySpan.textContent = currentQty;
+        }
     }
 </script>
 {% endblock %}

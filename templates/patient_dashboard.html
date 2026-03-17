@@ -101,7 +101,6 @@
                         <i class="fas fa-calendar-times text-gray-300 text-2xl"></i>
                     </div>
                     <p class="text-gray-500 text-sm mb-2">No upcoming appointments</p>
-                    <a href="{{ url_for('symptom_screening.index') }}" class="text-primary-600 hover:text-primary-700 text-sm font-medium transition">Check symptoms first?</a>
                 </div>
                 {% endif %}
             </div>
@@ -128,9 +127,7 @@
                     </div>
                     {% endfor %}
                 </div>
-                <a href="{{ url_for('patient_dashboard.timeline') }}" class="inline-flex items-center text-primary-600 hover:text-primary-700 text-sm font-semibold mt-4 transition group">
-                    View full timeline <i class="fas fa-arrow-right ml-1.5 group-hover:translate-x-1 transition-transform"></i>
-                </a>
+                <p class="text-xs text-gray-400 mt-4">Visit history is updated by clinic staff.</p>
                 {% else %}
                 <p class="text-center py-8 text-gray-400 text-sm">No visit history yet</p>
                 {% endif %}
@@ -190,25 +187,11 @@
             <div class="bg-white rounded-2xl border border-gray-100 p-6">
                 <h3 class="font-bold text-gray-900 text-sm mb-4">Quick Actions</h3>
                 <div class="space-y-2">
-                    <a href="{{ url_for('symptom_screening.index') }}" class="flex items-center gap-3 p-3 rounded-xl hover:bg-violet-50 transition group">
-                        <div class="w-9 h-9 bg-violet-50 rounded-lg flex items-center justify-center group-hover:bg-violet-100 transition">
-                            <i class="fas fa-stethoscope text-violet-500 text-sm"></i>
-                        </div>
-                        <span class="text-sm font-semibold text-gray-700">Check Symptoms</span>
-                        <i class="fas fa-chevron-right text-[10px] text-gray-300 ml-auto"></i>
-                    </a>
                     <a href="{{ url_for('appointments.book') }}" class="flex items-center gap-3 p-3 rounded-xl hover:bg-blue-50 transition group">
                         <div class="w-9 h-9 bg-blue-50 rounded-lg flex items-center justify-center group-hover:bg-blue-100 transition">
                             <i class="fas fa-calendar-plus text-blue-500 text-sm"></i>
                         </div>
                         <span class="text-sm font-semibold text-gray-700">Book Appointment</span>
-                        <i class="fas fa-chevron-right text-[10px] text-gray-300 ml-auto"></i>
-                    </a>
-                    <a href="{{ url_for('patient_dashboard.timeline') }}" class="flex items-center gap-3 p-3 rounded-xl hover:bg-gray-50 transition group">
-                        <div class="w-9 h-9 bg-gray-100 rounded-lg flex items-center justify-center group-hover:bg-gray-200 transition">
-                            <i class="fas fa-history text-gray-500 text-sm"></i>
-                        </div>
-                        <span class="text-sm font-semibold text-gray-700">Health Timeline</span>
                         <i class="fas fa-chevron-right text-[10px] text-gray-300 ml-auto"></i>
                     </a>
                 </div>

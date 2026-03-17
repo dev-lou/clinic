@@ -138,6 +138,7 @@
             padding: 1.5px;
             background: linear-gradient(135deg, transparent 40%, rgba(37, 99, 235, .3), rgba(16, 185, 129, .3));
             -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
             -webkit-mask-composite: xor;
             mask-composite: exclude;
             opacity: 0;
@@ -463,6 +464,7 @@
                 class="flex items-center space-x-3 px-4 py-3 rounded-xl text-blue-200/80 hover:bg-white/10 hover:text-white transition text-sm font-medium">
                 <i class="fas fa-user-md w-5 text-center text-blue-300/60"></i><span>Our Team</span>
             </a>
+
             <a href="{{ url_for('reservations.view_medicines') }}"
                 class="flex items-center space-x-3 px-4 py-3 rounded-xl text-blue-200/80 hover:bg-white/10 hover:text-white transition text-sm font-medium">
                 <i class="fas fa-pills w-5 text-center text-emerald-400/60"></i><span>Medicines</span>
@@ -485,6 +487,7 @@
                 class="flex items-center space-x-3 px-4 py-3 rounded-xl text-blue-200/80 hover:bg-white/10 hover:text-white transition text-sm font-medium">
                 <i class="fas fa-user-circle w-5 text-center text-blue-300/60"></i><span>Profile</span>
             </a>
+
             {% if current_user.role in ['admin', 'staff'] %}
             <a href="{{ url_for('admin') }}"
                 class="flex items-center space-x-3 px-4 py-3 rounded-xl text-blue-200/80 hover:bg-white/10 hover:text-white transition text-sm font-medium">
@@ -576,12 +579,7 @@
                                 <a href="{{ url_for('reservations.my_reservations') }}"
                                     class="flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors rounded-lg mx-1.5"><i
                                         class="fas fa-capsules w-5 text-gray-400 mr-2.5"></i>My Reservations</a>
-                                <a href="{{ url_for('patient_dashboard.timeline') }}"
-                                    class="flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors rounded-lg mx-1.5"><i
-                                        class="fas fa-history w-5 text-gray-400 mr-2.5"></i>Health Timeline</a>
-                                <a href="{{ url_for('symptom_screening.index') }}"
-                                    class="flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors rounded-lg mx-1.5"><i
-                                        class="fas fa-stethoscope w-5 text-gray-400 mr-2.5"></i>Symptom Check</a>
+
                                 <a href="{{ url_for('auth.profile') }}"
                                     class="flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors rounded-lg mx-1.5"><i
                                         class="fas fa-user-circle w-5 text-gray-400 mr-2.5"></i>My Profile</a>

@@ -31,61 +31,57 @@ def list_inventory():
     return render_template('inventory.html', items=items)
 
 
-@inventory.route('/add', methods=['GET', 'POST'])
+@inventory.route('/add', methods=['POST'])
 @login_required
 @require_staff
 def add():
-    """Add new inventory item."""
-    if request.method == 'POST':
-        name = request.form.get('name')
-        batch_number = request.form.get('batch_number')
-        category = request.form.get('category')
-        quantity = int(request.form.get('quantity'))
-        expiry_date_str = request.form.get('expiry_date')
-        
-        expiry_date = None
-        if expiry_date_str:
-            expiry_date = datetime.strptime(expiry_date_str, '%Y-%m-%d').date()
-        
-        item = Inventory(
-            name=name,
-            batch_number=batch_number,
-            category=category,
-            quantity=quantity,
-            expiry_date=expiry_date
-        )
-        db.session.add(item)
-        db.session.commit()
-        
-        flash(f'{name} added to inventory.', 'success')
-        return redirect(url_for('inventory.list_inventory'))
+    """Add new inventory item from modal."""
+    name = request.form.get('name')
+    batch_number = request.form.get('batch_number')
+    category = request.form.get('category')
+    quantity = int(request.form.get('quantity'))
+    expiry_date_str = request.form.get('expiry_date')
     
-    return render_template('inventory_form.html', item=None)
+    expiry_date = None
+    if expiry_date_str:
+        expiry_date = datetime.strptime(expiry_date_str, '%Y-%m-%d').date()
+    
+    item = Inventory(
+        name=name,
+        batch_number=batch_number,
+        category=category,
+        quantity=quantity,
+        expiry_date=expiry_date
+    )
+    db.session.add(item)
+    db.session.commit()
+    
+    flash(f'{name} added to inventory.', 'success')
+    return redirect(url_for('inventory.list_inventory'))
 
 
-@inventory.route('/<int:item_id>/edit', methods=['GET', 'POST'])
+@inventory.route('/<int:item_id>/edit', methods=['POST'])
 @login_required
 @require_staff
 def edit(item_id):
-    """Edit an inventory item."""
+    """Edit an inventory item from modal."""
     item = Inventory.query.get_or_404(item_id)
     
-    if request.method == 'POST':
-        item.name = request.form.get('name')
-        item.batch_number = request.form.get('batch_number')
-        item.category = request.form.get('category')
-        item.quantity = int(request.form.get('quantity'))
-        
-        expiry_date_str = request.form.get('expiry_date')
-        if expiry_date_str:
-            item.expiry_date = datetime.strptime(expiry_date_str, '%Y-%m-%d').date()
-        
-        db.session.commit()
-        
-        flash(f'{item.name} updated successfully.', 'success')
-        return redirect(url_for('inventory.list_inventory'))
+    item.name = request.form.get('name')
+    item.batch_number = request.form.get('batch_number')
+    item.category = request.form.get('category')
+    item.quantity = int(request.form.get('quantity'))
     
-    return render_template('inventory_form.html', item=item)
+    expiry_date_str = request.form.get('expiry_date')
+    if expiry_date_str:
+        item.expiry_date = datetime.strptime(expiry_date_str, '%Y-%m-%d').date()
+    else:
+        item.expiry_date = None
+    
+    db.session.commit()
+    
+    flash(f'{item.name} updated successfully.', 'success')
+    return redirect(url_for('inventory.list_inventory'))
 
 
 @inventory.route('/<int:item_id>/delete', methods=['POST'])

@@ -44,7 +44,7 @@
                         </div>
                     </div>
                     <div class="flex items-center gap-2">
-                        <button onclick="viewQRCode({{ appt.id }})" class="px-4 py-2.5 bg-primary-50 text-primary-700 rounded-xl hover:bg-primary-100 transition text-sm font-semibold">
+                        <button data-id="{{ appt.id }}" onclick="viewQRCode(this.getAttribute('data-id'))" class="px-4 py-2.5 bg-primary-50 text-primary-700 rounded-xl hover:bg-primary-100 transition text-sm font-semibold">
                             <i class="fas fa-qrcode mr-1.5"></i>QR
                         </button>
                         <form method="POST" action="{{ url_for('appointments.cancel', appointment_id=appt.id) }}" onsubmit="return confirmCancelAppointment(event);">

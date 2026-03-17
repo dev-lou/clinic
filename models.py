@@ -24,6 +24,7 @@ class User(UserMixin, db.Model):
     is_active = db.Column(db.Boolean, default=True)
     profile_image_url = db.Column(db.String(500), nullable=True)  # Supabase storage URL
     signature_data = db.Column(db.Text, nullable=True)  # Base64 encoded signature image
+    face_descriptor = db.Column(db.Text, nullable=True)  # JSON array of 128 floats for face recognition
     created_at = db.Column(
         db.DateTime(timezone=True),
         default=lambda: datetime.now(timezone.utc),
