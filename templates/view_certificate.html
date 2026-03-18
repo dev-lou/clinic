@@ -31,21 +31,22 @@
                 <div class="grid grid-cols-2 gap-4">
                     <div>
                         <p class="text-xs text-gray-500">Full Name</p>
-                        <p class="font-semibold text-gray-900">{{ student.user.full_name }}</p>
+                        <p class="font-semibold text-gray-900">{{ certificate.student.full_name }}</p>
                     </div>
                     <div>
                         <p class="text-xs text-gray-500">Student ID</p>
-                        <p class="font-semibold text-gray-900">{{ student.student_id }}</p>
+                        <p class="font-semibold text-gray-900">{{ certificate.student.student_profile.student_id_number if certificate.student.student_profile else 'N/A' }}</p>
                     </div>
                     <div>
                         <p class="text-xs text-gray-500">Course</p>
-                        <p class="font-semibold text-gray-900">{{ student.course }}</p>
+                        <p class="font-semibold text-gray-900">{{ certificate.student.student_profile.course if certificate.student.student_profile else 'N/A' }}</p>
                     </div>
                     <div>
                         <p class="text-xs text-gray-500">Year Level</p>
                         <p class="font-semibold text-gray-900">
-                            {% if student.year_level %}
-                                {{ student.year_level }}{{ 'st' if student.year_level == 1 else 'nd' if student.year_level == 2 else 'rd' if student.year_level == 3 else 'th' }} Year
+                            {% set ylevel = certificate.student.student_profile.year_level if certificate.student.student_profile else None %}
+                            {% if ylevel %}
+                                {{ ylevel }}{{ 'st' if ylevel == 1 else 'nd' if ylevel == 2 else 'rd' if ylevel == 3 else 'th' }} Year
                             {% else %}
                                 N/A
                             {% endif %}
@@ -68,12 +69,12 @@
                     </div>
                     <div>
                         <p class="text-xs text-gray-500">Valid Until</p>
-                        <p class="font-semibold text-gray-900">{{ certificate.valid_until.strftime('%B %d, %Y') }}</p>
+                        <p class="font-semibold text-gray-900">{{ certificate.valid_until.strftime('%B %d, %Y') if certificate.valid_until else 'N/A' }}</p>
                     </div>
                     <div>
                         <p class="text-xs text-gray-500">Issued By</p>
-                        <p class="font-semibold text-gray-900">{{ issuer.full_name }}</p>
-                        <p class="text-xs text-gray-500">{{ issuer.role|title }}</p>
+                        <p class="font-semibold text-gray-900">{{ certificate.issuer.full_name }}</p>
+                        <p class="text-xs text-gray-500">{{ certificate.issuer.role|title }}</p>
                     </div>
                 </div>
             </div>
