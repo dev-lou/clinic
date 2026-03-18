@@ -185,8 +185,8 @@ def download_certificate(cert_id):
     doc = SimpleDocTemplate(
         buffer,
         pagesize=letter,
-        topMargin=0.3*inch,
-        bottomMargin=0.4*inch,
+        topMargin=1.3*inch,
+        bottomMargin=1.2*inch,
         leftMargin=0.5*inch,
         rightMargin=0.5*inch
     )
@@ -259,34 +259,86 @@ def download_certificate(cert_id):
                 return None
         return None
     
+    # Header Logos
     isufst_logo = load_logo(os.path.join('static', 'images', 'isufst-logo.png'), 1*inch, 0.7*inch)
     bayan_logo = load_logo(os.path.join('static', 'images', 'bayan.png'), 0.6*inch, 0.6*inch)
     
-    # ========== HEADER ==========
-    # Header table with logos and university name
-    header_data = [
-        [isufst_logo or '', Paragraph("<b>ILOILO STATE UNIVERSITY OF<br/>FISHERIES SCIENCE AND TECHNOLOGY</b>", university_style), bayan_logo or '']
-    ]
-    header_table = Table(header_data, colWidths=[1.2*inch, 4.6*inch, 1.2*inch])
-    header_table.setStyle(TableStyle([
-        ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
-        ('ALIGN', (0, 0), (0, 0), 'LEFT'),
-        ('ALIGN', (1, 0), (1, 0), 'CENTER'),
-        ('ALIGN', (2, 0), (2, 0), 'RIGHT'),
-    ]))
-    elements.append(header_table)
-    elements.append(Spacer(1, 0.05*inch))
+    # Footer Logos (Increased size)
+    heart_logo = load_logo(os.path.join('static', 'images', 'heart.png'), 0.6*inch, 0.6*inch)
+    gcl_logo = load_logo(os.path.join('static', 'images', 'gcl.png'), 0.6*inch, 0.6*inch)
     
-    # Separator line
-    separator_line = Table([['']], colWidths=[7*inch], rowHeights=0.02*inch)
-    separator_line.setStyle(TableStyle([
-        ('BACKGROUND', (0, 0), (0, 0), PRIMARY_BLUE),
-        ('ALIGN', (0, 0), (0, 0), 'CENTER'),
-    ]))
-    elements.append(separator_line)
-    elements.append(Spacer(1, 0.08*inch))
+    def draw_fixed_elements(canvas, doc):
+        canvas.saveState()
+        
+        # --- HEADER ---
+        header_data = [
+            [isufst_logo or '', Paragraph("<b>ILOILO STATE UNIVERSITY OF<br/>FISHERIES SCIENCE AND TECHNOLOGY</b>", university_style), bayan_logo or '']
+        ]
+        header_table = Table(header_data, colWidths=[1.2*inch, 5.1*inch, 1.2*inch])
+        header_table.setStyle(TableStyle([
+            ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+            ('ALIGN', (0, 0), (0, 0), 'LEFT'),
+            ('ALIGN', (1, 0), (1, 0), 'CENTER'),
+            ('ALIGN', (2, 0), (2, 0), 'RIGHT'),
+        ]))
+        
+        # Wrap and draw header at the absolute top margin
+        header_table.wrapOn(canvas, doc.width, doc.topMargin)
+        header_table.drawOn(canvas, doc.leftMargin, doc.height + doc.bottomMargin + 0.3*inch)
+        
+        # Separator line
+        canvas.setStrokeColor(PRIMARY_BLUE)
+        canvas.setLineWidth(1)
+        line_y = doc.height + doc.bottomMargin + 0.2*inch
+        canvas.line(doc.leftMargin, line_y, doc.leftMargin + doc.width, line_y)
+        
+        # --- FOOTER ---
+        core_values = Paragraph(
+            "<b>INTEGRITY</b>  •  <b>SOCIAL JUSTICE</b>  •  <b>DISCIPLINE</b>  •  <b>ACADEMIC EXCELLENCE</b>",
+            ParagraphStyle('CoreValues', parent=styles['Normal'], fontSize=8, textColor=TEXT_DARK, alignment=TA_CENTER, fontName='Helvetica-Bold')
+        )
+        
+        logos_row = []
+        if heart_logo: logos_row.append(heart_logo)
+        if gcl_logo: logos_row.append(gcl_logo)
+        
+        if logos_row:
+            logos_table = Table([logos_row], colWidths=[0.65*inch]*len(logos_row))
+            logos_table.setStyle(TableStyle([
+                ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+                ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+            ]))
+            
+            footer_table = Table([[core_values, logos_table]], colWidths=[6.0*inch, 1.5*inch])
+            footer_table.setStyle(TableStyle([
+                ('ALIGN', (0, 0), (0, 0), 'CENTER'),
+                ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+                ('ALIGN', (1, 0), (1, 0), 'RIGHT'),
+            ]))
+        else:
+            footer_table = Table([[core_values]], colWidths=[7.5*inch])
+            footer_table.setStyle(TableStyle([('ALIGN', (0, 0), (0, 0), 'CENTER'), ('VALIGN', (0, 0), (0, 0), 'MIDDLE')]))
+            
+        footer_table.wrapOn(canvas, doc.width, doc.bottomMargin)
+        footer_table.drawOn(canvas, doc.leftMargin, 0.6*inch)
+        
+        contact_info = Paragraph(
+            "For verification: clinic@isufst.edu.ph | www.isufst.edu.ph",
+            ParagraphStyle('ContactInfo', parent=styles['Normal'], fontSize=7, textColor=TEXT_GRAY, alignment=TA_CENTER)
+        )
+        contact_info.wrapOn(canvas, doc.width, doc.bottomMargin)
+        contact_info.drawOn(canvas, doc.leftMargin, 0.4*inch)
+        
+        verify_text = Paragraph(
+            "<i>This certificate is digitally signed and cryptographically verified. Tampering invalidates this document.</i>",
+            ParagraphStyle('VerifyText', parent=styles['Normal'], fontSize=6, textColor=TEXT_LIGHT, alignment=TA_CENTER)
+        )
+        verify_text.wrapOn(canvas, doc.width, doc.bottomMargin)
+        verify_text.drawOn(canvas, doc.leftMargin, 0.25*inch)
+        
+        canvas.restoreState()
     
-    # Certificate title
+    # Certificate title (First flowable element)
     title_para = Paragraph(
         "<font color='#1e3a5f'><b>OFFICIAL HEALTH CERTIFICATE</b></font>",
         certificate_title_style
@@ -417,7 +469,7 @@ def download_certificate(cert_id):
     issuer = cert.issuer
     
     # Generate QR code for verification
-    verification_url = f"https://isufst.edu.ph/verify/{cert.certificate_number}"
+    verification_url = f"https://isufst-clinic.onrender.com/verify/{cert.certificate_number}"
     qr = qrcode.QRCode(version=1, box_size=4, border=1)
     qr.add_data(verification_url)
     qr.make(fit=True)
@@ -491,37 +543,8 @@ def download_certificate(cert_id):
     )
     elements.append(verify_note)
     
-    # ========== FOOTER ==========
-    # Core values
-    core_values = Paragraph(
-        "<b>INTEGRITY</b>  •  <b>SOCIAL JUSTICE</b>  •  <b>DISCIPLINE</b>  •  <b>ACADEMIC EXCELLENCE</b>",
-        ParagraphStyle(
-            'CoreValues',
-            parent=styles['Normal'],
-            fontSize=8,
-            textColor=TEXT_DARK,
-            alignment=TA_CENTER,
-            fontName='Helvetica-Bold',
-            spaceAfter=4
-        )
-    )
-    elements.append(core_values)
-    
-    # Contact info
-    contact_info = Paragraph(
-        "For verification: clinic@isufst.edu.ph | www.isufst.edu.ph",
-        ParagraphStyle(
-            'ContactInfo',
-            parent=styles['Normal'],
-            fontSize=7,
-            textColor=TEXT_GRAY,
-            alignment=TA_CENTER
-        )
-    )
-    elements.append(contact_info)
-    
-    # Build PDF
-    doc.build(elements)
+    # Build PDF with fixed header/footer layout
+    doc.build(elements, onFirstPage=draw_fixed_elements, onLaterPages=draw_fixed_elements)
     buffer.seek(0)
     
     return send_file(
