@@ -5,208 +5,252 @@
 
 {% block content %}
 <div class="space-y-6 fade-in">
-    <!-- Header -->
-    <div class="relative bg-gradient-to-br from-violet-800 via-violet-700 to-indigo-800 rounded-3xl p-8 sm:p-10 overflow-hidden">
-        <div class="absolute top-0 right-0 w-72 h-72 bg-white/[0.04] rounded-full -translate-y-1/3 translate-x-1/4"></div>
-        <div class="relative z-10">
-            <h1 class="text-3xl sm:text-4xl font-extrabold text-white mb-1">Analytics Dashboard</h1>
-            <p class="text-violet-200/50 text-sm">Comprehensive clinic performance metrics and insights</p>
-        </div>
-    </div>
-
-    <!-- Quick Stats -->
-    <div id="statsGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div class="bg-white rounded-2xl border border-gray-100 p-5 animate-pulse"><div class="h-20 bg-gray-100 rounded-xl"></div></div>
-        <div class="bg-white rounded-2xl border border-gray-100 p-5 animate-pulse"><div class="h-20 bg-gray-100 rounded-xl"></div></div>
-        <div class="bg-white rounded-2xl border border-gray-100 p-5 animate-pulse"><div class="h-20 bg-gray-100 rounded-xl"></div></div>
-        <div class="bg-white rounded-2xl border border-gray-100 p-5 animate-pulse"><div class="h-20 bg-gray-100 rounded-xl"></div></div>
-    </div>
-
-    <!-- AI Predictions Section -->
-    <div class="bg-gradient-to-br from-indigo-50 to-violet-50 rounded-2xl border border-indigo-100 p-6 sm:p-8">
-        <div class="flex items-center justify-between mb-5">
+    <!-- Header Section -->
+    <div class="relative bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 rounded-2xl p-8 overflow-hidden">
+        <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-slate-700/30 to-transparent"></div>
+        <div class="relative z-10 flex items-center justify-between">
+            <div>
+                <h1 class="text-2xl font-semibold text-white tracking-tight">Analytics Dashboard</h1>
+                <p class="text-slate-400 text-sm mt-1">Clinic performance metrics and insights</p>
+            </div>
             <div class="flex items-center gap-3">
-                <div class="w-10 h-10 bg-gradient-to-br from-indigo-600 to-violet-600 rounded-xl flex items-center justify-center shadow-md shadow-indigo-600/20">
-                    <i class="fas fa-brain text-white"></i>
-                </div>
-                <div>
-                    <h2 class="text-lg font-bold text-gray-900">AI Predictive Insights</h2>
-                    <p class="text-xs text-gray-500">Powered by Gemini AI — analyzes your clinic data for predictions</p>
-                </div>
+                <span class="text-xs text-slate-400">Last updated: <span id="lastUpdated">Loading...</span></span>
+                <button onclick="refreshAllData()" class="px-3 py-1.5 bg-slate-700 hover:bg-slate-600 text-slate-200 text-xs font-medium rounded-lg transition-colors">
+                    Refresh
+                </button>
             </div>
-            <span class="px-2.5 py-1 bg-indigo-600 text-white text-[10px] font-bold rounded-lg uppercase tracking-wider">AI</span>
+        </div>
+    </div>
+
+    <!-- Key Metrics Grid -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4" id="statsGrid">
+        <div class="bg-white rounded-xl border border-slate-200 p-4">
+            <div class="flex items-center gap-3 mb-3">
+                <div class="w-8 h-8 bg-blue-50 rounded-lg flex items-center justify-center">
+                    <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                    </svg>
+                </div>
+                <span class="text-xs text-slate-500 font-medium">Today</span>
+            </div>
+            <div class="text-2xl font-semibold text-slate-900" id="todayAppointments">-</div>
+            <div class="text-xs text-slate-400 mt-1">Appointments</div>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <!-- Peak Hours Prediction -->
-            <div class="bg-white rounded-2xl border border-gray-100 p-5">
-                <div class="flex items-center gap-2 mb-3">
-                    <div class="w-8 h-8 bg-blue-50 rounded-lg flex items-center justify-center"><i class="fas fa-clock text-blue-500 text-sm"></i></div>
-                    <h3 class="text-sm font-bold text-gray-900">Peak Hours Forecast</h3>
+        <div class="bg-white rounded-xl border border-slate-200 p-4">
+            <div class="flex items-center gap-3 mb-3">
+                <div class="w-8 h-8 bg-emerald-50 rounded-lg flex items-center justify-center">
+                    <svg class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
                 </div>
-                <div id="predictPeakHours" class="min-h-[100px]">
-                    <p class="text-xs text-gray-400 mb-3">Predict busiest hours and staffing needs</p>
-                    <button onclick="runPrediction('peak-hours', 'predictPeakHours')" class="w-full py-2.5 bg-blue-600 text-white text-xs font-bold rounded-xl hover:bg-blue-700 transition">
-                        <i class="fas fa-magic mr-1.5"></i>Generate Prediction
-                    </button>
-                </div>
+                <span class="text-xs text-slate-500 font-medium">This Month</span>
             </div>
+            <div class="text-2xl font-semibold text-slate-900" id="monthlyAppointments">-</div>
+            <div class="text-xs text-slate-400 mt-1">Total Visits</div>
+        </div>
 
-            <!-- Medicine Demand Prediction -->
-            <div class="bg-white rounded-2xl border border-gray-100 p-5">
-                <div class="flex items-center gap-2 mb-3">
-                    <div class="w-8 h-8 bg-emerald-50 rounded-lg flex items-center justify-center"><i class="fas fa-pills text-emerald-500 text-sm"></i></div>
-                    <h3 class="text-sm font-bold text-gray-900">Medicine Demand</h3>
+        <div class="bg-white rounded-xl border border-slate-200 p-4">
+            <div class="flex items-center gap-3 mb-3">
+                <div class="w-8 h-8 bg-violet-50 rounded-lg flex items-center justify-center">
+                    <svg class="w-4 h-4 text-violet-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
                 </div>
-                <div id="predictMedicine" class="min-h-[100px]">
-                    <p class="text-xs text-gray-400 mb-3">Forecast restocking needs and expiry risks</p>
-                    <button onclick="runPrediction('medicine-demand', 'predictMedicine')" class="w-full py-2.5 bg-emerald-600 text-white text-xs font-bold rounded-xl hover:bg-emerald-700 transition">
-                        <i class="fas fa-magic mr-1.5"></i>Generate Prediction
-                    </button>
-                </div>
+                <span class="text-xs text-slate-500 font-medium">Active</span>
             </div>
+            <div class="text-2xl font-semibold text-slate-900" id="activeReservations">-</div>
+            <div class="text-xs text-slate-400 mt-1">Reservations</div>
+        </div>
 
-            <!-- Health Trends Prediction -->
-            <div class="bg-white rounded-2xl border border-gray-100 p-5">
-                <div class="flex items-center gap-2 mb-3">
-                    <div class="w-8 h-8 bg-violet-50 rounded-lg flex items-center justify-center"><i class="fas fa-virus text-violet-500 text-sm"></i></div>
-                    <h3 class="text-sm font-bold text-gray-900">Health Trends</h3>
+        <div class="bg-white rounded-xl border border-slate-200 p-4">
+            <div class="flex items-center gap-3 mb-3">
+                <div class="w-8 h-8 bg-amber-50 rounded-lg flex items-center justify-center">
+                    <svg class="w-4 h-4 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/>
+                    </svg>
                 </div>
-                <div id="predictHealth" class="min-h-[100px]">
-                    <p class="text-xs text-gray-400 mb-3">Detect outbreak patterns and trending symptoms</p>
-                    <button onclick="runPrediction('health-trends', 'predictHealth')" class="w-full py-2.5 bg-violet-600 text-white text-xs font-bold rounded-xl hover:bg-violet-700 transition">
-                        <i class="fas fa-magic mr-1.5"></i>Generate Prediction
-                    </button>
-                </div>
+                <span class="text-xs text-slate-500 font-medium">Rating</span>
             </div>
+            <div class="text-2xl font-semibold text-slate-900" id="avgSatisfaction">-</div>
+            <div class="text-xs text-slate-400 mt-1">Patient Satisfaction</div>
         </div>
     </div>
 
     <!-- Charts Row 1 -->
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
-        <div class="bg-white rounded-2xl border border-gray-100 p-6">
-            <h3 class="flex items-center gap-2 text-sm font-bold text-gray-900 mb-4">
-                <div class="w-7 h-7 bg-blue-50 rounded-lg flex items-center justify-center"><i class="fas fa-chart-line text-blue-500 text-xs"></i></div>
-                Appointments Trend
-            </h3>
-            <div style="position:relative;height:250px"><canvas id="appointmentsTrendChart"></canvas></div>
-        </div>
-
-        <div id="serviceChartContainer" class="bg-white rounded-2xl border border-gray-100 p-6">
-            <h3 class="flex items-center gap-2 text-sm font-bold text-gray-900 mb-4">
-                <div class="w-7 h-7 bg-emerald-50 rounded-lg flex items-center justify-center"><i class="fas fa-chart-pie text-emerald-500 text-xs"></i></div>
-                Service Distribution
-            </h3>
-            <div style="position:relative;height:250px"><canvas id="serviceDistributionChart"></canvas></div>
-        </div>
-
-        <div class="bg-white rounded-2xl border border-gray-100 p-6">
-            <h3 class="flex items-center gap-2 text-sm font-bold text-gray-900 mb-4">
-                <div class="w-7 h-7 bg-violet-50 rounded-lg flex items-center justify-center"><i class="fas fa-clock text-violet-500 text-xs"></i></div>
-                Peak Hours
-            </h3>
-            <div style="position:relative;height:250px"><canvas id="peakHoursChart"></canvas></div>
-        </div>
-
-        <div class="bg-white rounded-2xl border border-gray-100 p-6 lg:col-span-2">
-            <h3 class="flex items-center gap-2 text-sm font-bold text-gray-900 mb-4">
-                <div class="w-7 h-7 bg-amber-50 rounded-lg flex items-center justify-center"><i class="fas fa-star text-amber-500 text-xs"></i></div>
-                Patient Satisfaction Trend
-            </h3>
-            <div style="position:relative;height:200px"><canvas id="satisfactionTrendChart"></canvas></div>
-        </div>
-    </div>
-
-    <!-- Additional Metrics -->
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-        <div class="bg-white rounded-2xl border border-gray-100 p-6">
-            <h3 class="flex items-center gap-2 text-sm font-bold text-gray-900 mb-4">
-                <div class="w-7 h-7 bg-red-50 rounded-lg flex items-center justify-center"><i class="fas fa-user-times text-red-500 text-xs"></i></div>
-                No-Show Rate Analysis
-            </h3>
-            <div id="noShowStats">
-                <div class="space-y-3 animate-pulse"><div class="h-4 bg-gray-100 rounded w-3/4"></div><div class="h-4 bg-gray-100 rounded w-1/2"></div><div class="h-4 bg-gray-100 rounded w-2/3"></div></div>
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <div class="bg-white rounded-xl border border-slate-200 p-5">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-sm font-medium text-slate-900">Appointment Trend</h3>
+                <select id="trendPeriod" class="text-xs border border-slate-200 rounded-lg px-2 py-1 bg-white" onchange="loadAppointmentsTrend()">
+                    <option value="7">Last 7 days</option>
+                    <option value="14">Last 14 days</option>
+                    <option value="30" selected>Last 30 days</option>
+                </select>
+            </div>
+            <div class="h-[220px]">
+                <canvas id="appointmentsTrendChart"></canvas>
             </div>
         </div>
 
-        <div class="bg-white rounded-2xl border border-gray-100 p-6">
-            <h3 class="flex items-center gap-2 text-sm font-bold text-gray-900 mb-4">
-                <div class="w-7 h-7 bg-emerald-50 rounded-lg flex items-center justify-center"><i class="fas fa-pills text-emerald-500 text-xs"></i></div>
-                Top Medicine Usage
-            </h3>
-            <div id="inventoryConsumption">
-                <div class="space-y-3 animate-pulse"><div class="h-10 bg-gray-100 rounded-xl"></div><div class="h-10 bg-gray-100 rounded-xl"></div><div class="h-10 bg-gray-100 rounded-xl"></div></div>
+        <div class="bg-white rounded-xl border border-slate-200 p-5">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-sm font-medium text-slate-900">Service Distribution</h3>
+            </div>
+            <div class="h-[220px] flex items-center justify-center">
+                <canvas id="serviceDistributionChart" class="max-h-full"></canvas>
             </div>
         </div>
     </div>
 
-    <!-- 🏥 University Clinic Specific Metrics -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-5 mt-5">
-        <!-- Daily Clinic Overview -->
-        <div class="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl border border-blue-100 p-6">
-            <div class="flex items-center gap-2 mb-4">
-                <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-                    <i class="fas fa-hospital text-white text-sm"></i>
-                </div>
-                <h3 class="text-sm font-bold text-gray-900">Daily Clinic Overview</h3>
+    <!-- Charts Row 2 -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        <div class="bg-white rounded-xl border border-slate-200 p-5">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-sm font-medium text-slate-900">Peak Hours</h3>
             </div>
-            <div id="dailyOverview" class="space-y-3">
-                <div class="space-y-3 animate-pulse">
-                    <div class="h-4 bg-blue-100 rounded w-full"></div>
-                    <div class="h-4 bg-blue-100 rounded w-5/6"></div>
-                    <div class="h-4 bg-blue-100 rounded w-4/6"></div>
-                </div>
+            <div class="h-[180px]">
+                <canvas id="peakHoursChart"></canvas>
             </div>
         </div>
 
-        <!-- Mental Health Stats -->
-        <div class="bg-gradient-to-br from-violet-50 to-purple-50 rounded-2xl border border-violet-100 p-6">
-            <div class="flex items-center gap-2 mb-4">
-                <div class="w-8 h-8 bg-violet-600 rounded-lg flex items-center justify-center">
-                    <i class="fas fa-brain text-white text-sm"></i>
-                </div>
-                <h3 class="text-sm font-bold text-gray-900">Mental Health Stats</h3>
+        <div class="bg-white rounded-xl border border-slate-200 p-5">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-sm font-medium text-slate-900">Daily Overview</h3>
             </div>
-            <div id="mentalHealthStats" class="space-y-3">
-                <div class="space-y-3 animate-pulse">
-                    <div class="h-4 bg-violet-100 rounded w-full"></div>
-                    <div class="h-4 bg-violet-100 rounded w-5/6"></div>
-                    <div class="h-4 bg-violet-100 rounded w-4/6"></div>
-                </div>
+            <div id="dailyOverview" class="space-y-2 text-sm">
+                <div class="animate-pulse h-6 bg-slate-100 rounded"></div>
+                <div class="animate-pulse h-6 bg-slate-100 rounded w-5/6"></div>
+                <div class="animate-pulse h-6 bg-slate-100 rounded w-4/6"></div>
             </div>
         </div>
 
-        <!-- Health Issues Trend -->
-        <div class="bg-gradient-to-br from-rose-50 to-pink-50 rounded-2xl border border-rose-100 p-6">
-            <div class="flex items-center gap-2 mb-4">
-                <div class="w-8 h-8 bg-rose-600 rounded-lg flex items-center justify-center">
-                    <i class="fas fa-virus text-white text-sm"></i>
-                </div>
-                <h3 class="text-sm font-bold text-gray-900">Top Health Issues</h3>
+        <div class="bg-white rounded-xl border border-slate-200 p-5">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-sm font-medium text-slate-900">Mental Health Stats</h3>
             </div>
-            <div id="healthIssuesTrend" class="space-y-3">
-                <div class="space-y-3 animate-pulse">
-                    <div class="h-4 bg-rose-100 rounded w-full"></div>
-                    <div class="h-4 bg-rose-100 rounded w-5/6"></div>
-                    <div class="h-4 bg-rose-100 rounded w-4/6"></div>
-                </div>
+            <div id="mentalHealthStats" class="space-y-2 text-sm">
+                <div class="animate-pulse h-6 bg-slate-100 rounded"></div>
+                <div class="animate-pulse h-6 bg-slate-100 rounded w-5/6"></div>
+                <div class="animate-pulse h-6 bg-slate-100 rounded w-4/6"></div>
             </div>
         </div>
     </div>
 
-    <!-- Campus Comparison Section -->
-    <div class="bg-white rounded-2xl border border-gray-100 p-6 mt-5">
-        <h3 class="flex items-center gap-2 text-sm font-bold text-gray-900 mb-4">
-            <div class="w-7 h-7 bg-indigo-50 rounded-lg flex items-center justify-center"><i class="fas fa-university text-indigo-500 text-xs"></i></div>
-            Campus Comparison
-        </h3>
-        <div id="campusComparison">
-            <div class="grid grid-cols-5 gap-4">
-                <div class="text-center p-4 bg-gray-50 rounded-xl animate-pulse"><div class="h-8 bg-gray-200 rounded mb-2"></div><div class="h-4 bg-gray-200 rounded w-3/4 mx-auto"></div></div>
-                <div class="text-center p-4 bg-gray-50 rounded-xl animate-pulse"><div class="h-8 bg-gray-200 rounded mb-2"></div><div class="h-4 bg-gray-200 rounded w-3/4 mx-auto"></div></div>
-                <div class="text-center p-4 bg-gray-50 rounded-xl animate-pulse"><div class="h-8 bg-gray-200 rounded mb-2"></div><div class="h-4 bg-gray-200 rounded w-3/4 mx-auto"></div></div>
-                <div class="text-center p-4 bg-gray-50 rounded-xl animate-pulse"><div class="h-8 bg-gray-200 rounded mb-2"></div><div class="h-4 bg-gray-200 rounded w-3/4 mx-auto"></div></div>
-                <div class="text-center p-4 bg-gray-50 rounded-xl animate-pulse"><div class="h-8 bg-gray-200 rounded mb-2"></div><div class="h-4 bg-gray-200 rounded w-3/4 mx-auto"></div></div>
+    <!-- Metrics Row 3 -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        <div class="bg-white rounded-xl border border-slate-200 p-5">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-sm font-medium text-slate-900">Top Health Issues</h3>
+            </div>
+            <div id="healthIssuesTrend" class="space-y-2 text-sm">
+                <div class="animate-pulse h-4 bg-slate-100 rounded w-full"></div>
+                <div class="animate-pulse h-4 bg-slate-100 rounded w-5/6"></div>
+                <div class="animate-pulse h-4 bg-slate-100 rounded w-4/6"></div>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-xl border border-slate-200 p-5">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-sm font-medium text-slate-900">No-Show Analysis</h3>
+            </div>
+            <div id="noShowStats" class="space-y-2 text-sm">
+                <div class="animate-pulse h-6 bg-slate-100 rounded"></div>
+                <div class="animate-pulse h-6 bg-slate-100 rounded w-5/6"></div>
+                <div class="animate-pulse h-6 bg-slate-100 rounded w-4/6"></div>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-xl border border-slate-200 p-5">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-sm font-medium text-slate-900">Medicine Usage</h3>
+            </div>
+            <div id="inventoryConsumption" class="space-y-2 text-sm">
+                <div class="animate-pulse h-5 bg-slate-100 rounded"></div>
+                <div class="animate-pulse h-5 bg-slate-100 rounded w-5/6"></div>
+                <div class="animate-pulse h-5 bg-slate-100 rounded w-4/6"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Campus Comparison -->
+    <div class="bg-white rounded-xl border border-slate-200 p-5">
+        <div class="flex items-center justify-between mb-4">
+            <h3 class="text-sm font-medium text-slate-900">Campus Comparison</h3>
+            <span class="text-xs text-slate-400">Last 30 days</span>
+        </div>
+        <div id="campusComparison" class="grid grid-cols-5 gap-3">
+            {% for i in range(5) %}
+            <div class="text-center p-3 bg-slate-50 rounded-lg">
+                <div class="animate-pulse h-5 bg-slate-200 rounded mb-2"></div>
+                <div class="animate-pulse h-4 bg-slate-200 rounded w-3/4 mx-auto"></div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- AI Predictions Section -->
+    <div class="bg-gradient-to-br from-slate-50 to-slate-100 rounded-xl border border-slate-200 p-5">
+        <div class="flex items-center justify-between mb-4">
+            <div class="flex items-center gap-3">
+                <div class="w-9 h-9 bg-slate-800 rounded-lg flex items-center justify-center">
+                    <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
+                    </svg>
+                </div>
+                <div>
+                    <h3 class="text-sm font-medium text-slate-900">AI Predictive Insights</h3>
+                    <p class="text-xs text-slate-500">Powered by Gemini AI</p>
+                </div>
+            </div>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+            <div class="bg-white rounded-lg border border-slate-200 p-4">
+                <div class="flex items-center gap-2 mb-2">
+                    <div class="w-7 h-7 bg-blue-50 rounded flex items-center justify-center">
+                        <svg class="w-3.5 h-3.5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                    </div>
+                    <span class="text-xs font-medium text-slate-900">Peak Hours</span>
+                </div>
+                <div id="predictPeakHours" class="min-h-[60px]">
+                    <button onclick="runPrediction('peak-hours', 'predictPeakHours')" class="w-full py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-medium rounded-lg transition-colors">
+                        Generate Prediction
+                    </button>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-lg border border-slate-200 p-4">
+                <div class="flex items-center gap-2 mb-2">
+                    <div class="w-7 h-7 bg-emerald-50 rounded flex items-center justify-center">
+                        <svg class="w-3.5 h-3.5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/>
+                        </svg>
+                    </div>
+                    <span class="text-xs font-medium text-slate-900">Medicine Demand</span>
+                </div>
+                <div id="predictMedicine" class="min-h-[60px]">
+                    <button onclick="runPrediction('medicine-demand', 'predictMedicine')" class="w-full py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-medium rounded-lg transition-colors">
+                        Generate Prediction
+                    </button>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-lg border border-slate-200 p-4">
+                <div class="flex items-center gap-2 mb-2">
+                    <div class="w-7 h-7 bg-violet-50 rounded flex items-center justify-center">
+                        <svg class="w-3.5 h-3.5 text-violet-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                        </svg>
+                    </div>
+                    <span class="text-xs font-medium text-slate-900">Health Trends</span>
+                </div>
+                <div id="predictHealth" class="min-h-[60px]">
+                    <button onclick="runPrediction('health-trends', 'predictHealth')" class="w-full py-2 bg-violet-600 hover:bg-violet-700 text-white text-xs font-medium rounded-lg transition-colors">
+                        Generate Prediction
+                    </button>
+                </div>
             </div>
         </div>
     </div>
@@ -217,56 +261,76 @@
 <script>
     let charts = {};
     const chartFont = { family: 'Inter, sans-serif' };
-    const chartDefaults = { responsive: true, maintainAspectRatio: false, plugins: { legend: { labels: { font: chartFont } } }, scales: {} };
+    const chartDefaults = {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { labels: { font: chartFont, usePointStyle: true, pointStyle: 'circle', padding: 12 } } },
+        scales: {}
+    };
+
+    // Format date for display
+    function formatDate(date) {
+        return date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+    }
+
+    async function refreshAllData() {
+        const now = new Date();
+        document.getElementById('lastUpdated').textContent = formatDate(now);
+        
+        await Promise.all([
+            loadOverview(),
+            loadAppointmentsTrend(),
+            loadServiceDistribution(),
+            loadPeakHours(),
+            loadDailyOverview(),
+            loadMentalHealthStats(),
+            loadHealthIssuesTrend(),
+            loadNoShowRate(),
+            loadInventoryConsumption(),
+            loadCampusComparison()
+        ]);
+    }
 
     async function loadOverview() {
         try {
             const r = await fetch('/analytics/api/overview');
             const d = await r.json();
-            document.getElementById('statsGrid').innerHTML = `
-                <div class="bg-white rounded-2xl border border-gray-100 p-5 hover:shadow-lg hover:shadow-blue-500/5 transition-all duration-300">
-                    <div class="flex items-center justify-between mb-3">
-                        <div class="w-11 h-11 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center shadow-md shadow-blue-500/20"><i class="fas fa-calendar-day text-white"></i></div>
-                        <span class="text-xs font-bold text-blue-600 bg-blue-50 px-2.5 py-1 rounded-lg">${d.today_completed||0} done</span>
-                    </div>
-                    <p class="text-2xl font-extrabold text-gray-900">${d.today_appointments||0}</p>
-                    <p class="text-xs text-gray-400 mt-0.5">Today's Appointments</p>
-                </div>
-                <div class="bg-white rounded-2xl border border-gray-100 p-5 hover:shadow-lg hover:shadow-emerald-500/5 transition-all duration-300">
-                    <div class="flex items-center justify-between mb-3">
-                        <div class="w-11 h-11 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-xl flex items-center justify-center shadow-md shadow-emerald-500/20"><i class="fas fa-chart-line text-white"></i></div>
-                        <span class="text-xs font-bold text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-lg">${d.monthly_visits||0} visits</span>
-                    </div>
-                    <p class="text-2xl font-extrabold text-gray-900">${d.monthly_appointments||0}</p>
-                    <p class="text-xs text-gray-400 mt-0.5">This Month</p>
-                </div>
-                <div class="bg-white rounded-2xl border border-gray-100 p-5 hover:shadow-lg hover:shadow-violet-500/5 transition-all duration-300">
-                    <div class="flex items-center justify-between mb-3">
-                        <div class="w-11 h-11 bg-gradient-to-br from-violet-500 to-violet-600 rounded-xl flex items-center justify-center shadow-md shadow-violet-500/20"><i class="fas fa-hand-holding-medical text-white"></i></div>
-                        <span class="text-xs font-bold text-violet-600 bg-violet-50 px-2.5 py-1 rounded-lg">Active</span>
-                    </div>
-                    <p class="text-2xl font-extrabold text-gray-900">${d.active_reservations||0}</p>
-                    <p class="text-xs text-gray-400 mt-0.5">Active Reservations</p>
-                </div>
-                <div class="bg-white rounded-2xl border border-gray-100 p-5 hover:shadow-lg hover:shadow-amber-500/5 transition-all duration-300">
-                    <div class="flex items-center justify-between mb-3">
-                        <div class="w-11 h-11 bg-gradient-to-br from-amber-500 to-amber-600 rounded-xl flex items-center justify-center shadow-md shadow-amber-500/20"><i class="fas fa-star text-white"></i></div>
-                        <span class="text-xs font-bold text-amber-600 bg-amber-50 px-2.5 py-1 rounded-lg">${d.feedback_count||0} reviews</span>
-                    </div>
-                    <p class="text-2xl font-extrabold text-gray-900">${(d.avg_satisfaction||0).toFixed(1)}<span class="text-sm text-gray-400 font-normal">/5.0</span></p>
-                    <p class="text-xs text-gray-400 mt-0.5">Avg Satisfaction</p>
-                </div>`;
+            document.getElementById('todayAppointments').textContent = d.today_appointments || 0;
+            document.getElementById('monthlyAppointments').textContent = d.monthly_appointments || 0;
+            document.getElementById('activeReservations').textContent = d.active_reservations || 0;
+            document.getElementById('avgSatisfaction').textContent = (d.avg_satisfaction || 0).toFixed(1);
         } catch(e) { console.error(e); }
     }
 
     async function loadAppointmentsTrend() {
         try {
-            const r = await fetch('/analytics/api/appointments-trend?days=30');
+            const days = document.getElementById('trendPeriod')?.value || 30;
+            const r = await fetch(`/analytics/api/appointments-trend?days=${days}`);
             const d = await r.json();
             if(charts.appointmentsTrend) charts.appointmentsTrend.destroy();
             charts.appointmentsTrend = new Chart(document.getElementById('appointmentsTrendChart'), {
-                type:'line', data:{ labels:d.labels||[], datasets:[{ label:'Appointments', data:d.values||[], borderColor:'rgb(59,130,246)', backgroundColor:'rgba(59,130,246,0.08)', tension:.4, fill:true, pointRadius:3, pointHoverRadius:6 }] },
-                options:{ ...chartDefaults, plugins:{legend:{display:false}}, scales:{ y:{beginAtZero:true,ticks:{stepSize:1,font:chartFont},grid:{color:'rgba(0,0,0,.04)'}}, x:{grid:{display:false},ticks:{font:chartFont}} } }
+                type: 'line',
+                data: {
+                    labels: d.labels || [],
+                    datasets: [{
+                        label: 'Appointments',
+                        data: d.values || [],
+                        borderColor: 'rgb(59, 130, 246)',
+                        backgroundColor: 'rgba(59, 130, 246, 0.08)',
+                        tension: 0.4,
+                        fill: true,
+                        pointRadius: 2,
+                        pointHoverRadius: 5
+                    }]
+                },
+                options: {
+                    ...chartDefaults,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { beginAtZero: true, ticks: { stepSize: 1, font: chartFont }, grid: { color: 'rgba(0,0,0,.04)' } },
+                        x: { grid: { display: false }, ticks: { font: chartFont } }
+                    }
+                }
             });
         } catch(e) { console.error(e); }
     }
@@ -276,10 +340,22 @@
             const r = await fetch('/analytics/api/service-distribution');
             const d = await r.json();
             if(charts.serviceDistribution) charts.serviceDistribution.destroy();
-            if(!d.labels||d.labels.length===0){document.getElementById('serviceChartContainer').querySelector('div[style]').innerHTML='<div class="flex items-center justify-center h-full text-gray-400 text-sm"><div class="text-center"><i class="fas fa-chart-pie text-4xl mb-2 text-gray-200"></i><p>No data yet</p></div></div>';return}
+            if(!d.labels || d.labels.length === 0) {
+                document.getElementById('serviceDistributionChart').parentElement.innerHTML = '<div class="flex items-center justify-center h-full text-slate-400 text-sm">No data available</div>';
+                return;
+            }
+            const colors = ['rgb(59, 130, 246)', 'rgb(16, 185, 129)', 'rgb(139, 92, 246)', 'rgb(245, 158, 11)', 'rgb(239, 68, 68)', 'rgb(236, 72, 153)'];
             charts.serviceDistribution = new Chart(document.getElementById('serviceDistributionChart'), {
-                type:'doughnut', data:{ labels:d.labels, datasets:[{ data:d.values, backgroundColor:['rgb(59,130,246)','rgb(16,185,129)','rgb(245,158,11)','rgb(239,68,68)','rgb(139,92,246)','rgb(236,72,153)','rgb(14,165,233)'], borderWidth:0 }] },
-                options:{ ...chartDefaults, plugins:{legend:{position:'bottom',labels:{padding:12,font:{...chartFont,size:11},usePointStyle:true,pointStyle:'circle'}}} }
+                type: 'doughnut',
+                data: {
+                    labels: d.labels,
+                    datasets: [{ data: d.values, backgroundColor: colors, borderWidth: 0 }]
+                },
+                options: {
+                    ...chartDefaults,
+                    cutout: '65%',
+                    plugins: { legend: { position: 'right', labels: { font: chartFont, usePointStyle: true, pointStyle: 'circle', padding: 12 } } }
+                }
             });
         } catch(e) { console.error(e); }
     }
@@ -290,49 +366,20 @@
             const d = await r.json();
             if(charts.peakHours) charts.peakHours.destroy();
             charts.peakHours = new Chart(document.getElementById('peakHoursChart'), {
-                type:'bar', data:{ labels:d.labels||[], datasets:[{ label:'Appointments', data:d.values||[], backgroundColor:'rgba(139,92,246,.8)', borderRadius:8, borderSkipped:false }] },
-                options:{ ...chartDefaults, plugins:{legend:{display:false}}, scales:{ y:{beginAtZero:true,ticks:{stepSize:1,font:chartFont},grid:{color:'rgba(0,0,0,.04)'}}, x:{grid:{display:false},ticks:{font:chartFont}} } }
+                type: 'bar',
+                data: {
+                    labels: d.labels || [],
+                    datasets: [{ label: 'Appointments', data: d.values || [], backgroundColor: 'rgba(139, 92, 246, 0.8)', borderRadius: 4 }]
+                },
+                options: {
+                    ...chartDefaults,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { beginAtZero: true, ticks: { stepSize: 1, font: chartFont }, grid: { color: 'rgba(0,0,0,.04)' } },
+                        x: { grid: { display: false }, ticks: { font: chartFont } }
+                    }
+                }
             });
-        } catch(e) { console.error(e); }
-    }
-
-    async function loadSatisfactionTrend() {
-        try {
-            const r = await fetch('/analytics/api/satisfaction-trend?days=30');
-            const d = await r.json();
-            if(charts.satisfactionTrend) charts.satisfactionTrend.destroy();
-            charts.satisfactionTrend = new Chart(document.getElementById('satisfactionTrendChart'), {
-                type:'line', data:{ labels:d.labels||[], datasets:[{ label:'Avg Rating', data:d.values||[], borderColor:'rgb(245,158,11)', backgroundColor:'rgba(245,158,11,0.08)', tension:.4, fill:true, pointRadius:3 }] },
-                options:{ ...chartDefaults, scales:{ y:{beginAtZero:true,max:5,ticks:{stepSize:.5,font:chartFont},grid:{color:'rgba(0,0,0,.04)'}}, x:{grid:{display:false},ticks:{font:chartFont}} } }
-            });
-        } catch(e) { console.error(e); }
-    }
-
-    async function loadNoShowRate() {
-        try {
-            const r = await fetch('/analytics/api/no-show-rate');
-            const d = await r.json();
-            const rate = (d.rate||0).toFixed(1);
-            document.getElementById('noShowStats').innerHTML = `
-                <div class="space-y-3">
-                    <div class="flex justify-between items-center p-3 bg-gray-50 rounded-xl"><span class="text-sm text-gray-600">Total Scheduled</span><span class="font-bold text-gray-900">${d.total_scheduled||0}</span></div>
-                    <div class="flex justify-between items-center p-3 bg-red-50 rounded-xl"><span class="text-sm text-red-700">No-Shows</span><span class="font-bold text-red-600">${d.no_shows||0}</span></div>
-                    <div class="flex justify-between items-center p-3 rounded-xl ${parseFloat(rate)>10?'bg-red-50':'bg-emerald-50'}"><span class="text-sm ${parseFloat(rate)>10?'text-red-700':'text-emerald-700'}">Rate</span><span class="font-bold ${parseFloat(rate)>10?'text-red-600':'text-emerald-600'}">${rate}%</span></div>
-                    <p class="text-xs text-gray-400 mt-2 flex items-center gap-1"><i class="fas fa-info-circle"></i>${d.no_shows||0} missed appointments in the past 30 days</p>
-                </div>`;
-        } catch(e) { console.error(e); }
-    }
-
-    async function loadInventoryConsumption() {
-        try {
-            const r = await fetch('/analytics/api/inventory-consumption?limit=5');
-            const d = await r.json();
-            if(!d||d.length===0){document.getElementById('inventoryConsumption').innerHTML='<div class="text-center py-8 text-gray-400 text-sm"><i class="fas fa-pills text-3xl mb-2 text-gray-200"></i><p>No usage data yet</p></div>';return}
-            const colors=[{bg:'bg-blue-50',t:'text-blue-600'},{bg:'bg-emerald-50',t:'text-emerald-600'},{bg:'bg-violet-50',t:'text-violet-600'},{bg:'bg-amber-50',t:'text-amber-600'},{bg:'bg-pink-50',t:'text-pink-600'}];
-            let html='<div class="space-y-2.5">';
-            d.forEach((item,i)=>{const c=colors[i%colors.length];html+=`<div class="flex items-center justify-between p-3 ${c.bg} rounded-xl"><span class="font-medium text-sm text-gray-900">${item.medicine_name||'Unknown'}</span><span class="${c.t} font-bold text-sm">${item.count||0} uses</span></div>`});
-            html+='</div>';
-            document.getElementById('inventoryConsumption').innerHTML=html;
         } catch(e) { console.error(e); }
     }
 
@@ -340,27 +387,19 @@
         try {
             const r = await fetch('/analytics/api/daily-overview');
             const d = await r.json();
-            const noShowClass = d.no_show_rate > 10 ? 'text-red-600 bg-red-50' : 'text-emerald-600 bg-emerald-50';
+            const rateColor = d.no_show_rate > 10 ? 'text-red-600 bg-red-50' : 'text-emerald-600 bg-emerald-50';
             document.getElementById('dailyOverview').innerHTML = `
-                <div class="flex justify-between items-center p-2 bg-blue-50 rounded-lg mb-2">
-                    <span class="text-sm text-blue-700">📅 Today's Appointments</span>
-                    <span class="font-bold text-blue-800">${d.today_appts || 0}</span>
+                <div class="flex justify-between items-center p-2 bg-blue-50 rounded-lg">
+                    <span class="text-slate-600">Today's Appointments</span>
+                    <span class="font-medium text-slate-900">${d.today_appts || 0}</span>
                 </div>
-                <div class="flex justify-between items-center p-2 bg-emerald-50 rounded-lg mb-2">
-                    <span class="text-sm text-emerald-700">✅ Completed</span>
-                    <span class="font-bold text-emerald-800">${d.today_completed || 0}</span>
+                <div class="flex justify-between items-center p-2 bg-emerald-50 rounded-lg">
+                    <span class="text-slate-600">Completed</span>
+                    <span class="font-medium text-slate-900">${d.today_completed || 0}</span>
                 </div>
-                <div class="flex justify-between items-center p-2 bg-red-50 rounded-lg mb-2">
-                    <span class="text-sm text-red-700">❌ No-Shows</span>
-                    <span class="font-bold text-red-800">${d.today_no_shows || 0}</span>
-                </div>
-                <div class="flex justify-between items-center p-2 ${noShowClass} rounded-lg mb-2">
-                    <span class="text-sm">No-Show Rate</span>
-                    <span class="font-bold">${d.no_show_rate || 0}%</span>
-                </div>
-                <div class="flex justify-between items-center p-2 bg-indigo-50 rounded-lg">
-                    <span class="text-sm text-indigo-700">👨‍⚕️ Staff on Duty</span>
-                    <span class="font-bold text-indigo-800">${d.staff_on_duty || 0}</span>
+                <div class="flex justify-between items-center p-2 ${rateColor} rounded-lg">
+                    <span>No-Show Rate</span>
+                    <span class="font-medium">${d.no_show_rate || 0}%</span>
                 </div>
             `;
         } catch(e) { console.error(e); }
@@ -371,17 +410,17 @@
             const r = await fetch('/analytics/api/mental-health-stats?days=30');
             const d = await r.json();
             document.getElementById('mentalHealthStats').innerHTML = `
-                <div class="flex justify-between items-center p-2 bg-violet-50 rounded-lg mb-2">
-                    <span class="text-sm text-violet-700">🧠 Mental Health Appts</span>
-                    <span class="font-bold text-violet-800">${d.mental_appts || 0}</span>
+                <div class="flex justify-between items-center p-2 bg-violet-50 rounded-lg">
+                    <span class="text-slate-600">Mental Health Appts</span>
+                    <span class="font-medium text-slate-900">${d.mental_appts || 0}</span>
                 </div>
-                <div class="flex justify-between items-center p-2 bg-purple-50 rounded-lg mb-2">
-                    <span class="text-sm text-purple-700">💭 Stress-Related</span>
-                    <span class="font-bold text-purple-800">${d.stress_related || 0}</span>
+                <div class="flex justify-between items-center p-2 bg-purple-50 rounded-lg">
+                    <span class="text-slate-600">Stress-Related Cases</span>
+                    <span class="font-medium text-slate-900">${d.stress_related || 0}</span>
                 </div>
                 <div class="flex justify-between items-center p-2 bg-pink-50 rounded-lg">
-                    <span class="text-sm text-pink-700">📊 % of Screenings</span>
-                    <span class="font-bold text-pink-800">${d.mental_health_percentage || 0}%</span>
+                    <span class="text-slate-600">% of Screenings</span>
+                    <span class="font-medium text-slate-900">${d.mental_health_percentage || 0}%</span>
                 </div>
             `;
         } catch(e) { console.error(e); }
@@ -391,23 +430,22 @@
         try {
             const r = await fetch('/analytics/api/health-issues-trend?days=30');
             const d = await r.json();
-            if (!d.labels || d.labels.length === 0) {
-                document.getElementById('healthIssuesTrend').innerHTML = '<p class="text-center text-gray-400 text-sm">No data yet</p>';
+            if(!d.labels || d.labels.length === 0) {
+                document.getElementById('healthIssuesTrend').innerHTML = '<p class="text-slate-400 text-center py-4">No data available</p>';
                 return;
             }
             const maxCount = Math.max(...d.values);
+            const colors = ['bg-rose-500', 'bg-pink-500', 'bg-purple-500', 'bg-indigo-500', 'bg-blue-500'];
             let html = '<div class="space-y-2">';
-            d.labels.forEach((label, i) => {
+            d.labels.slice(0, 5).forEach((label, i) => {
                 const percentage = (d.values[i] / maxCount * 100);
-                const colors = ['bg-rose-500', 'bg-pink-500', 'bg-purple-500', 'bg-indigo-500', 'bg-blue-500'];
-                const color = colors[i % colors.length];
                 html += `
                     <div class="flex items-center gap-2">
-                        <span class="text-xs text-gray-600 w-28 truncate">${label}</span>
-                        <div class="flex-1 bg-gray-100 rounded-full h-3 overflow-hidden">
-                            <div class="${color} h-full rounded-full" style="width: ${percentage}%"></div>
+                        <span class="text-slate-500 w-28 truncate text-xs">${label}</span>
+                        <div class="flex-1 bg-slate-100 rounded-full h-2 overflow-hidden">
+                            <div class="${colors[i % colors.length]} h-full rounded-full" style="width: ${percentage}%"></div>
                         </div>
-                        <span class="text-xs font-medium text-gray-500 w-8 text-right">${d.values[i]}</span>
+                        <span class="text-slate-400 w-6 text-right text-xs">${d.values[i]}</span>
                     </div>
                 `;
             });
@@ -416,98 +454,105 @@
         } catch(e) { console.error(e); }
     }
 
+    async function loadNoShowRate() {
+        try {
+            const r = await fetch('/analytics/api/no-show-rate');
+            const d = await r.json();
+            const rate = (d.rate || 0).toFixed(1);
+            const rateClass = parseFloat(rate) > 10 ? 'text-red-600 bg-red-50' : 'text-emerald-600 bg-emerald-50';
+            document.getElementById('noShowStats').innerHTML = `
+                <div class="flex justify-between items-center p-2 bg-slate-50 rounded-lg mb-2">
+                    <span class="text-slate-600">Total Scheduled</span>
+                    <span class="font-medium text-slate-900">${d.total_scheduled || 0}</span>
+                </div>
+                <div class="flex justify-between items-center p-2 bg-red-50 rounded-lg mb-2">
+                    <span class="text-red-700">No-Shows</span>
+                    <span class="font-medium text-red-600">${d.no_shows || 0}</span>
+                </div>
+                <div class="flex justify-between items-center p-2 ${rateClass} rounded-lg">
+                    <span>Rate</span>
+                    <span class="font-medium">${rate}%</span>
+                </div>
+            `;
+        } catch(e) { console.error(e); }
+    }
+
+    async function loadInventoryConsumption() {
+        try {
+            const r = await fetch('/analytics/api/inventory-consumption?limit=5');
+            const d = await r.json();
+            if(!d || d.length === 0) {
+                document.getElementById('inventoryConsumption').innerHTML = '<p class="text-slate-400 text-center py-4">No usage data</p>';
+                return;
+            }
+            const colors = ['bg-blue-50 text-blue-700', 'bg-emerald-50 text-emerald-700', 'bg-violet-50 text-violet-700', 'bg-amber-50 text-amber-700', 'bg-pink-50 text-pink-700'];
+            let html = '<div class="space-y-1.5">';
+            d.forEach((item, i) => {
+                const c = colors[i % colors.length];
+                html += `<div class="flex items-center justify-between p-2 ${c} rounded-lg"><span class="text-sm">${item.medicine_name || 'Unknown'}</span><span class="font-medium text-sm">${item.count || 0} uses</span></div>`;
+            });
+            html += '</div>';
+            document.getElementById('inventoryConsumption').innerHTML = html;
+        } catch(e) { console.error(e); }
+    }
+
     async function loadCampusComparison() {
         try {
             const r = await fetch('/analytics/api/campus-stats');
             const d = await r.json();
             const colors = ['bg-blue-100 text-blue-700', 'bg-emerald-100 text-emerald-700', 'bg-violet-100 text-violet-700', 'bg-amber-100 text-amber-700', 'bg-rose-100 text-rose-700'];
-            let html = '<div class="grid grid-cols-5 gap-4">';
+            let html = '';
             d.forEach((campus, i) => {
                 html += `
-                    <div class="text-center p-4 ${colors[i]} rounded-xl">
-                        <p class="font-bold text-sm mb-1">${campus.campus}</p>
-                        <p class="text-lg font-extrabold">${campus.appointments || 0}</p>
-                        <p class="text-xs opacity-70">appointments</p>
+                    <div class="text-center p-3 ${colors[i]} rounded-lg">
+                        <p class="text-xs font-medium mb-1">${campus.campus}</p>
+                        <p class="text-lg font-semibold">${campus.appointments || 0}</p>
+                        <p class="text-xs opacity-70">visits</p>
                     </div>
                 `;
             });
-            html += '</div>';
             document.getElementById('campusComparison').innerHTML = html;
         } catch(e) { console.error(e); }
     }
 
-    document.addEventListener('DOMContentLoaded', () => {
-        loadOverview();
-        loadAppointmentsTrend();
-        loadServiceDistribution();
-        loadPeakHours();
-
-        loadSatisfactionTrend();
-        loadNoShowRate();
-        loadInventoryConsumption();
-
-        // University clinic specific metrics
-        loadDailyOverview();
-        loadMentalHealthStats();
-        loadHealthIssuesTrend();
-        loadCampusComparison();
-    });
-
     // AI Predictions
     async function runPrediction(type, containerId) {
         const container = document.getElementById(containerId);
-        container.innerHTML = `<div class="flex items-center gap-2 py-4 justify-center"><div class="w-5 h-5 border-2 border-indigo-600 border-t-transparent rounded-full animate-spin"></div><span class="text-xs font-medium text-indigo-600">AI is analyzing data...</span></div>`;
+        container.innerHTML = `<div class="flex items-center justify-center py-3"><div class="w-4 h-4 border-2 border-slate-400 border-t-transparent rounded-full animate-spin"></div></div>`;
 
         try {
             const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content || '';
             const r = await fetch(`/analytics/api/predict/${type}`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json', 'X-CSRFToken': csrfToken, 'X-CSRF-Token': csrfToken }
+                headers: { 'Content-Type': 'application/json', 'X-CSRFToken': csrfToken }
             });
             const d = await r.json();
 
-            const typeColors = { warning: { bg: 'bg-amber-50', border: 'border-amber-100', text: 'text-amber-700', icon: 'text-amber-500' }, info: { bg: 'bg-blue-50', border: 'border-blue-100', text: 'text-blue-700', icon: 'text-blue-500' }, success: { bg: 'bg-emerald-50', border: 'border-emerald-100', text: 'text-emerald-700', icon: 'text-emerald-500' } };
-
-            let html = '<div class="text-left mt-2">';
-            if (d.summary) {
+            let html = '<div class="text-left space-y-2 mt-2">';
+            if(d.summary) {
                 const conf = d.confidence || 'medium';
-                const confColor = conf === 'high' ? 'text-emerald-600 bg-emerald-50' : conf === 'low' ? 'text-red-600 bg-red-50' : 'text-amber-600 bg-amber-50';
-                html += `<div class="flex items-center justify-between mb-4"><p class="text-sm font-semibold text-gray-700">${d.summary}</p><span class="text-xs font-bold ${confColor} px-2.5 py-1 rounded-md uppercase">${conf} Confidence</span></div>`;
+                const confColor = conf === 'high' ? 'bg-emerald-100 text-emerald-700' : conf === 'low' ? 'bg-red-100 text-red-700' : 'bg-amber-100 text-amber-700';
+                html += `<div class="flex items-center justify-between"><p class="text-xs font-medium text-slate-700">${d.summary}</p><span class="text-[10px] font-medium ${confColor} px-2 py-0.5 rounded">${conf}</span></div>`;
             }
-            if (d.insights && d.insights.length > 0) {
-                html += '<div class="space-y-3">';
-                d.insights.forEach(insight => {
-                    const c = typeColors[insight.type] || typeColors.info;
-                    html += `<div class="${c.bg} ${c.border} border rounded-xl p-4"><div class="flex items-start gap-3"><i class="fas ${insight.icon || 'fa-lightbulb'} ${c.icon} mt-1 text-lg"></i><div><p class="text-sm font-bold ${c.text} mb-1">${insight.title}</p><p class="text-sm text-gray-700">${insight.description}</p></div></div></div>`;
+            if(d.insights && d.insights.length > 0) {
+                html += '<div class="space-y-1.5">';
+                d.insights.slice(0, 3).forEach(insight => {
+                    html += `<div class="text-xs text-slate-600 bg-slate-50 p-2 rounded"><span class="font-medium">${insight.title}:</span> ${insight.description}</div>`;
                 });
                 html += '</div>';
             }
             html += '</div>';
 
-            const typeConfig = {
-                'peak-hours': { title: 'Peak Hours Prediction', icon: 'fa-chart-line', color: 'indigo' },
-                'medicine-demand': { title: 'Medicine Demand', icon: 'fa-pills', color: 'emerald' },
-                'health-trends': { title: 'Health Trends', icon: 'fa-virus', color: 'violet' }
-            };
-            const config = typeConfig[type] || { title: 'AI Analysis', icon: 'fa-magic', color: 'blue' };
-
-            Swal.fire({
-                title: `<div class="flex items-center justify-center gap-3"><i class="fas ${config.icon} text-${config.color}-500"></i><span class="text-xl font-bold">${config.title}</span></div>`,
-                html: html || '<p class="text-sm text-gray-500">No specific insights generated.</p>',
-                showConfirmButton: true,
-                confirmButtonText: 'Close',
-                customClass: {
-                    popup: 'rounded-2xl',
-                    confirmButton: 'bg-gray-200 text-gray-800 font-bold py-2.5 px-6 rounded-xl hover:bg-gray-300 transition w-full mt-4'
-                },
-                buttonsStyling: false
-            });
-            // Reset container button state
-            container.innerHTML = `<button onclick="runPrediction('${type}', '${containerId}')" class="w-full py-2.5 bg-${config.color}-600 text-white text-xs font-bold rounded-xl hover:bg-${config.color}-700 transition"><i class="fas fa-redo mr-1.5"></i>Regenerate Prediction</button>`;
-        } catch (e) {
-            container.innerHTML = `<p class="text-xs text-red-500 mb-2">Failed to generate prediction.</p><button onclick="runPrediction('${type}', '${containerId}')" class="w-full py-2 bg-gray-200 text-gray-700 text-xs font-bold rounded-xl hover:bg-gray-300 transition">Try Again</button>`;
+            container.innerHTML = html;
+        } catch(e) {
+            container.innerHTML = `<p class="text-xs text-red-500">Prediction unavailable</p>`;
             console.error(e);
         }
     }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        refreshAllData();
+        document.getElementById('lastUpdated').textContent = formatDate(new Date());
+    });
 </script>
 {% endblock %}
