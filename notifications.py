@@ -6,6 +6,7 @@ from flask import Blueprint, jsonify, request
 from flask_login import login_required, current_user
 from datetime import datetime, timezone
 from models import db, Notification
+from models_extended import PushSubscription
 
 notifications = Blueprint('notifications', __name__, url_prefix='/notifications')
 
@@ -102,6 +103,78 @@ def mark_read():
             return jsonify({'success': True})
     
     return jsonify({'error': 'Invalid request'}), 400
+
+
+# ═══════════ PUSH NOTIFICATION ROUTES ═══════════
+
+@notifications.route('/push-subscribe', methods=['POST'])
+@login_required
+def push_subscribe():
+    """Subscribe to push notifications."""
+    data = request.get_json() or {}
+    
+    endpoint = data.get('endpoint')
+    p256dh = data.get('keys', {}).get('p256dh')
+    auth = data.get('keys', {}).get('auth')
+    
+    if not endpoint or not p256dh or not auth:
+        return jsonify({'error': 'Missing subscription data'}), 400
+    
+    # Check if subscription already exists
+    existing = PushSubscription.query.filter_by(endpoint=endpoint).first()
+    
+    if existing:
+        # Update existing subscription
+        existing.last_used = datetime.now(timezone.utc)
+        existing.user_agent = request.headers.get('User-Agent', '')
+        db.session.commit()
+    else:
+        # Create new subscription
+        subscription = PushSubscription(
+            user_id=current_user.id,
+            endpoint=endpoint,
+            p256dh=p256dh,
+            auth=auth,
+            user_agent=request.headers.get('User-Agent', '')
+        )
+        db.session.add(subscription)
+        db.session.commit()
+    
+    return jsonify({'success': True, 'message': 'Subscribed to push notifications'})
+
+
+@notifications.route('/push-unsubscribe', methods=['POST'])
+@login_required
+def push_unsubscribe():
+    """Unsubscribe from push notifications."""
+    data = request.get_json() or {}
+    endpoint = data.get('endpoint')
+    
+    if not endpoint:
+        return jsonify({'error': 'Endpoint required'}), 400
+    
+    subscription = PushSubscription.query.filter_by(
+        endpoint=endpoint,
+        user_id=current_user.id
+    ).first()
+    
+    if subscription:
+        db.session.delete(subscription)
+        db.session.commit()
+        return jsonify({'success': True, 'message': 'Unsubscribed from push notifications'})
+    
+    return jsonify({'error': 'Subscription not found'}), 404
+
+
+@notifications.route('/push-status')
+@login_required
+def push_status():
+    """Check if user has push subscription."""
+    subscription = PushSubscription.query.filter_by(
+        user_id=current_user.id
+    ).first()
+    
+    return jsonify({'subscribed': subscription is not None})
 
 
 def _time_ago(dt):

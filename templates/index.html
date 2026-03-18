@@ -9,6 +9,18 @@
     <title>ISUFST CareHub &mdash; Your Health, Digitized</title>
     <meta name="description"
         content="ISUFST CareHub: Modern clinic management system for students. Book appointments, reserve medicines, and manage your health records.">
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
+    <meta name="theme-color" content="#2563eb">
+    
+    <!-- Open Graph / Social Media -->
+    <meta property="og:title" content="ISUFST CareHub — Your Health, Digitized">
+    <meta property="og:description" content="Modern clinic management system for students. Book appointments, reserve medicines, and manage your health records.">
+    <meta property="og:image" content="{{ url_for('static', filename='images/og-carehub.png') }}">
+    <meta property="og:url" content="{{ request.url }}">
+    <meta property="og:type" content="website">
+    <meta name="twitter:card" content="summary_large_image">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/fontawesome.min.css') }}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -1478,6 +1490,21 @@
             btn.addEventListener('click', function(e) { e.stopPropagation(); dd.classList.toggle('hidden'); });
             document.addEventListener('click', function(e) { if (!wrap.contains(e.target)) dd.classList.add('hidden'); });
         })();
+    </script>
+
+    <!-- Service Worker Registration for PWA -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('{{ url_for("static", filename="service-worker.js") }}')
+                    .then((registration) => {
+                        console.log('SW registered: ', registration);
+                    })
+                    .catch((error) => {
+                        console.log('SW registration failed: ', error);
+                    });
+            });
+        }
     </script>
 
     {% include 'partials/chatbot_widget.html' %}

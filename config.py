@@ -26,12 +26,12 @@ def get_database_uri():
         # Fix postgres:// to postgresql:// for SQLAlchemy 1.4+
         if uri.startswith('postgres://'):
             uri = uri.replace('postgres://', 'postgresql://', 1)
-        print(f"🐘 Using PostgreSQL database")
+        print("INFO: Using PostgreSQL database")
         return uri
     
     # Ensure instance directory exists for local SQLite
     os.makedirs(os.path.join(basedir, 'instance'), exist_ok=True)
-    print(f"💾 Using local SQLite database")
+    print("INFO: Using local SQLite database")
     return uri
 
 

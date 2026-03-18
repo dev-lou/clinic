@@ -164,3 +164,26 @@ class SymptomScreening(db.Model):
 
     def __repr__(self):
         return f'<SymptomScreening student={self.student_id} severity={self.severity_level}>'
+
+
+# ──────────────────────────────────────────────
+#  Push Notification Subscriptions
+# ──────────────────────────────────────────────
+class PushSubscription(db.Model):
+    """Browser push notification subscriptions for users."""
+    __tablename__ = 'push_subscriptions'
+
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False, index=True)
+    endpoint = db.Column(db.Text, nullable=False, unique=True)
+    p256dh = db.Column(db.Text, nullable=False)  # Public key
+    auth = db.Column(db.Text, nullable=False)     # Auth secret
+    user_agent = db.Column(db.Text)               # Browser info
+    created_at = db.Column(db.DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))
+    last_used = db.Column(db.DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))
+
+    # Relationships
+    user = db.relationship('User', backref=db.backref('push_subscriptions', lazy='dynamic'))
+
+    def __repr__(self):
+        return f'<PushSubscription user={self.user_id} endpoint={self.endpoint[:50]}...>'

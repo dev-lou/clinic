@@ -393,9 +393,10 @@ function toggleVoice() {
 
 function startVoice() {
     recognition = new SpeechRecognition();
-    recognition.continuous = true;
+    recognition.continuous = false;  // Single session mode for better reliability
     recognition.interimResults = true;
     recognition.lang = 'en-US';
+    recognition.maxAlternatives = 1;
 
     fullTranscript = '';
     isRecording = true;
@@ -404,7 +405,7 @@ function startVoice() {
     const icon = document.getElementById('micIcon');
     btn.className = 'mic-btn recording';
     icon.className = 'fas fa-stop text-2xl';
-    document.getElementById('voiceStatus').textContent = 'Listening... Tap to stop';
+    document.getElementById('voiceStatus').textContent = 'Listening... Speak your symptoms';
     document.getElementById('voiceWave').classList.remove('hidden');
     document.getElementById('transcriptBox').classList.remove('hidden');
     document.getElementById('voiceResults').classList.add('hidden');
@@ -427,14 +428,16 @@ function startVoice() {
         console.error('Speech error:', e.error);
         if (e.error === 'not-allowed') {
             alert('Microphone access denied. Please allow microphone access in your browser settings.');
+        } else if (e.error === 'no-speech') {
+            document.getElementById('voiceStatus').textContent = 'No speech detected. Please speak again.';
         }
         stopVoice();
     };
 
     recognition.onend = () => {
+        // Only auto-stop if we're still recording
         if (isRecording) {
-            // Auto-restart if still recording (browser sometimes stops)
-            try { recognition.start(); } catch(e) {}
+            stopVoice();
         }
     };
 
@@ -443,7 +446,7 @@ function startVoice() {
 
 function stopVoice() {
     isRecording = false;
-    if (recognition) { recognition.stop(); recognition = null; }
+    if (recognition) { try { recognition.stop(); } catch(e) {} recognition = null; }
 
     const btn = document.getElementById('micButton');
     const icon = document.getElementById('micIcon');
@@ -452,10 +455,14 @@ function stopVoice() {
     document.getElementById('voiceWave').classList.add('hidden');
 
     const transcript = fullTranscript.trim();
-    if (transcript.length > 5) {
+    // Check for meaningful speech: at least 2 words of 3+ chars, OR 15+ total characters
+    const words = transcript.split(/\s+/).filter(w => w.length > 2);
+    if (transcript.length > 0 && (words.length >= 2 || transcript.length >= 15)) {
         analyzeVoice(transcript);
+    } else if (transcript.length > 0) {
+        document.getElementById('voiceStatus').textContent = 'Please speak more. Try again.';
     } else {
-        document.getElementById('voiceStatus').textContent = 'Too short. Tap to try again.';
+        document.getElementById('voiceStatus').textContent = 'No speech detected. Tap and speak.';
     }
 }
 

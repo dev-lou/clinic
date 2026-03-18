@@ -1,0 +1,22 @@
+{
+  "name": "ISUFST CareHub",
+  "short_name": "CareHub",
+  "description": "Your Health, Digitized - Modern clinic management for ISUFST students",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0f1d30",
+  "theme_color": "#2563eb",
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "icons": [
+    {
+      "src": "/static/favicon.ico",
+      "sizes": "32x32",
+      "type": "image/x-icon",
+      "purpose": "any"
+    }
+  ],
+  "categories": ["health", "medical", "lifestyle"],
+  "lang": "en",
+  "dir": "ltr"
+}

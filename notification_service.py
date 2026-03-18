@@ -1,13 +1,15 @@
 """
 Notification Service for ISUFST CareHub.
-Handles email, SMS, and in-app notifications.
+Handles email, SMS, in-app, and push notifications.
 """
 import os
 import requests
+import json
 from datetime import datetime, timezone
 from flask import current_app
 from flask_mail import Mail, Message as EmailMessage
 from models import db, Notification
+from models_extended import PushSubscription
 
 
 # Initialize Flask-Mail (configured in app.py)
@@ -82,12 +84,63 @@ def send_sms(phone_number, message):
         return False
 
 
+def send_push_notification(user_id, title, body, data=None):
+    """Send push notification to all user's subscribed devices."""
+    subscriptions = PushSubscription.query.filter_by(user_id=user_id).all()
+    
+    if not subscriptions:
+        return False
+    
+    # VAPID keys (generate with: webpush --generate-vapid-keys)
+    vapid_private_key = os.environ.get('VAPID_PRIVATE_KEY')
+    vapid_public_key = os.environ.get('VAPID_PUBLIC_KEY')
+    
+    if not vapid_private_key or not vapid_public_key:
+        current_app.logger.warning("VAPID keys not configured for push notifications")
+        return False
+    
+    # Prepare payload
+    payload = {
+        'title': title,
+        'body': body,
+        'icon': '/static/icons/icon-192x192.png',
+        'badge': '/static/icons/icon-192x192.png',
+        'data': data or {}
+    }
+    
+    success_count = 0
+    for subscription in subscriptions:
+        try:
+            # Send push notification using web-push library or custom implementation
+            # This is a simplified version - in production, use python-web-push library
+            response = requests.post(
+                subscription.endpoint,
+                headers={
+                    'Content-Type': 'application/json',
+                    'User-Agent': 'ISUFST-CareHub/1.0'
+                },
+                data=json.dumps(payload),
+                timeout=5
+            )
+            if response.status_code in [200, 201, 202]:
+                success_count += 1
+            else:
+                # Remove invalid subscriptions
+                if response.status_code == 410:  # Gone
+                    db.session.delete(subscription)
+        except Exception as e:
+            current_app.logger.error(f"Push notification failed: {str(e)}")
+    
+    db.session.commit()
+    return success_count > 0
+
+
 # ──────────────────────────────────────────────
 #  Appointment Notifications
 # ──────────────────────────────────────────────
 
 def notify_appointment_confirmation(appointment, user):
-    """Send appointment confirmation via email, SMS, and in-app."""
+    """Send appointment confirmation via email, SMS, in-app, and push."""
     from datetime import datetime
     
     # In-app notification
@@ -97,6 +150,14 @@ def notify_appointment_confirmation(appointment, user):
         title='Appointment Confirmed',
         message=f'Your {appointment.service_type} appointment on {appointment.appointment_date.strftime("%B %d, %Y")} at {appointment.start_time.strftime("%I:%M %p")} has been confirmed.',
         link=f'/appointments/my'
+    )
+    
+    # Push notification
+    send_push_notification(
+        user_id=user.id,
+        title='Appointment Confirmed',
+        body=f'Your {appointment.service_type} appointment is confirmed for {appointment.appointment_date.strftime("%B %d")}.',
+        data={'link': '/appointments/my', 'type': 'appointment_confirmed'}
     )
     
     # Email
@@ -132,6 +193,14 @@ def notify_appointment_reminder(appointment, user):
         title='Appointment Reminder',
         message=f'Reminder: You have a {appointment.service_type} appointment tomorrow at {appointment.start_time.strftime("%I:%M %p")}.',
         link=f'/appointments/my'
+    )
+    
+    # Push notification
+    send_push_notification(
+        user_id=user.id,
+        title='Appointment Reminder',
+        body=f'Reminder: Your {appointment.service_type} appointment is tomorrow at {appointment.start_time.strftime("%I:%M %p")}.',
+        data={'link': '/appointments/my', 'type': 'appointment_reminder'}
     )
     
     # Email reminder
