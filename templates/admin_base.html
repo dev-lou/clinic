@@ -33,6 +33,16 @@
         }
     </script>
     <style>
+        /* Tailwind Forms vs SweetAlert2 Fix */
+        .swal2-container select.swal2-select,
+        .swal2-container input.swal2-input,
+        .swal2-container input.swal2-radio,
+        .swal2-container input.swal2-checkbox,
+        .swal2-container input.swal2-file,
+        .swal2-container textarea.swal2-textarea {
+            display: none !important;
+        }
+
         * {
             font-family: 'Inter', sans-serif;
         }
@@ -675,13 +685,13 @@
 
         // ── Boot on page load ──
         document.addEventListener('DOMContentLoaded', () => {
-            document.querySelectorAll('select').forEach(makeDropdown);
+            document.querySelectorAll('select:not(.swal2-select)').forEach(makeDropdown);
             document.querySelectorAll('input[type="date"], input[type="time"], input[type="datetime-local"]').forEach(makeDatePicker);
         });
 
         // ── Re-init helper for modals / dynamic content ──
         window.initCustomUI = function(container = document) {
-            container.querySelectorAll('select:not(.tomselected)').forEach(makeDropdown);
+            container.querySelectorAll('select:not(.tomselected):not(.swal2-select)').forEach(makeDropdown);
             container.querySelectorAll('input[type="date"]:not(.flatpickr-input), input[type="time"]:not(.flatpickr-input), input[type="datetime-local"]:not(.flatpickr-input)').forEach(makeDatePicker);
         };
     </script>

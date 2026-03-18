@@ -104,10 +104,10 @@
         /* Face Login Styles */
         .face-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); z-index: 100; display: flex; align-items: center; justify-content: center; }
         .face-modal { background: white; border-radius: 24px; padding: 32px; max-width: 420px; width: 90%; box-shadow: 0 25px 60px rgba(0,0,0,0.3); }
-        .face-video-container { position: relative; width: 100%; aspect-ratio: 4/3; border-radius: 16px; overflow: hidden; background: #0f172a; }
+        .face-video-container { position: relative; width: 100%; aspect-ratio: 4/3; border-radius: 16px; overflow: hidden; background: #0f172a; border: 3px solid rgba(59,130,246,0.6); animation: scanPulse 2s infinite; }
+        .face-video-container:not(.scanning) { animation: none; border-color: transparent; }
         .face-video-container video { width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1); }
         .face-video-container canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; transform: scaleX(-1); }
-        .face-scan-ring { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); width: 180px; height: 180px; border: 3px solid rgba(59,130,246,0.6); border-radius: 50%; animation: scanPulse 2s infinite; }
         @keyframes scanPulse { 0%,100% { border-color: rgba(59,130,246,0.3); box-shadow: 0 0 0 0 rgba(59,130,246,0.2); } 50% { border-color: rgba(59,130,246,0.8); box-shadow: 0 0 20px 5px rgba(59,130,246,0.15); } }
         .face-status { text-align: center; margin-top: 16px; font-size: 14px; font-weight: 600; }
     </style>
@@ -127,8 +127,8 @@
                 </div>
                 <span class="text-xl font-bold text-white">ISUFST CareHub</span>
             </a>
-            <a href="/" class="flex items-center gap-2 px-4 py-2 bg-white/10 hover:bg-white/20 text-white text-sm font-semibold rounded-xl transition-all border border-white/10 backdrop-blur-sm">
-                <i class="fas fa-home text-xs"></i>
+            <a href="/" class="flex items-center gap-2 px-4 py-2 bg-white/10 hover:bg-white/20 text-white text-sm font-medium rounded-xl backdrop-blur-md border border-white/10 transition-all hover:scale-105 active:scale-95">
+                <i class="fas fa-home text-white/80"></i>
                 <span>Home</span>
             </a>
         </div>
@@ -167,12 +167,17 @@
     <!-- Right Panel -->
     <div class="w-full lg:w-1/2 flex items-center justify-center bg-gray-50 p-6 sm:p-12">
         <div class="w-full max-w-md space-y-8 slide-in-right">
-            <div class="lg:hidden flex items-center space-x-3 mb-4">
-                <div
-                    class="w-10 h-10 bg-gradient-to-br from-primary-600 to-accent rounded-xl flex items-center justify-center shadow-lg">
-                    <i class="fas fa-heartbeat text-white text-lg"></i>
-                </div>
-                <span class="text-xl font-bold text-primary-900">ISUFST CareHub</span>
+            <div class="lg:hidden flex items-center justify-between space-x-3 mb-4">
+                <a href="/" class="flex items-center space-x-3 group">
+                    <div class="w-10 h-10 bg-gradient-to-br from-primary-600 to-accent rounded-xl flex items-center justify-center shadow-lg">
+                        <i class="fas fa-heartbeat text-white text-lg"></i>
+                    </div>
+                    <span class="text-xl font-bold text-primary-900">ISUFST CareHub</span>
+                </a>
+                <a href="/" class="flex items-center gap-2 px-3 py-1.5 bg-white hover:bg-gray-50 text-gray-700 text-xs font-semibold rounded-lg transition-all border border-gray-200">
+                    <i class="fas fa-home text-[10px]"></i>
+                    <span>Home</span>
+                </a>
             </div>
 
             <div>
@@ -197,7 +202,7 @@
             {% endif %}
             {% endwith %}
 
-            <form method="POST" class="space-y-5">
+            <form method="POST" class="space-y-5" onsubmit="return handleAuthSubmit(this, 'loginBtn')">
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                 <div>
                     <label for="email" class="block text-sm font-semibold text-gray-700 mb-2">Email address</label>
@@ -229,9 +234,10 @@
                     <label for="remember" class="ml-2 text-sm text-gray-600">Keep me signed in</label>
                 </div>
 
-                <button type="submit"
-                    class="btn-premium w-full py-4 bg-primary-700 text-white font-bold rounded-xl hover:bg-primary-800 shadow-lg shadow-primary-700/20 hover:shadow-primary-700/30 text-sm">
-                    Sign In
+                <button type="submit" id="loginBtn"
+                    class="btn-premium flex items-center justify-center w-full py-4 bg-primary-700 text-white font-bold rounded-xl hover:bg-primary-800 shadow-lg shadow-primary-700/20 hover:shadow-primary-700/30 text-sm">
+                    <span class="btn-text">Sign In</span>
+                    <span class="btn-loader hidden ml-2"><i class="fas fa-spinner fa-spin"></i></span>
                 </button>
 
                 <div class="flex items-center gap-4">
@@ -242,24 +248,13 @@
 
                 <!-- Face Login Button -->
                 <button type="button" onclick="openFaceLogin()"
-                    class="w-full flex items-center justify-center gap-3 py-3.5 border-2 border-indigo-100 rounded-xl text-sm font-semibold text-indigo-700 hover:bg-indigo-50 hover:border-indigo-200 transition-all group">
-                    <div class="w-8 h-8 bg-gradient-to-br from-indigo-500 to-violet-500 rounded-lg flex items-center justify-center shadow-sm group-hover:scale-105 transition-transform">
-                        <i class="fas fa-face-viewfinder text-white text-sm"></i>
+                    class="w-full flex items-center gap-3 px-4 py-3.5 border-2 border-indigo-100/80 bg-white rounded-xl text-sm font-semibold text-gray-800 hover:bg-indigo-50 hover:border-indigo-200 transition-all group shadow-sm">
+                    <div class="w-9 h-9 bg-indigo-100 rounded-lg text-indigo-600 flex items-center justify-center group-hover:scale-105 group-hover:bg-indigo-600 group-hover:text-white transition-all">
+                        <i class="fas fa-user-check text-[16px]"></i>
                     </div>
                     Sign in with Face ID
-                    <span class="ml-auto px-2 py-0.5 bg-indigo-100 text-indigo-600 text-[10px] font-bold rounded-md uppercase">Biometric</span>
+                    <span class="ml-auto px-2.5 py-1 bg-indigo-50 text-indigo-600 text-[10px] font-bold rounded-md uppercase tracking-wider border border-indigo-100/50">Biometric</span>
                 </button>
-
-                <div class="grid grid-cols-2 gap-3">
-                    <a href="{{ url_for('reservations.view_medicines') }}"
-                        class="flex items-center justify-center px-4 py-3 border border-gray-200 rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-50 hover:border-gray-300 transition-all">
-                        <i class="fas fa-pills text-emerald-500 mr-2"></i>Medicines
-                    </a>
-                    <a href="/"
-                        class="flex items-center justify-center px-4 py-3 border border-gray-200 rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-50 hover:border-gray-300 transition-all">
-                        <i class="fas fa-home text-primary-500 mr-2"></i>Home
-                    </a>
-                </div>
             </form>
         </div>
     </div>
@@ -269,8 +264,8 @@
         <div class="face-modal">
             <div class="flex items-center justify-between mb-5">
                 <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 bg-gradient-to-br from-indigo-500 to-violet-500 rounded-xl flex items-center justify-center">
-                        <i class="fas fa-face-viewfinder text-white"></i>
+                    <div class="w-10 h-10 bg-indigo-100 rounded-xl flex items-center justify-center text-indigo-600">
+                        <i class="fas fa-user-check text-lg"></i>
                     </div>
                     <div>
                         <h3 class="font-bold text-gray-900">Face ID Login</h3>
@@ -282,10 +277,9 @@
                 </button>
             </div>
 
-            <div class="face-video-container" id="faceVideoContainer">
+            <div class="face-video-container scanning" id="faceVideoContainer">
                 <video id="faceVideo" autoplay muted playsinline></video>
                 <canvas id="faceCanvas"></canvas>
-                <div class="face-scan-ring" id="faceScanRing"></div>
             </div>
 
             <div class="face-status" id="faceStatus">
@@ -303,6 +297,18 @@
 
     <script src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
     <script>
+        function handleAuthSubmit(form, btnId) {
+            const btn = document.getElementById(btnId);
+            const text = btn.querySelector('.btn-text');
+            const loader = btn.querySelector('.btn-loader');
+            
+            btn.disabled = true;
+            btn.classList.add('opacity-80', 'cursor-wait');
+            text.textContent = 'Please wait...';
+            loader.classList.remove('hidden');
+            return true;
+        }
+
         function togglePassword() {
             const i = document.getElementById('password'), ic = document.getElementById('toggle-icon');
             if (i.type === 'password') { i.type = 'text'; ic.classList.replace('fa-eye', 'fa-eye-slash') }
@@ -349,7 +355,7 @@
                 video.srcObject = faceStream;
                 await video.play();
 
-                status.innerHTML = '<div class="text-indigo-600"><i class="fas fa-eye mr-2"></i>Position your face in the circle...</div>';
+                status.innerHTML = '<div class="text-indigo-600"><i class="fas fa-eye mr-2"></i>Position your face in the frame...</div>';
 
                 // Start face detection loop
                 startFaceDetection(video);
@@ -363,34 +369,40 @@
                 }
             }
         }
-
         function startFaceDetection(video) {
             const canvas = document.getElementById('faceCanvas');
-            const ring = document.getElementById('faceScanRing');
+            const container = document.getElementById('faceVideoContainer');
             let attemptCount = 0;
             const MAX_ATTEMPTS = 30; // ~15 seconds at 2 checks/sec
+
+            container.classList.add('scanning');
+            container.style.borderColor = '';
+            document.getElementById('faceStatus').innerHTML = '<div class="text-indigo-600"><i class="fas fa-eye mr-2"></i>Scanning for face...</div>';
 
             faceDetectionInterval = setInterval(async () => {
                 attemptCount++;
                 if (attemptCount > MAX_ATTEMPTS) {
                     clearInterval(faceDetectionInterval);
-                    document.getElementById('faceStatus').innerHTML = '<div class="text-amber-600"><i class="fas fa-exclamation-triangle mr-2"></i>No face recognized. Try again or use email/password.</div>';
+                    container.classList.remove('scanning');
+                    document.getElementById('faceStatus').innerHTML = `
+                        <div class="text-amber-600 mb-3"><i class="fas fa-exclamation-triangle mr-2"></i>No face recognized.</div>
+                        <button type="button" onclick="startFaceDetection(document.getElementById('faceVideo'))" class="w-full py-2 bg-indigo-50 text-indigo-700 font-bold rounded-xl hover:bg-indigo-100 transition text-sm">
+                            <i class="fas fa-sync mr-2"></i>Try Again
+                        </button>
+                    `;
                     return;
                 }
 
                 try {
                     const detection = await faceapi.detectSingleFace(video).withFaceLandmarks().withFaceDescriptor();
-
                     if (detection) {
-                        // Face detected — update UI
-                        ring.style.borderColor = 'rgba(16,185,129,0.8)';
-                        ring.style.animation = 'none';
+                        // Face detected
+                        container.classList.remove('scanning');
+                        container.style.borderColor = 'rgba(16,185,129,0.8)';
 
                         document.getElementById('faceStatus').innerHTML = '<div class="flex items-center justify-center gap-2 text-emerald-600"><div class="w-4 h-4 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin"></div><span>Face detected! Verifying...</span></div>';
-
                         clearInterval(faceDetectionInterval);
 
-                        // Send descriptor to server
                         const descriptor = Array.from(detection.descriptor);
                         const csrfInput = document.querySelector('input[name="csrf_token"]');
                         const csrfToken = csrfInput ? csrfInput.value : '';
@@ -403,18 +415,15 @@
                         const result = await resp.json();
 
                         if (result.success) {
-                            document.getElementById('faceStatus').innerHTML = `<div class="text-emerald-600"><i class="fas fa-check-circle mr-2"></i>${result.message}<br><span class="text-xs text-gray-400">Confidence: ${result.confidence}%</span></div>`;
+                            const confStr = result.confidence !== undefined ? result.confidence : '--';
+                            document.getElementById('faceStatus').innerHTML = `<div class="text-emerald-600"><i class="fas fa-check-circle mr-2"></i>${result.message}<br><span class="text-xs text-gray-400">Confidence: ${confStr}%</span></div>`;
                             setTimeout(() => { window.location.href = result.redirect; }, 1200);
                         } else {
-                            ring.style.borderColor = 'rgba(239,68,68,0.8)';
-                            document.getElementById('faceStatus').innerHTML = `<div class="text-red-600"><i class="fas fa-times-circle mr-2"></i>${result.message}</div>`;
-                            // Restart detection after a pause
-                            setTimeout(() => {
-                                ring.style.borderColor = 'rgba(59,130,246,0.6)';
-                                ring.style.animation = 'scanPulse 2s infinite';
-                                attemptCount = 0;
-                                startFaceDetection(video);
-                            }, 3000);
+                            container.style.borderColor = 'rgba(239,68,68,0.8)';
+                            document.getElementById('faceStatus').innerHTML = `<div class="text-red-600 mb-3"><i class="fas fa-times-circle mr-2"></i>${result.message}</div>
+                            <button type="button" onclick="startFaceDetection(document.getElementById('faceVideo'))" class="w-full py-2 bg-indigo-50 text-indigo-700 font-bold rounded-xl hover:bg-indigo-100 transition text-sm">
+                                <i class="fas fa-sync mr-2"></i>Try Again
+                            </button>`;
                         }
                     }
                 } catch (e) {
@@ -427,11 +436,14 @@
             if (faceDetectionInterval) { clearInterval(faceDetectionInterval); faceDetectionInterval = null; }
             if (faceStream) { faceStream.getTracks().forEach(t => t.stop()); faceStream = null; }
             document.getElementById('faceLoginOverlay').style.display = 'none';
-            const ring = document.getElementById('faceScanRing');
-            ring.style.borderColor = 'rgba(59,130,246,0.6)';
-            ring.style.animation = 'scanPulse 2s infinite';
+            const container = document.getElementById('faceVideoContainer');
+            if (container) {
+                container.classList.remove('scanning');
+                container.style.borderColor = '';
+            }
         }
     </script>
 </body>
 
 </html>
+

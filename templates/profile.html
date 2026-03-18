@@ -192,10 +192,10 @@
 
     <!-- Face Recognition Login -->
     <div class="bg-white rounded-2xl border border-gray-100 p-6 sm:p-8">
-        <h2 class="flex items-center gap-2 text-lg font-bold text-gray-900 mb-2">
-            <div class="w-8 h-8 bg-indigo-50 rounded-lg flex items-center justify-center"><i class="fas fa-face-viewfinder text-indigo-600 text-sm"></i></div>
+        <h2 class="flex items-center gap-3 text-lg font-bold text-gray-900 mb-2">
+            <div class="w-10 h-10 bg-indigo-100 rounded-xl flex items-center justify-center"><i class="fas fa-user-check text-indigo-600 text-lg"></i></div>
             Face Recognition Login
-            <span class="ml-auto px-2 py-0.5 bg-indigo-100 text-indigo-600 text-[10px] font-bold rounded-md uppercase">Biometric</span>
+            <span class="ml-auto px-2.5 py-1 bg-indigo-50 text-indigo-600 text-[10px] font-bold rounded-md uppercase tracking-wider border border-indigo-100/50">Biometric</span>
         </h2>
         <p class="text-sm text-gray-600 mb-5">Enable face login to sign in without typing your email or password. Your face data is stored securely as a mathematical descriptor.</p>
 
@@ -211,12 +211,11 @@
             <!-- Webcam container for enrollment -->
             <div id="faceEnrollCamera" class="hidden">
                 <div class="relative w-full max-w-sm mx-auto" style="aspect-ratio:4/3">
-                    <div class="w-full h-full rounded-2xl overflow-hidden bg-gray-900 border-2 border-indigo-200">
+                    <div id="enrollVideoContainer" class="w-full h-full rounded-2xl overflow-hidden bg-gray-900 border-2 border-indigo-400/60" style="border-width:3px;animation:scanPulse 2s infinite">
                         <video id="enrollVideo" autoplay muted playsinline class="w-full h-full object-cover" style="transform:scaleX(-1)"></video>
                     </div>
-                    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-40 h-40 border-3 border-indigo-400/60 rounded-full" style="border-width:3px;animation:scanPulse 2s infinite"></div>
                 </div>
-                <p id="enrollCameraStatus" class="text-center text-sm font-medium text-indigo-600 mt-3">Position your face in the circle</p>
+                <p id="enrollCameraStatus" class="text-center text-sm font-medium text-indigo-600 mt-3">Position your face in the frame</p>
                 <div class="flex gap-3 mt-4">
                     <button type="button" onclick="captureEnrollFace()" id="enrollCaptureBtn" class="flex-1 py-3 bg-indigo-600 text-white font-bold rounded-xl hover:bg-indigo-700 transition text-sm">
                         <i class="fas fa-camera mr-2"></i>Capture & Save
@@ -527,7 +526,7 @@ async function startEnroll() {
         const video = document.getElementById('enrollVideo');
         video.srcObject = enrollStream;
         await video.play();
-        statusText.textContent = 'Position your face in the circle, then click Capture';
+        statusText.textContent = 'Position your face in the frame, then click Capture';
     } catch (e) {
         console.error('Enroll camera error:', e);
         if (e.name === 'NotAllowedError') {
@@ -597,7 +596,7 @@ function cancelEnroll() {
     if (enrollStream) { enrollStream.getTracks().forEach(t => t.stop()); enrollStream = null; }
     document.getElementById('faceEnrollCamera').classList.add('hidden');
     const statusText = document.getElementById('enrollCameraStatus');
-    statusText.textContent = 'Position your face in the circle';
+    statusText.textContent = 'Position your face in the frame';
     statusText.className = 'text-center text-sm font-medium text-indigo-600 mt-3';
 }
 
