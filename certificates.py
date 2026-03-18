@@ -350,7 +350,7 @@ def download_certificate(cert_id):
     elements.append(certifying_text)
     
     # ========== STUDENT INFORMATION BOX ==========
-    student_name = profile.full_name if profile else student.full_name
+    student_name = student.full_name
     student_id_num = profile.student_id_number if profile else 'N/A'
     course_year = 'N/A'
     if profile and profile.course:
