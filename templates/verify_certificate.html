@@ -1,0 +1,119 @@
+{% extends "student_base.html" %}
+
+{% block title %}Verify Certificate{% endblock %}
+
+{% block content %}
+<div class="min-h-[80vh] flex items-center justify-center bg-slate-50 py-12 px-4">
+    <div class="max-w-md w-full">
+        <!-- Logo Header -->
+        <div class="text-center mb-8">
+            <img src="{{ url_for('static', filename='images/isufst-logo.png') }}" alt="ISUFST Logo" class="h-12 mx-auto mb-3">
+            <p class="text-sm text-slate-500">Iloilo State University of Fisheries Science and Technology</p>
+        </div>
+
+        {% if valid %}
+            <!-- Valid Certificate Card -->
+            <div class="bg-white rounded-2xl shadow-lg border border-slate-200 overflow-hidden">
+                <!-- Header -->
+                <div class="bg-gradient-to-r from-slate-800 to-slate-900 px-6 py-4">
+                    <div class="flex items-center justify-between">
+                        <span class="text-slate-300 text-sm">Certificate Verification</span>
+                        <span class="px-2 py-1 bg-emerald-500 text-white text-xs font-bold rounded-full">VERIFIED</span>
+                    </div>
+                </div>
+
+                <!-- Certificate Details -->
+                <div class="p-6 space-y-4">
+                    <!-- Certificate Number -->
+                    <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+                        <span class="text-slate-500 text-sm">Certificate No.</span>
+                        <span class="font-semibold text-slate-900">{{ certificate.certificate_number }}</span>
+                    </div>
+
+                    <!-- Student Name -->
+                    <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+                        <span class="text-slate-500 text-sm">Name</span>
+                        <span class="font-medium text-slate-900">{{ student.full_name }}</span>
+                    </div>
+
+                    <!-- Student ID -->
+                    <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+                        <span class="text-slate-500 text-sm">Student ID</span>
+                        <span class="font-medium text-slate-900">{{ profile.student_id_number if profile else 'N/A' }}</span>
+                    </div>
+
+                    <!-- Course -->
+                    <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+                        <span class="text-slate-500 text-sm">Course</span>
+                        <span class="font-medium text-slate-900">{{ profile.course if profile else 'N/A' }}</span>
+                    </div>
+
+                    <!-- Valid Until -->
+                    <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+                        <span class="text-slate-500 text-sm">Valid Until</span>
+                        <span class="font-medium text-slate-900">
+                            {% if certificate.valid_until %}
+                                {{ certificate.valid_until.strftime('%B %d, %Y') }}
+                            {% else %}
+                                N/A
+                            {% endif %}
+                        </span>
+                    </div>
+
+                    <!-- Issue Date -->
+                    <div class="flex items-center justify-between">
+                        <span class="text-slate-500 text-sm">Issued Date</span>
+                        <span class="font-medium text-slate-900">{{ certificate.issued_at.strftime('%B %d, %Y') }}</span>
+                    </div>
+                </div>
+
+                <!-- Digital Signature Badge -->
+                <div class="bg-blue-50 px-6 py-3">
+                    <div class="flex items-center justify-center gap-2">
+                        <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+                        </svg>
+                        <span class="text-xs font-medium text-blue-700">Digitally Signed & Cryptographically Verified</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Verification Info -->
+            <div class="mt-6 text-center">
+                <p class="text-xs text-slate-400">
+                    This certificate can be verified at<br>
+                    <span class="font-mono bg-slate-100 px-2 py-1 rounded">isufst.edu.ph/verify/{{ certificate.certificate_number }}</span>
+                </p>
+            </div>
+
+        {% else %}
+            <!-- Invalid Certificate Card -->
+            <div class="bg-white rounded-2xl shadow-lg border border-slate-200 overflow-hidden">
+                <!-- Header -->
+                <div class="bg-gradient-to-r from-red-600 to-red-700 px-6 py-4">
+                    <div class="flex items-center justify-between">
+                        <span class="text-red-100 text-sm">Certificate Verification</span>
+                        <span class="px-2 py-1 bg-white/20 text-white text-xs font-bold rounded-full">INVALID</span>
+                    </div>
+                </div>
+
+                <!-- Error Content -->
+                <div class="p-6 text-center">
+                    <div class="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <svg class="w-8 h-8 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                    </div>
+                    <h3 class="text-lg font-semibold text-slate-900 mb-2">Certificate Not Found</h3>
+                    <p class="text-slate-500 text-sm">
+                        The certificate with number <span class="font-mono bg-slate-100 px-1 rounded">{{ cert_number }}</span> could not be found.
+                    </p>
+                    <p class="text-slate-400 text-xs mt-4">
+                        Please verify the certificate number and try again, or contact the clinic for assistance.
+                    </p>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

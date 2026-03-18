@@ -150,6 +150,26 @@ def view_certificate(cert_id):
     return render_template('view_certificate.html', certificate=cert)
 
 
+@certificates.route('/verify/<string:cert_number>')
+def verify_certificate(cert_number):
+    """Public verification page for certificates (accessible via QR code)."""
+    cert = HealthCertificate.query.filter_by(certificate_number=cert_number).first()
+    
+    if not cert:
+        return render_template('verify_certificate.html', valid=False, cert_number=cert_number)
+    
+    student = cert.student
+    profile = student.student_profile
+    
+    return render_template(
+        'verify_certificate.html',
+        valid=True,
+        certificate=cert,
+        student=student,
+        profile=profile
+    )
+
+
 @certificates.route('/download/<int:cert_id>')
 @login_required
 def download_certificate(cert_id):
