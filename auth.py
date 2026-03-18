@@ -17,7 +17,7 @@ auth = Blueprint('auth', __name__, url_prefix='/auth')
 def login():
     """Login page and form handler."""
     if current_user.is_authenticated:
-        if current_user.role in ['admin', 'nurse']:
+        if current_user.role == 'admin':
             return redirect(url_for('admin'))
         return redirect(url_for('index'))
     
@@ -32,7 +32,7 @@ def login():
             login_user(user, remember=remember)
             
             # Redirect based on role
-            if user.role in ['admin', 'nurse']:
+            if user.role == 'admin':
                 return redirect(url_for('admin'))
             return redirect(url_for('index'))
         else:
@@ -226,7 +226,7 @@ def profile():
 @login_required
 def list_users():
     """Admin: List all users."""
-    if current_user.role not in ['admin', 'staff']:
+    if current_user.role != 'admin':
         flash('Access denied. Admin only.', 'error')
         return redirect(url_for('index'))
     
@@ -238,7 +238,7 @@ def list_users():
 @login_required
 def edit_user(user_id):
     """Admin: Edit a user."""
-    if current_user.role not in ['admin', 'staff']:
+    if current_user.role != 'admin':
         flash('Access denied. Admin only.', 'error')
         return redirect(url_for('index'))
     
@@ -292,7 +292,7 @@ def edit_user(user_id):
 @login_required
 def delete_user(user_id):
     """Admin: Delete a user."""
-    if current_user.role not in ['admin', 'staff']:
+    if current_user.role != 'admin':
         flash('Access denied. Admin only.', 'error')
         return redirect(url_for('index'))
     
@@ -381,7 +381,7 @@ def face_login():
 
     if best_match and best_distance < THRESHOLD:
         login_user(best_match, remember=True)
-        redirect_url = url_for('admin') if best_match.role in ['admin', 'nurse'] else url_for('index')
+        redirect_url = url_for('admin') if best_match.role == 'admin' else url_for('index')
         return jsonify({
             'success': True,
             'message': f'Welcome back, {best_match.first_name}!',

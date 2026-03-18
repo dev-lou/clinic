@@ -17,10 +17,10 @@ symptom_screening = Blueprint('symptom_screening', __name__, url_prefix='/screen
 @login_required
 def index():
     """Symptom screening questionnaire."""
-    if current_user.role != 'student':
+    if current_user.role not in ['student', 'admin']:
         from flask import flash
-        flash('Symptom screening is for students only.', 'error')
-        return redirect(url_for('admin') if current_user.role in ['admin', 'nurse'] else url_for('auth.login'))
+        flash('Access denied.', 'error')
+        return redirect(url_for('admin') if current_user.role == 'admin' else url_for('auth.login'))
     
     return render_template('symptom_screening.html')
 
@@ -70,8 +70,8 @@ def analyze():
 @login_required
 def history():
     """View previous symptom screenings."""
-    if current_user.role != 'student':
-        return redirect(url_for('admin') if current_user.role in ['admin', 'nurse'] else url_for('auth.login'))
+    if current_user.role not in ['student', 'admin']:
+        return redirect(url_for('admin') if current_user.role == 'admin' else url_for('auth.login'))
     
     screenings = SymptomScreening.query.filter_by(
         student_id=current_user.id

@@ -51,7 +51,7 @@ def check_expiring_medicines():
         if expiring:
             # Get all admins
             admins = User.query.filter(
-                User.role.in_(['admin', 'nurse']),
+                User.role == 'admin',
                 User.is_active == True
             ).all()
             

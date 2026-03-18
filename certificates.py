@@ -26,7 +26,7 @@ def require_staff(f):
     """Decorator to require nurse or admin role."""
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        if current_user.role not in ['nurse', 'admin']:
+        if current_user.role not in ['admin']:
             flash('Access denied. Staff only.', 'error')
             return redirect(url_for('index'))
         return f(*args, **kwargs)
@@ -81,6 +81,10 @@ def issue_certificate():
         
         db.session.add(certificate)
         db.session.commit()
+        
+        # Send notification to student about certificate
+        from notification_service import notify_certificate_issued
+        notify_certificate_issued(student, certificate)
         
         flash(f'Certificate {cert_number} issued successfully to {student.full_name}!', 'success')
         return redirect(url_for('certificates.admin_certificates'))

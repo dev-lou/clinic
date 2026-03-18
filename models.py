@@ -19,7 +19,7 @@ class User(UserMixin, db.Model):
     role = db.Column(
         db.String(20),
         nullable=False,
-        default='student',  # student | nurse | admin
+        default='student',  # student | admin
     )
     is_active = db.Column(db.Boolean, default=True)
     profile_image_url = db.Column(db.String(500), nullable=True)  # Supabase storage URL

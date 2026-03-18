@@ -336,6 +336,47 @@ def notify_expiring_medicines(admin_users, expiring_items):
         send_email(admin.email, 'Medicine Expiry Alert - Action Required', email_body)
 
 
+def notify_certificate_issued(student, certificate):
+    """Send notification when a health certificate is issued."""
+    certificate_url = url_for('certificates.view_certificate', cert_id=certificate.id, _external=True)
+    
+    # In-app notification
+    create_notification(
+        user_id=student.id,
+        type='certificate_issued',
+        title='Health Certificate Ready',
+        message=f'Your health certificate ({certificate.certificate_number}) has been issued and is ready for download.',
+        link=certificate_url
+    )
+    
+    # Push notification
+    send_push_notification(
+        user_id=student.id,
+        title='Certificate Ready',
+        body=f'Your health certificate {certificate.certificate_number} is ready!',
+        data={'link': certificate_url, 'type': 'certificate', 'cert_number': certificate.certificate_number}
+    )
+    
+    # Optional: Email notification
+    if student.email:
+        email_body = f"""
+        <html>
+            <body style="font-family: Arial, sans-serif;">
+                <h2>Health Certificate Ready</h2>
+                <p>Dear {student.first_name},</p>
+                <p>Your health certificate has been issued!</p>
+                <p><strong>Certificate Number:</strong> {certificate.certificate_number}</p>
+                <p><strong>Purpose:</strong> {certificate.purpose}</p>
+                <p><strong>Valid Until:</strong> {certificate.valid_until.strftime('%B %d, %Y')}</p>
+                <p>You can download your certificate by clicking the link below:</p>
+                <p><a href="{certificate_url}" style="background-color: #2563eb; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">Download Certificate</a></p>
+                <p><strong>ISUFST CareHub</strong></p>
+            </body>
+        </html>
+        """
+        send_email(student.email, f'Health Certificate Ready - {certificate.certificate_number}', email_body)
+
+
 def init_notification_service(app):
     """Initialize notification service with Flask app."""
     mail.init_app(app)

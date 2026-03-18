@@ -11,8 +11,6 @@ from enum import Enum
 class Role(Enum):
     """User roles with hierarchical permissions."""
     STUDENT = 'student'
-    NURSE = 'nurse'
-    DOCTOR = 'doctor'
     ADMIN = 'admin'
 
 
@@ -62,29 +60,6 @@ ROLE_PERMISSIONS = {
         Permission.VIEW_OWN_APPOINTMENTS,
         Permission.VIEW_OWN_RECORDS,
         Permission.RESERVE_MEDICINE,
-    },
-    Role.NURSE: {
-        Permission.VIEW_QUEUE,
-        Permission.MANAGE_QUEUE,
-        Permission.VIEW_ALL_APPOINTMENTS,
-        Permission.MANAGE_APPOINTMENTS,
-        Permission.VIEW_ALL_RECORDS,
-        Permission.CREATE_CLINIC_VISIT,
-        Permission.VIEW_INVENTORY,
-        Permission.MANAGE_RESERVATIONS,
-        Permission.VIEW_ANALYTICS,
-    },
-    Role.DOCTOR: {
-        Permission.VIEW_QUEUE,
-        Permission.MANAGE_QUEUE,
-        Permission.VIEW_ALL_APPOINTMENTS,
-        Permission.MANAGE_APPOINTMENTS,
-        Permission.VIEW_ALL_RECORDS,
-        Permission.CREATE_CLINIC_VISIT,
-        Permission.VIEW_INVENTORY,
-        Permission.PRESCRIBE_MEDICINE,
-        Permission.MANAGE_SCHEDULE,
-        Permission.VIEW_ANALYTICS,
     },
     Role.ADMIN: set(Permission),  # Admin has all permissions
 }
@@ -156,13 +131,13 @@ def require_role(*roles):
 
 
 def require_staff(f):
-    """Decorator to require nurse, doctor, or admin role."""
-    return require_role(Role.NURSE, Role.DOCTOR, Role.ADMIN)(f)
+    """Decorator to require admin role (staff/nurse roles removed)."""
+    return require_role(Role.ADMIN)(f)
 
 
 def require_medical_staff(f):
-    """Decorator to require doctor or nurse role (not admin)."""
-    return require_role(Role.DOCTOR, Role.NURSE)(f)
+    """Decorator to require admin role only (medical staff roles removed)."""
+    return require_role(Role.ADMIN)(f)
 
 
 def require_admin(f):

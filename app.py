@@ -174,7 +174,7 @@ def create_app(config_name=None):
         from utils import get_next_patient
         from datetime import date
 
-        if current_user.role not in ['admin', 'nurse']:
+        if current_user.role != 'admin':
             abort(403)
 
         next_patient = get_next_patient()

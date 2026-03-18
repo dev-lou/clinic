@@ -148,7 +148,7 @@ def require_staff(f):
     from functools import wraps
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        if current_user.role not in ['nurse', 'admin']:
+        if current_user.role not in ['admin']:
             flash('Access denied. Staff only.', 'error')
             return redirect(url_for('index'))
         return f(*args, **kwargs)

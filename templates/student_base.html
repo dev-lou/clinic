@@ -485,7 +485,7 @@
                     {% endif %}
                 </div>
 
-                <!-- Right Side Actions -->
+                 <!-- Right Side Actions -->
                 <div class="flex items-center space-x-3">
                     {% if current_user.is_authenticated %}
                     <!-- Notification Bell (Desktop) -->
@@ -539,12 +539,15 @@
                                     <a href="{{ url_for('reservations.my_reservations') }}"
                                         class="flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition rounded-lg mx-1.5"><i
                                             class="fas fa-pills w-5 text-gray-400 mr-2"></i>Reservations</a>
+                                    <a href="{{ url_for('symptom_screening.index') }}"
+                                        class="flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition rounded-lg mx-1.5"><i
+                                            class="fas fa-stethoscope w-5 text-gray-400 mr-2"></i>Symptom Checker</a>
                                     <div class="border-t border-gray-100 my-1 mx-4"></div>
                                     <a href="{{ url_for('auth.profile') }}"
                                         class="flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition rounded-lg mx-1.5"><i
                                             class="fas fa-user-circle w-5 text-gray-400 mr-2"></i>Profile</a>
 
-                                    {% if current_user.role in ['admin', 'staff'] %}
+                                    {% if current_user.role == 'admin' %}
                                     <div class="border-t border-gray-100 my-1 mx-4"></div>
                                     <a href="{{ url_for('admin') }}"
                                         class="flex items-center px-4 py-2.5 text-sm text-primary-700 hover:bg-primary-50 transition rounded-lg mx-1.5"><i
@@ -566,9 +569,25 @@
                         class="px-5 py-2.5 bg-primary-700 text-white text-sm font-semibold rounded-xl hover:bg-primary-800 transition-all shadow-md shadow-primary-700/20">Register</a>
                     {% endif %}
 
+                    <!-- Mobile Notification Bell -->
+                    <div class="lg:hidden relative">
+                        <button id="mobileNotificationBell"
+                            class="w-9 h-9 flex items-center justify-center rounded-lg hover:bg-gray-100 transition-all relative text-gray-500 hover:text-gray-700">
+                            <i class="fas fa-bell text-[15px]"></i>
+                            <span id="mobileNotifBadge"
+                                class="hidden absolute -top-0.5 -right-0.5 bg-red-500 text-white text-[10px] font-bold rounded-full h-4 min-w-[16px] flex items-center justify-center px-1 notif-pulse">0</span>
+                        </button>
+                        <div id="mobileNotificationDropdown"
+                            class="hidden absolute right-0 mt-2.5 w-80 bg-white rounded-2xl shadow-xl shadow-black/8 border border-gray-100 z-50">
+                            <div class="p-4 border-b border-gray-100">
+                                <h3 class="font-bold text-sm text-gray-900">Notifications</h3>
+                            </div>
+                            <div id="mobileNotificationList" class="max-h-80 overflow-y-auto"></div>
+                        </div>
+                    </div>
                     <!-- Mobile Burger Menu Button -->
                     <button id="mobileMenuBtn" onclick="toggleMobileMenu()"
-                        class="lg:hidden w-10 h-10 flex items-center justify-center rounded-xl hover:bg-gray-100 transition text-gray-600 ring-1 ring-gray-100">
+                        class="lg:hidden w-10 h-10 flex items-center justify-center rounded-xl hover:bg-gray-100 transition text-gray-600 ring-1 ring-gray-100 ml-2">
                         <i class="fas fa-bars text-lg"></i>
                     </button>
                 </div>
@@ -614,6 +633,7 @@
                     class="flex items-center gap-3 px-4 py-3 text-sm font-medium text-gray-700 rounded-xl hover:bg-primary-50 hover:text-primary-700 transition">
                     <i class="fas fa-th-large w-5 text-center text-gray-400"></i>Dashboard
                 </a>
+
                 <a href="{{ url_for('appointments.my_appointments') }}"
                     class="flex items-center gap-3 px-4 py-3 text-sm font-medium text-gray-700 rounded-xl hover:bg-primary-50 hover:text-primary-700 transition">
                     <i class="fas fa-calendar-check w-5 text-center text-gray-400"></i>Appointments
@@ -631,7 +651,7 @@
                     class="flex items-center gap-3 px-4 py-3 text-sm font-medium text-gray-700 rounded-xl hover:bg-primary-50 hover:text-primary-700 transition">
                     <i class="fas fa-user-circle w-5 text-center text-gray-400"></i>Profile
                 </a>
-                {% if current_user.role in ['admin', 'staff'] %}
+                {% if current_user.role == 'admin' %}
                 <div class="my-2 border-t border-gray-100"></div>
                 <a href="{{ url_for('admin') }}"
                     class="flex items-center gap-3 px-4 py-3 text-sm font-medium text-primary-700 rounded-xl hover:bg-primary-50 transition">
@@ -714,14 +734,87 @@
     </footer>
 
     <script>
+        // ── Notification Functions ──
+        function updateNotificationCount() {
+            fetch('{{ url_for("patient_dashboard.unread_notification_count") }}')
+                 .then(r => r.json()).then(data => {
+                    const badge = document.getElementById('notifBadge');
+                    const mobileBadge = document.getElementById('mobileNotifBadge');
+                    if (data.count > 0) { 
+                        const countText = data.count > 9 ? '9+' : data.count;
+                        if (badge) { badge.textContent = countText; badge.classList.remove('hidden') }
+                        if (mobileBadge) { mobileBadge.textContent = countText; mobileBadge.classList.remove('hidden') }
+                    } else { 
+                        if (badge) badge.classList.add('hidden');
+                        if (mobileBadge) mobileBadge.classList.add('hidden');
+                    }
+                });
+        }
+        
+        function loadNotifications() {
+            fetch('{{ url_for("api_v1.get_notifications") }}?unread_only=true')
+                .then(r => r.json()).then(notifications => {
+                    const list = document.getElementById('notificationList');
+                    if (notifications.length === 0) { list.innerHTML = '<p class="p-6 text-gray-400 text-center text-sm">No new notifications</p>' }
+                    else {
+                        list.innerHTML = notifications.map(n => `
+                <div class="px-4 py-3 border-b border-gray-50 hover:bg-gray-50 cursor-pointer transition" onclick="markRead(${n.id})">
+                    <h4 class="font-semibold text-sm text-gray-900">${n.title}</h4>
+                    <p class="text-xs text-gray-500 mt-0.5">${n.message}</p>
+                    <span class="text-[10px] text-gray-400 mt-1 block">${new Date(n.created_at).toLocaleString()}</span>
+                </div>
+            `).join('')
+                    }
+                });
+        }
+        
+        function markRead(id) {
+            fetch(`{{ url_for("patient_dashboard.mark_notification_read",notification_id=0) }}`.replace('0', id), {
+                method: 'POST', headers: { 'Content-Type': 'application/json', 'X-CSRFToken': '{{ csrf_token() }}' }
+            }).then(() => { updateNotificationCount(); loadNotifications() });
+        }
+
+        function loadMobileNotifications() {
+            fetch('{{ url_for("api_v1.get_notifications") }}?unread_only=true')
+                .then(r => r.json()).then(notifications => {
+                    const list = document.getElementById('mobileNotificationList');
+                    if (notifications.length === 0) { list.innerHTML = '<p class="p-6 text-gray-400 text-center text-sm">No new notifications</p>' }
+                    else {
+                        list.innerHTML = notifications.map(n => `
+                <div class="px-4 py-3 border-b border-gray-50 hover:bg-gray-50 cursor-pointer transition" onclick="markMobileRead(${n.id})">
+                    <h4 class="font-semibold text-sm text-gray-900">${n.title}</h4>
+                    <p class="text-xs text-gray-500 mt-0.5">${n.message}</p>
+                    <span class="text-[10px] text-gray-400 mt-1 block">${new Date(n.created_at).toLocaleString()}</span>
+                </div>
+            `).join('')
+                    }
+                });
+        }
+
+        function markMobileRead(id) {
+            fetch(`{{ url_for("patient_dashboard.mark_notification_read",notification_id=0) }}`.replace('0', id), {
+                method: 'POST', headers: { 'Content-Type': 'application/json', 'X-CSRFToken': '{{ csrf_token() }}' }
+            }).then(() => { updateNotificationCount(); loadMobileNotifications() });
+        }
+
         document.addEventListener('DOMContentLoaded', function () {
             const bell = document.getElementById('notificationBell');
             const dropdown = document.getElementById('notificationDropdown');
-            if (bell) {
-                bell.addEventListener('click', function (e) { e.stopPropagation(); dropdown.classList.toggle('hidden'); loadNotifications() });
-                document.addEventListener('click', function (e) { if (!dropdown.contains(e.target)) dropdown.classList.add('hidden') });
+            if (bell && dropdown) {
+                bell.addEventListener('click', function (e) {
+                    e.stopPropagation();
+                    dropdown.classList.toggle('hidden');
+                    if (!dropdown.classList.contains('hidden')) {
+                        loadNotifications();
+                    }
+                });
+                document.addEventListener('click', function (e) {
+                    if (!bell.contains(e.target)) {
+                        dropdown.classList.add('hidden');
+                    }
+                });
                 updateNotificationCount();
-                setInterval(updateNotificationCount, 30000);
+                setInterval(updateNotificationCount, 5000);
             }
         });
 
@@ -756,34 +849,22 @@
             mobileBtn.addEventListener('click', toggleMobileMenu);
         }
 
-        function updateNotificationCount() {
-            fetch('{{ url_for("patient_dashboard.unread_notification_count") }}')
-                .then(r => r.json()).then(data => {
-                    const badge = document.getElementById('notifBadge');
-                    if (data.count > 0) { badge.textContent = data.count > 9 ? '9+' : data.count; badge.classList.remove('hidden') }
-                    else { badge.classList.add('hidden') }
-                });
-        }
-        function loadNotifications() {
-            fetch('{{ url_for("api_v1.get_notifications") }}?unread_only=true')
-                .then(r => r.json()).then(notifications => {
-                    const list = document.getElementById('notificationList');
-                    if (notifications.length === 0) { list.innerHTML = '<p class="p-6 text-gray-400 text-center text-sm">No new notifications</p>' }
-                    else {
-                        list.innerHTML = notifications.map(n => `
-                <div class="px-4 py-3 border-b border-gray-50 hover:bg-gray-50 cursor-pointer transition" onclick="markRead(${n.id})">
-                    <h4 class="font-semibold text-sm text-gray-900">${n.title}</h4>
-                    <p class="text-xs text-gray-500 mt-0.5">${n.message}</p>
-                    <span class="text-[10px] text-gray-400 mt-1 block">${new Date(n.created_at).toLocaleString()}</span>
-                </div>
-            `).join('')
-                    }
-                });
-        }
-        function markRead(id) {
-            fetch(`{{ url_for("patient_dashboard.mark_notification_read",notification_id=0) }}`.replace('0', id), {
-                method: 'POST', headers: { 'Content-Type': 'application/json', 'X-CSRFToken': '{{ csrf_token() }}' }
-            }).then(() => { updateNotificationCount(); loadNotifications() });
+        // Mobile Notification Bell
+        const mobileBell = document.getElementById('mobileNotificationBell');
+        const mobileDropdown = document.getElementById('mobileNotificationDropdown');
+        if (mobileBell && mobileDropdown) {
+            mobileBell.addEventListener('click', function(e) {
+                e.stopPropagation();
+                mobileDropdown.classList.toggle('hidden');
+                if (!mobileDropdown.classList.contains('hidden')) {
+                    loadMobileNotifications();
+                }
+            });
+            document.addEventListener('click', function(e) {
+                if (!mobileBell.contains(e.target)) {
+                    mobileDropdown.classList.add('hidden');
+                }
+            });
         }
 
         // ── User Menu Dropdown (hover-friendly) ──

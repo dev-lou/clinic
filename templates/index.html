@@ -556,7 +556,22 @@
 
                 <div class="flex items-center space-x-3">
                     {% if current_user.is_authenticated %}
-                    {% include 'partials/notification_bell.html' %}
+                    <!-- Notification Bell -->
+                    <div class="relative">
+                        <button id="notificationBell"
+                            class="w-9 h-9 flex items-center justify-center rounded-lg hover:bg-gray-100 transition-all relative text-gray-500 hover:text-gray-700">
+                            <i class="fas fa-bell text-[15px]"></i>
+                            <span id="notifBadge"
+                                class="hidden absolute -top-0.5 -right-0.5 bg-red-500 text-white text-[10px] font-bold rounded-full h-4 min-w-[16px] flex items-center justify-center px-1 notif-pulse">0</span>
+                        </button>
+                        <div id="notificationDropdown"
+                            class="hidden absolute right-0 mt-2.5 w-80 bg-white rounded-2xl shadow-xl shadow-black/8 border border-gray-100 z-50">
+                            <div class="p-4 border-b border-gray-100">
+                                <h3 class="font-bold text-sm text-gray-900">Notifications</h3>
+                            </div>
+                            <div id="notificationList" class="max-h-80 overflow-y-auto"></div>
+                        </div>
+                    </div>
                     <div class="relative" id="indexUserMenuWrap">
                         <button id="indexUserMenuBtn"
                             class="flex items-center space-x-2 px-3 py-2 rounded-xl hover:bg-gray-50 transition-all">
@@ -591,11 +606,14 @@
                                 <a href="{{ url_for('reservations.my_reservations') }}"
                                     class="flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors rounded-lg mx-1.5"><i
                                         class="fas fa-capsules w-5 text-gray-400 mr-2.5"></i>My Reservations</a>
+                                <a href="{{ url_for('symptom_screening.index') }}"
+                                    class="flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors rounded-lg mx-1.5"><i
+                                        class="fas fa-stethoscope w-5 text-gray-400 mr-2.5"></i>Symptom Checker</a>
 
                                 <a href="{{ url_for('auth.profile') }}"
                                     class="flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors rounded-lg mx-1.5"><i
                                         class="fas fa-user-circle w-5 text-gray-400 mr-2.5"></i>My Profile</a>
-                                {% if current_user.role in ['admin', 'staff'] %}
+            {% if current_user.role == 'admin' %}
                                 <div class="border-t border-gray-100 my-1 mx-4"></div>
                                 <a href="{{ url_for('admin') }}"
                                     class="flex items-center px-4 py-2.5 text-sm text-primary-700 hover:bg-primary-50 transition-colors rounded-lg mx-1.5"><i
@@ -1473,6 +1491,61 @@
         }
         setInterval(rotateHeroText, 3000);
         document.getElementById('hero-rotating').style.transition = 'opacity .3s, transform .3s';
+
+        // ── Notification System ──
+        function updateNotificationCount() {
+            fetch('{{ url_for("patient_dashboard.unread_notification_count") }}')
+                 .then(r => r.json()).then(data => {
+                    const badge = document.getElementById('notifBadge');
+                    if (data.count > 0) { badge.textContent = data.count > 9 ? '9+' : data.count; badge.classList.remove('hidden') }
+                    else { badge.classList.add('hidden') }
+                });
+        }
+        
+        function loadNotifications() {
+            fetch('{{ url_for("api_v1.get_notifications") }}?unread_only=true')
+                .then(r => r.json()).then(notifications => {
+                    const list = document.getElementById('notificationList');
+                    if (notifications.length === 0) { list.innerHTML = '<p class="p-6 text-gray-400 text-center text-sm">No new notifications</p>' }
+                    else {
+                        list.innerHTML = notifications.map(n => `
+                <div class="px-4 py-3 border-b border-gray-50 hover:bg-gray-50 cursor-pointer transition" onclick="markRead(${n.id})">
+                    <h4 class="font-semibold text-sm text-gray-900">${n.title}</h4>
+                    <p class="text-xs text-gray-500 mt-0.5">${n.message}</p>
+                    <span class="text-[10px] text-gray-400 mt-1 block">${new Date(n.created_at).toLocaleString()}</span>
+                </div>
+            `).join('')
+                    }
+                });
+        }
+        
+        function markRead(id) {
+            fetch(`{{ url_for("patient_dashboard.mark_notification_read",notification_id=0) }}`.replace('0', id), {
+                method: 'POST', headers: { 'Content-Type': 'application/json', 'X-CSRFToken': '{{ csrf_token() }}' }
+            }).then(() => { updateNotificationCount(); loadNotifications() });
+        }
+        
+        // Notification bell click
+        const notificationBell = document.getElementById('notificationBell');
+        const notificationDropdown = document.getElementById('notificationDropdown');
+        if (notificationBell && notificationDropdown) {
+            notificationBell.addEventListener('click', function(e) {
+                e.stopPropagation();
+                notificationDropdown.classList.toggle('hidden');
+                if (!notificationDropdown.classList.contains('hidden')) {
+                    loadNotifications();
+                }
+            });
+            document.addEventListener('click', function(e) {
+                if (!notificationBell.contains(e.target)) {
+                    notificationDropdown.classList.add('hidden');
+                }
+            });
+        }
+        
+        // Update notification count every 5 seconds for real-time feel
+        updateNotificationCount();
+        setInterval(updateNotificationCount, 5000);
 
         // ── User Menu Dropdown (hover-friendly) ──
         (function() {

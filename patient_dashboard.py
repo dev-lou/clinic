@@ -2,7 +2,7 @@
 Patient Dashboard Blueprint for ISUFST CareHub.
 Health timeline, unified view of all patient data.
 """
-from flask import Blueprint, render_template, jsonify, redirect, url_for, flash
+from flask import Blueprint, render_template, jsonify, redirect, url_for, flash, request
 from flask_login import login_required, current_user
 from models import db, Appointment, ClinicVisit, MedicineReservation, Notification
 from models_extended import VisitFeedback, HealthCertificate
@@ -16,44 +16,50 @@ patient_dashboard = Blueprint('patient_dashboard', __name__, url_prefix='/dashbo
 @login_required
 def index():
     """Main patient dashboard with health timeline."""
-    if current_user.role != 'student':
-        flash('That page is for students only.', 'error')
-        return redirect(url_for('admin') if current_user.role in ['admin', 'nurse'] else url_for('auth.login'))
+    # Allow admin to test student pages using ?student_id= parameter
+    if current_user.role == 'admin':
+        # Admin can view specific student or their own data for testing
+        student_id = request.args.get('student_id', current_user.id)
+    elif current_user.role == 'student':
+        student_id = current_user.id
+    else:
+        flash('Access denied.', 'error')
+        return redirect(url_for('admin'))
     
     # Upcoming appointments
     upcoming_appointments = Appointment.query.filter(
-        Appointment.student_id == current_user.id,
+        Appointment.student_id == student_id,
         Appointment.appointment_date >= datetime.now().date(),
         Appointment.status.in_(['Pending', 'Confirmed'])
     ).order_by(Appointment.appointment_date, Appointment.start_time).limit(5).all()
     
     # Recent visits
     recent_visits = ClinicVisit.query.filter(
-        ClinicVisit.student_id == current_user.id
+        ClinicVisit.student_id == student_id
     ).order_by(desc(ClinicVisit.visit_date)).limit(10).all()
     
     # Active reservations
     active_reservations = MedicineReservation.query.filter(
-        MedicineReservation.student_id == current_user.id,
+        MedicineReservation.student_id == student_id,
         MedicineReservation.status == 'Reserved'
     ).order_by(desc(MedicineReservation.reserved_at)).all()
     
     # Unread notifications
     unread_notifications = Notification.query.filter(
-        Notification.user_id == current_user.id,
+        Notification.user_id == student_id,
         Notification.is_read == False
     ).order_by(desc(Notification.created_at)).limit(5).all()
     
     # Health certificates
     certificates = HealthCertificate.query.filter(
-        HealthCertificate.student_id == current_user.id
+        HealthCertificate.student_id == student_id
     ).order_by(desc(HealthCertificate.issued_at)).limit(5).all()
     
     # Pending feedback (visits without feedback)
     visits_without_feedback = db.session.query(ClinicVisit).outerjoin(
         VisitFeedback, ClinicVisit.id == VisitFeedback.visit_id
     ).filter(
-        ClinicVisit.student_id == current_user.id,
+        ClinicVisit.student_id == student_id,
         ClinicVisit.status == 'completed',
         VisitFeedback.id == None
     ).order_by(desc(ClinicVisit.visit_date)).limit(3).all()
@@ -71,16 +77,21 @@ def index():
 @login_required
 def timeline():
     """Health timeline view with all events chronologically."""
-    if current_user.role != 'student':
-        flash('That page is for students only.', 'error')
-        return redirect(url_for('admin') if current_user.role in ['admin', 'nurse'] else url_for('auth.login'))
+    # Allow admin to test student pages using ?student_id= parameter
+    if current_user.role == 'admin':
+        student_id = request.args.get('student_id', current_user.id)
+    elif current_user.role == 'student':
+        student_id = current_user.id
+    else:
+        flash('Access denied.', 'error')
+        return redirect(url_for('admin'))
     
     # Combine all events into timeline
     timeline_events = []
     
     # Add appointments
     appointments = Appointment.query.filter(
-        Appointment.student_id == current_user.id
+        Appointment.student_id == student_id
     ).all()
     for appt in appointments:
         timeline_events.append({
@@ -95,7 +106,7 @@ def timeline():
     
     # Add visits
     visits = ClinicVisit.query.filter(
-        ClinicVisit.student_id == current_user.id
+        ClinicVisit.student_id == student_id
     ).all()
     for visit in visits:
         timeline_events.append({
@@ -111,7 +122,7 @@ def timeline():
     
     # Add reservations
     reservations = MedicineReservation.query.filter(
-        MedicineReservation.student_id == current_user.id
+        MedicineReservation.student_id == student_id
     ).all()
     for res in reservations:
         res_date = res.reserved_at.date() if isinstance(res.reserved_at, datetime) else res.reserved_at
@@ -136,27 +147,32 @@ def timeline():
 @login_required
 def health_stats():
     """Health statistics and trends."""
-    if current_user.role != 'student':
-        flash('That page is for students only.', 'error')
-        return redirect(url_for('admin') if current_user.role in ['admin', 'nurse'] else url_for('auth.login'))
+    # Allow admin to test student pages using ?student_id= parameter
+    if current_user.role == 'admin':
+        student_id = request.args.get('student_id', current_user.id)
+    elif current_user.role == 'student':
+        student_id = current_user.id
+    else:
+        flash('Access denied.', 'error')
+        return redirect(url_for('admin'))
     
     # Count statistics
     total_visits = ClinicVisit.query.filter(
-        ClinicVisit.student_id == current_user.id
+        ClinicVisit.student_id == student_id
     ).count()
     
     total_appointments = Appointment.query.filter(
-        Appointment.student_id == current_user.id
+        Appointment.student_id == student_id
     ).count()
     
     completed_visits = ClinicVisit.query.filter(
-        ClinicVisit.student_id == current_user.id,
+        ClinicVisit.student_id == student_id,
         ClinicVisit.status == 'completed'
     ).count()
     
     # Most common complaints (if we track vitals/complaints)
     visits = ClinicVisit.query.filter(
-        ClinicVisit.student_id == current_user.id
+        ClinicVisit.student_id == student_id
     ).all()
     
     complaints = {}

@@ -51,8 +51,6 @@
                             <select name="role" required
                                 class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-primary-600 focus:ring-2 focus:ring-primary-600/10 outline-none transition">
                                 <option value="student" {% if user.role == 'student' %}selected{% endif %}>Student</option>
-                                <option value="staff" {% if user.role == 'staff' %}selected{% endif %}>Staff</option>
-                                <option value="nurse" {% if user.role == 'nurse' %}selected{% endif %}>Nurse</option>
                                 <option value="admin" {% if user.role == 'admin' %}selected{% endif %}>Admin</option>
                             </select>
                         </div>
@@ -161,7 +159,6 @@
                     <p class="text-sm text-gray-500">{{ user.email }}</p>
                     <span class="inline-block mt-3 px-3 py-1 rounded-full text-xs font-bold
                         {% if user.role == 'admin' %}bg-purple-100 text-purple-700
-                        {% elif user.role == 'staff' or user.role == 'nurse' %}bg-blue-100 text-blue-700
                         {% else %}bg-gray-100 text-gray-700{% endif %}">
                         {{ user.role|capitalize }}
                     </span>

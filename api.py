@@ -28,24 +28,24 @@ def api_required(f):
 
 
 def student_only(f):
-    """Decorator to restrict to students."""
+    """Decorator to restrict to students or admin (for testing)."""
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        if current_user.role != 'student':
+        if current_user.role not in ['student', 'admin']:
             from flask import flash, redirect, url_for as _url_for
-            flash('That page is for students only.', 'error')
-            return redirect(_url_for('admin') if current_user.role in ['admin', 'nurse'] else _url_for('auth.login'))
+            flash('Access denied.', 'error')
+            return redirect(_url_for('admin') if current_user.role == 'admin' else _url_for('auth.login'))
         return f(*args, **kwargs)
     return decorated_function
 
 
 def staff_only(f):
-    """Decorator to restrict to staff."""
+    """Decorator to restrict to admin only (no staff/nurse roles)."""
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        if current_user.role not in ['nurse', 'doctor', 'admin']:
+        if current_user.role != 'admin':
             from flask import flash, redirect, url_for as _url_for
-            flash('That page is for staff only.', 'error')
+            flash('Access denied. Admin only.', 'error')
             return redirect(_url_for('patient_dashboard.index') if current_user.role == 'student' else _url_for('auth.login'))
         return f(*args, **kwargs)
     return decorated_function
