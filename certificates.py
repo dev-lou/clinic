@@ -508,21 +508,55 @@ def download_certificate(cert_id):
     else:
         sig_content = Paragraph("<font color='#94a3b8'>___________________________</font>", value_style)
     
+    qr_text_style = ParagraphStyle(
+        'QRText',
+        parent=styles['Normal'],
+        fontSize=8,
+        textColor=TEXT_GRAY,
+        alignment=TA_CENTER,
+        fontName='Helvetica-Bold',
+        leading=10
+    )
+    
+    # Group QR code and its text
+    qr_cell = Table([
+        [qr_image],
+        [Paragraph("Scan to verify<br/>online authenticity", qr_text_style)]
+    ], colWidths=[2*inch])
+    qr_cell.setStyle(TableStyle([
+        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+        ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 0),
+        ('TOPPADDING', (0, 1), (-1, 1), 2), # Small padding above text
+    ]))
+    
     # Signature details
     issuer_name = issuer.full_name
     issuer_role = "Clinic Nurse" if issuer.role == 'nurse' else "Health Services"
     
+    # Group signature content
+    sig_text_cell = Table([
+        [Paragraph(f"<b>{issuer_name}</b>", value_style)],
+        [Paragraph(f"{issuer_role}<br/><font color='#64748b'>Iloilo State University of Fisheries Science and Technology</font>", label_style)]
+    ], colWidths=[4*inch])
+    sig_text_cell.setStyle(TableStyle([
+        ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+        ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 2),
+        ('TOPPADDING', (0, 0), (-1, -1), 2),
+    ]))
+    
     sig_details = [
-        [sig_content, qr_image],
-        [Paragraph(f"<b>{issuer_name}</b>", value_style), Paragraph("<font size=8>Scan to verify</font>", label_style)],
-        [Paragraph(f"{issuer_role}<br/><font color='#64748b'>Iloilo State University of Fisheries Science and Technology</font>", label_style), Paragraph("<font size=8>online authenticity</font>", label_style)]
+        [sig_content, qr_cell],
+        [sig_text_cell, '']
     ]
     
     sig_table = Table(sig_details, colWidths=[4*inch, 2*inch])
     sig_table.setStyle(TableStyle([
         ('ALIGN', (0, 0), (0, -1), 'LEFT'),
-        ('ALIGN', (1, 0), (1, 0), 'CENTER'),
+        ('ALIGN', (1, 0), (1, -1), 'CENTER'),
         ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+        ('SPAN', (1, 0), (1, 1)), # Span the right column across both rows
         ('BOTTOMPADDING', (0, 0), (-1, -1), 2),
     ]))
     
