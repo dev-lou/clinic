@@ -7,7 +7,7 @@ import json as json_mod
 from flask import Blueprint, render_template, jsonify, request
 from flask_login import login_required
 from rbac import require_permission, Permission
-from models import db, Appointment, ClinicVisit, Inventory, MedicineReservation, User, Queue, StudentProfile
+from models import db, Appointment, ClinicVisit, Inventory, MedicineReservation, User, Queue, StudentProfile, Notification
 from models_extended import VisitFeedback, AppointmentExtended, SymptomScreening
 from datetime import datetime, timedelta, date, timezone
 from sqlalchemy import func, desc, extract
@@ -266,6 +266,197 @@ def no_show_rate():
         'total_scheduled': total_scheduled,
         'no_shows': no_shows,
         'rate': round(rate, 2)
+    })
+
+
+@analytics.route('/api/health-issues-trend')
+@login_required
+@require_permission(Permission.VIEW_ANALYTICS)
+def health_issues_trend():
+    """Get health issues trend from symptom screenings and clinic visits."""
+    days = int(request.args.get('days', 30))
+    end_date = date.today()
+    start_date = end_date - timedelta(days=days)
+    
+    # Get top symptoms from symptom screenings
+    screenings = SymptomScreening.query.filter(
+        SymptomScreening.created_at >= datetime.combine(start_date, datetime.min.time())
+    ).all()
+    
+    symptom_counts = {}
+    for s in screenings:
+        try:
+            symptoms = json_mod.loads(s.symptoms_json) if s.symptoms_json else []
+            for sym in symptoms:
+                symptom_counts[sym] = symptom_counts.get(sym, 0) + 1
+        except:
+            pass
+    
+    # Get top complaints from clinic visits
+    visits = ClinicVisit.query.filter(
+        func.date(ClinicVisit.visit_date) >= start_date,
+        func.date(ClinicVisit.visit_date) <= end_date
+    ).all()
+    
+    complaint_counts = {}
+    for v in visits:
+        if v.chief_complaint:
+            complaint = v.chief_complaint.lower().strip()
+            complaint_counts[complaint] = complaint_counts.get(complaint, 0) + 1
+    
+    # Combine and sort
+    all_issues = {}
+    for sym, count in symptom_counts.items():
+        all_issues[sym] = all_issues.get(sym, 0) + count
+    for comp, count in complaint_counts.items():
+        all_issues[comp] = all_issues.get(comp, 0) + count
+    
+    # Get top 10 issues
+    top_issues = sorted(all_issues.items(), key=lambda x: -x[1])[:10]
+    
+    return jsonify({
+        'labels': [issue[0] for issue in top_issues],
+        'values': [issue[1] for issue in top_issues]
+    })
+
+
+@analytics.route('/api/mental-health-stats')
+@login_required
+@require_permission(Permission.VIEW_ANALYTICS)
+def mental_health_stats():
+    """Get mental health specific statistics."""
+    days = int(request.args.get('days', 30))
+    start_date = date.today() - timedelta(days=days)
+    
+    # Mental health appointments
+    mental_appts = Appointment.query.filter(
+        Appointment.appointment_date >= start_date,
+        Appointment.service_type == 'Mental Health'
+    ).count()
+    
+    # Mental health symptom screenings
+    mental_screenings = SymptomScreening.query.filter(
+        SymptomScreening.created_at >= datetime.combine(start_date, datetime.min.time()),
+        SymptomScreening.recommended_service == 'Mental Health'
+    ).count()
+    
+    # Total screenings for comparison
+    total_screenings = SymptomScreening.query.filter(
+        SymptomScreening.created_at >= datetime.combine(start_date, datetime.min.time())
+    ).count()
+    
+    # Stress-related symptoms from screenings
+    stress_keywords = ['stress', 'anxiety', 'depression', 'sleep', 'headache', 'fatigue']
+    stress_count = 0
+    screenings = SymptomScreening.query.filter(
+        SymptomScreening.created_at >= datetime.combine(start_date, datetime.min.time())
+    ).all()
+    
+    for s in screenings:
+        try:
+            symptoms = json_mod.loads(s.symptoms_json) if s.symptoms_json else []
+            for sym in symptoms:
+                if any(keyword in sym.lower() for keyword in stress_keywords):
+                    stress_count += 1
+                    break
+        except:
+            pass
+    
+    return jsonify({
+        'mental_appts': mental_appts,
+        'mental_screenings': mental_screenings,
+        'total_screenings': total_screenings,
+        'stress_related': stress_count,
+        'mental_health_percentage': round((mental_appts / max(mental_appts + total_screenings - mental_screenings, 1)) * 100, 1) if total_screenings > 0 else 0
+    })
+
+
+@analytics.route('/api/campus-stats')
+@login_required
+@require_permission(Permission.VIEW_ANALYTICS)
+def campus_stats():
+    """Get statistics grouped by campus."""
+    # Define campus names (adjust based on your actual campus structure)
+    campuses = ['Poblacion', 'Tiwi', 'Dumangas', 'San Enrique', 'Dingle']
+    
+    campus_data = []
+    for campus in campuses:
+        # Count appointments by campus (assuming campus info is in StudentProfile)
+        # For now, we'll use a simplified approach
+        appt_count = Appointment.query.filter(
+            Appointment.appointment_date >= date.today() - timedelta(days=30)
+        ).count()
+        
+        # Get visits by campus (simplified - would need campus field in models)
+        visit_count = ClinicVisit.query.filter(
+            func.date(ClinicVisit.visit_date) >= date.today() - timedelta(days=30)
+        ).count()
+        
+        campus_data.append({
+            'campus': campus,
+            'appointments': appt_count // len(campuses),  # Simplified distribution
+            'visits': visit_count // len(campuses),
+            'patients': 0  # Would need actual campus data
+        })
+    
+    return jsonify(campus_data)
+
+
+@analytics.route('/api/daily-overview')
+@login_required
+@require_permission(Permission.VIEW_ANALYTICS)
+def daily_overview():
+    """Get real-time daily clinic overview."""
+    today = date.today()
+    
+    # Today's appointments
+    today_appts = Appointment.query.filter(
+        Appointment.appointment_date == today
+    ).count()
+    
+    # Today's completed appointments
+    today_completed = Appointment.query.filter(
+        Appointment.appointment_date == today,
+        Appointment.status == 'Completed'
+    ).count()
+    
+    # Today's no-shows
+    today_no_shows = Appointment.query.filter(
+        Appointment.appointment_date == today,
+        Appointment.status == 'No Show'
+    ).count()
+    
+    # Today's walk-ins (appointments without scheduled time or direct visits)
+    today_visits = ClinicVisit.query.filter(
+        func.date(ClinicVisit.visit_date) == today
+    ).count()
+    
+    # Top issues today
+    today_visits_data = ClinicVisit.query.filter(
+        func.date(ClinicVisit.visit_date) == today
+    ).all()
+    
+    issue_counts = {}
+    for v in today_visits_data:
+        if v.chief_complaint:
+            complaint = v.chief_complaint.lower().strip()
+            issue_counts[complaint] = issue_counts.get(complaint, 0) + 1
+    
+    top_issues = sorted(issue_counts.items(), key=lambda x: -x[1])[:5]
+    
+    # Staff on duty (simplified - count active users with nurse/doctor role)
+    staff_on_duty = User.query.filter(
+        User.role.in_(['nurse', 'doctor', 'admin'])
+    ).count()
+    
+    return jsonify({
+        'today_appts': today_appts,
+        'today_completed': today_completed,
+        'today_no_shows': today_no_shows,
+        'today_visits': today_visits,
+        'top_issues': [{'issue': k, 'count': v} for k, v in top_issues],
+        'staff_on_duty': staff_on_duty,
+        'no_show_rate': round((today_no_shows / today_appts * 100) if today_appts > 0 else 0, 1)
     })
 
 

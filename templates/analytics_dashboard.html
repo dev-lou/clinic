@@ -139,6 +139,77 @@
             </div>
         </div>
     </div>
+
+    <!-- 🏥 University Clinic Specific Metrics -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-5 mt-5">
+        <!-- Daily Clinic Overview -->
+        <div class="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl border border-blue-100 p-6">
+            <div class="flex items-center gap-2 mb-4">
+                <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
+                    <i class="fas fa-hospital text-white text-sm"></i>
+                </div>
+                <h3 class="text-sm font-bold text-gray-900">Daily Clinic Overview</h3>
+            </div>
+            <div id="dailyOverview" class="space-y-3">
+                <div class="space-y-3 animate-pulse">
+                    <div class="h-4 bg-blue-100 rounded w-full"></div>
+                    <div class="h-4 bg-blue-100 rounded w-5/6"></div>
+                    <div class="h-4 bg-blue-100 rounded w-4/6"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mental Health Stats -->
+        <div class="bg-gradient-to-br from-violet-50 to-purple-50 rounded-2xl border border-violet-100 p-6">
+            <div class="flex items-center gap-2 mb-4">
+                <div class="w-8 h-8 bg-violet-600 rounded-lg flex items-center justify-center">
+                    <i class="fas fa-brain text-white text-sm"></i>
+                </div>
+                <h3 class="text-sm font-bold text-gray-900">Mental Health Stats</h3>
+            </div>
+            <div id="mentalHealthStats" class="space-y-3">
+                <div class="space-y-3 animate-pulse">
+                    <div class="h-4 bg-violet-100 rounded w-full"></div>
+                    <div class="h-4 bg-violet-100 rounded w-5/6"></div>
+                    <div class="h-4 bg-violet-100 rounded w-4/6"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Health Issues Trend -->
+        <div class="bg-gradient-to-br from-rose-50 to-pink-50 rounded-2xl border border-rose-100 p-6">
+            <div class="flex items-center gap-2 mb-4">
+                <div class="w-8 h-8 bg-rose-600 rounded-lg flex items-center justify-center">
+                    <i class="fas fa-virus text-white text-sm"></i>
+                </div>
+                <h3 class="text-sm font-bold text-gray-900">Top Health Issues</h3>
+            </div>
+            <div id="healthIssuesTrend" class="space-y-3">
+                <div class="space-y-3 animate-pulse">
+                    <div class="h-4 bg-rose-100 rounded w-full"></div>
+                    <div class="h-4 bg-rose-100 rounded w-5/6"></div>
+                    <div class="h-4 bg-rose-100 rounded w-4/6"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Campus Comparison Section -->
+    <div class="bg-white rounded-2xl border border-gray-100 p-6 mt-5">
+        <h3 class="flex items-center gap-2 text-sm font-bold text-gray-900 mb-4">
+            <div class="w-7 h-7 bg-indigo-50 rounded-lg flex items-center justify-center"><i class="fas fa-university text-indigo-500 text-xs"></i></div>
+            Campus Comparison
+        </h3>
+        <div id="campusComparison">
+            <div class="grid grid-cols-5 gap-4">
+                <div class="text-center p-4 bg-gray-50 rounded-xl animate-pulse"><div class="h-8 bg-gray-200 rounded mb-2"></div><div class="h-4 bg-gray-200 rounded w-3/4 mx-auto"></div></div>
+                <div class="text-center p-4 bg-gray-50 rounded-xl animate-pulse"><div class="h-8 bg-gray-200 rounded mb-2"></div><div class="h-4 bg-gray-200 rounded w-3/4 mx-auto"></div></div>
+                <div class="text-center p-4 bg-gray-50 rounded-xl animate-pulse"><div class="h-8 bg-gray-200 rounded mb-2"></div><div class="h-4 bg-gray-200 rounded w-3/4 mx-auto"></div></div>
+                <div class="text-center p-4 bg-gray-50 rounded-xl animate-pulse"><div class="h-8 bg-gray-200 rounded mb-2"></div><div class="h-4 bg-gray-200 rounded w-3/4 mx-auto"></div></div>
+                <div class="text-center p-4 bg-gray-50 rounded-xl animate-pulse"><div class="h-8 bg-gray-200 rounded mb-2"></div><div class="h-4 bg-gray-200 rounded w-3/4 mx-auto"></div></div>
+            </div>
+        </div>
+    </div>
 </div>
 
 <!-- Chart.js -->
@@ -265,6 +336,106 @@
         } catch(e) { console.error(e); }
     }
 
+    async function loadDailyOverview() {
+        try {
+            const r = await fetch('/analytics/api/daily-overview');
+            const d = await r.json();
+            const noShowClass = d.no_show_rate > 10 ? 'text-red-600 bg-red-50' : 'text-emerald-600 bg-emerald-50';
+            document.getElementById('dailyOverview').innerHTML = `
+                <div class="flex justify-between items-center p-2 bg-blue-50 rounded-lg mb-2">
+                    <span class="text-sm text-blue-700">📅 Today's Appointments</span>
+                    <span class="font-bold text-blue-800">${d.today_appts || 0}</span>
+                </div>
+                <div class="flex justify-between items-center p-2 bg-emerald-50 rounded-lg mb-2">
+                    <span class="text-sm text-emerald-700">✅ Completed</span>
+                    <span class="font-bold text-emerald-800">${d.today_completed || 0}</span>
+                </div>
+                <div class="flex justify-between items-center p-2 bg-red-50 rounded-lg mb-2">
+                    <span class="text-sm text-red-700">❌ No-Shows</span>
+                    <span class="font-bold text-red-800">${d.today_no_shows || 0}</span>
+                </div>
+                <div class="flex justify-between items-center p-2 ${noShowClass} rounded-lg mb-2">
+                    <span class="text-sm">No-Show Rate</span>
+                    <span class="font-bold">${d.no_show_rate || 0}%</span>
+                </div>
+                <div class="flex justify-between items-center p-2 bg-indigo-50 rounded-lg">
+                    <span class="text-sm text-indigo-700">👨‍⚕️ Staff on Duty</span>
+                    <span class="font-bold text-indigo-800">${d.staff_on_duty || 0}</span>
+                </div>
+            `;
+        } catch(e) { console.error(e); }
+    }
+
+    async function loadMentalHealthStats() {
+        try {
+            const r = await fetch('/analytics/api/mental-health-stats?days=30');
+            const d = await r.json();
+            document.getElementById('mentalHealthStats').innerHTML = `
+                <div class="flex justify-between items-center p-2 bg-violet-50 rounded-lg mb-2">
+                    <span class="text-sm text-violet-700">🧠 Mental Health Appts</span>
+                    <span class="font-bold text-violet-800">${d.mental_appts || 0}</span>
+                </div>
+                <div class="flex justify-between items-center p-2 bg-purple-50 rounded-lg mb-2">
+                    <span class="text-sm text-purple-700">💭 Stress-Related</span>
+                    <span class="font-bold text-purple-800">${d.stress_related || 0}</span>
+                </div>
+                <div class="flex justify-between items-center p-2 bg-pink-50 rounded-lg">
+                    <span class="text-sm text-pink-700">📊 % of Screenings</span>
+                    <span class="font-bold text-pink-800">${d.mental_health_percentage || 0}%</span>
+                </div>
+            `;
+        } catch(e) { console.error(e); }
+    }
+
+    async function loadHealthIssuesTrend() {
+        try {
+            const r = await fetch('/analytics/api/health-issues-trend?days=30');
+            const d = await r.json();
+            if (!d.labels || d.labels.length === 0) {
+                document.getElementById('healthIssuesTrend').innerHTML = '<p class="text-center text-gray-400 text-sm">No data yet</p>';
+                return;
+            }
+            const maxCount = Math.max(...d.values);
+            let html = '<div class="space-y-2">';
+            d.labels.forEach((label, i) => {
+                const percentage = (d.values[i] / maxCount * 100);
+                const colors = ['bg-rose-500', 'bg-pink-500', 'bg-purple-500', 'bg-indigo-500', 'bg-blue-500'];
+                const color = colors[i % colors.length];
+                html += `
+                    <div class="flex items-center gap-2">
+                        <span class="text-xs text-gray-600 w-28 truncate">${label}</span>
+                        <div class="flex-1 bg-gray-100 rounded-full h-3 overflow-hidden">
+                            <div class="${color} h-full rounded-full" style="width: ${percentage}%"></div>
+                        </div>
+                        <span class="text-xs font-medium text-gray-500 w-8 text-right">${d.values[i]}</span>
+                    </div>
+                `;
+            });
+            html += '</div>';
+            document.getElementById('healthIssuesTrend').innerHTML = html;
+        } catch(e) { console.error(e); }
+    }
+
+    async function loadCampusComparison() {
+        try {
+            const r = await fetch('/analytics/api/campus-stats');
+            const d = await r.json();
+            const colors = ['bg-blue-100 text-blue-700', 'bg-emerald-100 text-emerald-700', 'bg-violet-100 text-violet-700', 'bg-amber-100 text-amber-700', 'bg-rose-100 text-rose-700'];
+            let html = '<div class="grid grid-cols-5 gap-4">';
+            d.forEach((campus, i) => {
+                html += `
+                    <div class="text-center p-4 ${colors[i]} rounded-xl">
+                        <p class="font-bold text-sm mb-1">${campus.campus}</p>
+                        <p class="text-lg font-extrabold">${campus.appointments || 0}</p>
+                        <p class="text-xs opacity-70">appointments</p>
+                    </div>
+                `;
+            });
+            html += '</div>';
+            document.getElementById('campusComparison').innerHTML = html;
+        } catch(e) { console.error(e); }
+    }
+
     document.addEventListener('DOMContentLoaded', () => {
         loadOverview();
         loadAppointmentsTrend();
@@ -274,6 +445,12 @@
         loadSatisfactionTrend();
         loadNoShowRate();
         loadInventoryConsumption();
+
+        // University clinic specific metrics
+        loadDailyOverview();
+        loadMentalHealthStats();
+        loadHealthIssuesTrend();
+        loadCampusComparison();
     });
 
     // AI Predictions
