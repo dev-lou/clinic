@@ -35,28 +35,28 @@
     <div class="bg-white dark:bg-slate-900 rounded-2xl border border-gray-100 dark:border-slate-800 overflow-hidden">
         <div class="overflow-x-auto">
             <table class="w-full">
-                <thead class="bg-gray-50 dark:bg-slate-800/50">
+                <thead class="bg-gray-50/50 dark:bg-slate-800/30 border-b border-gray-100 dark:border-slate-800">
                     <tr>
-                        <th class="px-5 py-4 text-left text-[11px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                        <th class="px-5 py-4 text-left text-[11px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider">
                             Student</th>
                         <th
-                            class="px-5 py-4 text-left text-[11px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider hidden md:table-cell">
+                            class="px-5 py-4 text-left text-[11px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider hidden md:table-cell">
                             Service</th>
-                        <th class="px-5 py-4 text-left text-[11px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                        <th class="px-5 py-4 text-left text-[11px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider">
                             Date</th>
                         <th
-                            class="px-5 py-4 text-left text-[11px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider hidden sm:table-cell">
+                            class="px-5 py-4 text-left text-[11px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider hidden sm:table-cell">
                             Time</th>
 
-                        <th class="px-5 py-4 text-left text-[11px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                        <th class="px-5 py-4 text-left text-[11px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider">
                             Status</th>
-                        <th class="px-5 py-4 text-left text-[11px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                        <th class="px-5 py-4 text-left text-[11px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider">
                             Actions</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-gray-100 dark:divide-slate-800">
+                <tbody class="divide-y divide-gray-100 dark:divide-slate-800/50">
                     {% for appt in appointments %}
-                    <tr class="hover:bg-gray-50 dark:hover:bg-slate-800/50 dark:bg-slate-800/50 transition-colors">
+                    <tr class="hover:bg-primary-50/30 dark:hover:bg-primary-900/10 even:bg-gray-50/30 dark:even:bg-slate-800/10 transition-colors">
                         <td class="px-5 py-4">
                             <p class="text-sm font-semibold text-gray-900 dark:text-white">{{ appt.student.first_name }} {{
                                 appt.student.last_name }}</p>
