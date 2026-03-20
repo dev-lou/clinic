@@ -503,12 +503,12 @@ document.getElementById('symptomForm').addEventListener('submit', function(e) {
     }).catch(() => { alert('Error analyzing symptoms. Try again.'); });
 });
 
-// ═══════════════════════════════════════════
 // UNIVERSAL VOICE AI TRIAGE (All Browsers)
 // ═══════════════════════════════════════════
 let recognition = null;
 let isRecording = false;
 let fullTranscript = '';
+let currentInterim = '';
 let recognitionClass = null;
 
 // Detect browser
@@ -531,38 +531,6 @@ function getSpeechRecognition() {
     return null;
 }
 
-// Request microphone permission
-async function requestMicPermission() {
-    try {
-        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-        stream.getTracks().forEach(track => track.stop());
-        return true;
-    } catch (err) {
-        console.error('Microphone permission denied:', err);
-        
-        const browser = getBrowserInfo();
-        let message = 'Microphone access is required for voice recognition.\n\n';
-        
-        if (browser.isBrave) {
-            message += 'Brave Browser: Click the shield icon in the address bar, allow microphone, then refresh.';
-        } else if (browser.isSafari) {
-            message += 'Safari: Go to Settings > Websites > Microphone and allow this site.';
-        } else if (browser.isFirefox) {
-            message += 'Firefox: Click the microphone icon in the address bar and allow access.';
-        } else {
-            message += 'Chrome/Edge: Click the microphone icon in the address bar and allow access.';
-        }
-        
-        message += '\n\nOr use the text input below.';
-        alert(message);
-        
-        document.getElementById('textInput').classList.remove('hidden');
-        document.getElementById('voiceStatus').textContent = 'Microphone blocked. Use text input below.';
-        
-        return false;
-    }
-}
-
 function toggleVoice() {
     recognitionClass = getSpeechRecognition();
     
@@ -577,11 +545,7 @@ function toggleVoice() {
         // User clicked STOP — process whatever we have
         finishRecording();
     } else {
-        requestMicPermission().then(hasPermission => {
-            if (hasPermission) {
-                startVoice();
-            }
-        });
+        startVoice();
     }
 }
 
@@ -593,6 +557,7 @@ function startVoice() {
     recognition.maxAlternatives = 1;
 
     fullTranscript = '';
+    currentInterim = '';
     isRecording = true;
 
     const btn = document.getElementById('micButton');
@@ -615,37 +580,33 @@ function startVoice() {
             }
         }
         if (final) fullTranscript += final + ' ';
+        currentInterim = interim; // Save globally so finishRecording can grab it
+        
         document.getElementById('transcriptText').innerHTML = 
             fullTranscript + '<span class="text-gray-400 italic">' + interim + '</span>';
     };
 
     recognition.onerror = (e) => {
         console.warn('Speech recognition error:', e.error);
-        
-        if (e.error === 'not-allowed') {
+        if (e.error === 'not-allowed' || e.error === 'service-not-allowed') {
             isRecording = false;
-            alert('Microphone access denied. Please allow microphone access in your browser settings.');
+            alert('Microphone access denied or unsupported. Please check browser settings.');
             document.getElementById('textInput').classList.remove('hidden');
             resetVoiceUI();
             return;
         }
-        
-        // For 'no-speech' and 'network' errors, do NOT stop — just keep listening
         if (e.error === 'no-speech') {
             document.getElementById('voiceStatus').textContent = 'Still listening... speak now';
-            // The onend handler below will auto-restart
         }
     };
 
     recognition.onend = () => {
-        // If user hasn't clicked stop yet, auto-restart the recognition
+        // If user hasn't clicked stop yet, auto-restart the recognition (Chrome stops on pause)
         if (isRecording) {
             try {
                 recognition.start();
-                console.log('Auto-restarted speech recognition');
             } catch (err) {
-                console.warn('Could not restart recognition:', err);
-                // If restart fails, process what we have
+                console.warn('Could not restart:', err);
                 finishRecording();
             }
         }
@@ -671,14 +632,13 @@ function finishRecording() {
 
     resetVoiceUI();
 
-    const transcript = fullTranscript.trim();
+    // Combine final + whatever was interim when they hit stop!
+    const transcript = (fullTranscript + ' ' + currentInterim).trim();
     
     if (transcript.length > 0) {
-        // Accept ANY non-empty transcript
         analyzeVoice(transcript);
     } else {
         document.getElementById('voiceStatus').textContent = 'No speech detected. Tap the mic and try again.';
-        // Show text input as fallback
         document.getElementById('textInput').classList.remove('hidden');
     }
 }
