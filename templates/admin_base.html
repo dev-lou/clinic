@@ -240,6 +240,7 @@
             padding: 16px !important;
             font-family: 'Inter', sans-serif !important;
             width: 320px !important;
+            z-index: 9999 !important;
             animation: dropdownFadeIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
         }
         .flatpickr-calendar.arrowTop:before, .flatpickr-calendar.arrowTop:after,
@@ -640,15 +641,15 @@
                     w.style.cssText += '; border: none !important; padding: 0 !important; box-shadow: none !important;';
                 }
             },
-            date:     { altInput: true, altFormat: "F j, Y",      dateFormat: "Y-m-d",      static: true },
-            time:     { enableTime: true, noCalendar: true,        dateFormat: "H:i",         time_24hr: true, static: true },
-            datetime: { enableTime: true, altInput: true, altFormat: "F j, Y H:i", dateFormat: "Y-m-d H:i", static: true }
+            date:     { altInput: true, altFormat: "F j, Y",      dateFormat: "Y-m-d",      static: false },
+            time:     { enableTime: true, noCalendar: true,        dateFormat: "H:i",         time_24hr: true, static: false },
+            datetime: { enableTime: true, altInput: true, altFormat: "F j, Y H:i", dateFormat: "Y-m-d H:i", static: false }
         };
 
         function makeDropdown(el) {
             if (!el || el.classList.contains('tomselected')) return;
-            const placeholder = el.getAttribute('placeholder') ||
-                (el.options[0] && el.options[0].value === '' ? el.options[0].text : 'Select...');
+            const placeholder = el.getAttribute('placeholder') || 
+                                (el.options[0] && (el.options[0].value === '' || el.options[0].disabled) ? el.options[0].text : 'Select...');
             // No plugins = no search box ever
             new TomSelect(el, {
                 plugins: [],
