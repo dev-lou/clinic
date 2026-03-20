@@ -489,13 +489,13 @@
 
                  <!-- Right Side Actions -->
                 <div class="flex items-center space-x-3">
+                    {% if current_user.is_authenticated %}
                     <!-- Dark Mode Toggle -->
                     <button id="darkModeToggle" onclick="toggleDarkMode()"
                         aria-label="Toggle dark mode"
                         class="w-9 h-9 flex items-center justify-center rounded-lg hover:bg-gray-100 dark:hover:bg-slate-800 transition-all text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200">
                         <i class="fas fa-moon text-[14px]" id="darkModeIcon"></i>
                     </button>
-                    {% if current_user.is_authenticated %}
                     <!-- Notification Bell (Desktop) -->
                     <div class="hidden lg:block relative">
                         <button id="notificationBell"

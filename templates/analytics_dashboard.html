@@ -11,10 +11,10 @@
         <div class="relative z-10 flex items-center justify-between">
             <div>
                 <h1 class="text-2xl font-semibold text-white tracking-tight">Analytics Dashboard</h1>
-                <p class="text-slate-400 text-sm mt-1">Clinic performance metrics and insights</p>
+                <p class="text-slate-400 dark:text-slate-500 text-sm mt-1">Clinic performance metrics and insights</p>
             </div>
             <div class="flex items-center gap-3">
-                <span class="text-xs text-slate-400">Last updated: <span id="lastUpdated">Loading...</span></span>
+                <span class="text-xs text-slate-400 dark:text-slate-500">Last updated: <span id="lastUpdated">Loading...</span></span>
                 <button onclick="refreshAllData()" class="px-3 py-1.5 bg-slate-700 hover:bg-slate-600 text-slate-200 text-xs font-medium rounded-lg transition-colors">
                     Refresh
                 </button>
@@ -24,65 +24,65 @@
 
     <!-- Key Metrics Grid -->
     <div class="grid grid-cols-2 md:grid-cols-4 gap-4" id="statsGrid">
-        <div class="bg-white rounded-xl border border-slate-200 p-4">
+        <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700 p-4">
             <div class="flex items-center gap-3 mb-3">
-                <div class="w-8 h-8 bg-blue-50 rounded-lg flex items-center justify-center">
+                <div class="w-8 h-8 bg-blue-50 dark:bg-blue-950/30 rounded-lg flex items-center justify-center">
                     <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                     </svg>
                 </div>
-                <span class="text-xs text-slate-500 font-medium">Today</span>
+                <span class="text-xs text-slate-500 dark:text-slate-400 font-medium">Today</span>
             </div>
-            <div class="text-2xl font-semibold text-slate-900" id="todayAppointments">-</div>
-            <div class="text-xs text-slate-400 mt-1">Appointments</div>
+            <div class="text-2xl font-semibold text-slate-900 dark:text-white" id="todayAppointments">-</div>
+            <div class="text-xs text-slate-400 dark:text-slate-500 mt-1">Appointments</div>
         </div>
 
-        <div class="bg-white rounded-xl border border-slate-200 p-4">
+        <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700 p-4">
             <div class="flex items-center gap-3 mb-3">
-                <div class="w-8 h-8 bg-emerald-50 rounded-lg flex items-center justify-center">
+                <div class="w-8 h-8 bg-emerald-50 dark:bg-emerald-950/30 rounded-lg flex items-center justify-center">
                     <svg class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
                     </svg>
                 </div>
-                <span class="text-xs text-slate-500 font-medium">This Month</span>
+                <span class="text-xs text-slate-500 dark:text-slate-400 font-medium">This Month</span>
             </div>
-            <div class="text-2xl font-semibold text-slate-900" id="monthlyAppointments">-</div>
-            <div class="text-xs text-slate-400 mt-1">Total Visits</div>
+            <div class="text-2xl font-semibold text-slate-900 dark:text-white" id="monthlyAppointments">-</div>
+            <div class="text-xs text-slate-400 dark:text-slate-500 mt-1">Total Visits</div>
         </div>
 
-        <div class="bg-white rounded-xl border border-slate-200 p-4">
+        <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700 p-4">
             <div class="flex items-center gap-3 mb-3">
-                <div class="w-8 h-8 bg-violet-50 rounded-lg flex items-center justify-center">
+                <div class="w-8 h-8 bg-violet-50 dark:bg-violet-950/30 rounded-lg flex items-center justify-center">
                     <svg class="w-4 h-4 text-violet-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
                     </svg>
                 </div>
-                <span class="text-xs text-slate-500 font-medium">Active</span>
+                <span class="text-xs text-slate-500 dark:text-slate-400 font-medium">Active</span>
             </div>
-            <div class="text-2xl font-semibold text-slate-900" id="activeReservations">-</div>
-            <div class="text-xs text-slate-400 mt-1">Reservations</div>
+            <div class="text-2xl font-semibold text-slate-900 dark:text-white" id="activeReservations">-</div>
+            <div class="text-xs text-slate-400 dark:text-slate-500 mt-1">Reservations</div>
         </div>
 
-        <div class="bg-white rounded-xl border border-slate-200 p-4">
+        <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700 p-4">
             <div class="flex items-center gap-3 mb-3">
-                <div class="w-8 h-8 bg-amber-50 rounded-lg flex items-center justify-center">
+                <div class="w-8 h-8 bg-amber-50 dark:bg-amber-950/30 rounded-lg flex items-center justify-center">
                     <svg class="w-4 h-4 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/>
                     </svg>
                 </div>
-                <span class="text-xs text-slate-500 font-medium">Rating</span>
+                <span class="text-xs text-slate-500 dark:text-slate-400 font-medium">Rating</span>
             </div>
-            <div class="text-2xl font-semibold text-slate-900" id="avgSatisfaction">-</div>
-            <div class="text-xs text-slate-400 mt-1">Patient Satisfaction</div>
+            <div class="text-2xl font-semibold text-slate-900 dark:text-white" id="avgSatisfaction">-</div>
+            <div class="text-xs text-slate-400 dark:text-slate-500 mt-1">Patient Satisfaction</div>
         </div>
     </div>
 
     <!-- Charts Row 1 -->
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        <div class="bg-white rounded-xl border border-slate-200 p-5">
+        <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700 p-5">
             <div class="flex items-center justify-between mb-4">
-                <h3 class="text-sm font-medium text-slate-900">Appointment Trend</h3>
-                <select id="trendPeriod" class="text-xs border border-slate-200 rounded-lg px-2 py-1 bg-white" onchange="loadAppointmentsTrend()">
+                <h3 class="text-sm font-medium text-slate-900 dark:text-white">Appointment Trend</h3>
+                <select id="trendPeriod" class="text-xs border border-slate-200 dark:border-slate-700 rounded-lg px-2 py-1 bg-white dark:bg-slate-900" onchange="loadAppointmentsTrend()">
                     <option value="7">Last 7 days</option>
                     <option value="14">Last 14 days</option>
                     <option value="30" selected>Last 30 days</option>
@@ -93,9 +93,9 @@
             </div>
         </div>
 
-        <div class="bg-white rounded-xl border border-slate-200 p-5">
+        <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700 p-5">
             <div class="flex items-center justify-between mb-4">
-                <h3 class="text-sm font-medium text-slate-900">Service Distribution</h3>
+                <h3 class="text-sm font-medium text-slate-900 dark:text-white">Service Distribution</h3>
             </div>
             <div class="h-[220px] flex items-center justify-center">
                 <canvas id="serviceDistributionChart" class="max-h-full"></canvas>
@@ -105,92 +105,92 @@
 
     <!-- Charts Row 2 -->
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
-        <div class="bg-white rounded-xl border border-slate-200 p-5">
+        <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700 p-5">
             <div class="flex items-center justify-between mb-4">
-                <h3 class="text-sm font-medium text-slate-900">Peak Hours</h3>
+                <h3 class="text-sm font-medium text-slate-900 dark:text-white">Peak Hours</h3>
             </div>
             <div class="h-[180px]">
                 <canvas id="peakHoursChart"></canvas>
             </div>
         </div>
 
-        <div class="bg-white rounded-xl border border-slate-200 p-5">
+        <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700 p-5">
             <div class="flex items-center justify-between mb-4">
-                <h3 class="text-sm font-medium text-slate-900">Daily Overview</h3>
+                <h3 class="text-sm font-medium text-slate-900 dark:text-white">Daily Overview</h3>
             </div>
             <div id="dailyOverview" class="space-y-2 text-sm">
-                <div class="animate-pulse h-6 bg-slate-100 rounded"></div>
-                <div class="animate-pulse h-6 bg-slate-100 rounded w-5/6"></div>
-                <div class="animate-pulse h-6 bg-slate-100 rounded w-4/6"></div>
+                <div class="animate-pulse h-6 bg-slate-100 dark:bg-slate-800 rounded"></div>
+                <div class="animate-pulse h-6 bg-slate-100 dark:bg-slate-800 rounded w-5/6"></div>
+                <div class="animate-pulse h-6 bg-slate-100 dark:bg-slate-800 rounded w-4/6"></div>
             </div>
         </div>
 
-        <div class="bg-white rounded-xl border border-slate-200 p-5">
+        <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700 p-5">
             <div class="flex items-center justify-between mb-4">
-                <h3 class="text-sm font-medium text-slate-900">Mental Health Stats</h3>
+                <h3 class="text-sm font-medium text-slate-900 dark:text-white">Mental Health Stats</h3>
             </div>
             <div id="mentalHealthStats" class="space-y-2 text-sm">
-                <div class="animate-pulse h-6 bg-slate-100 rounded"></div>
-                <div class="animate-pulse h-6 bg-slate-100 rounded w-5/6"></div>
-                <div class="animate-pulse h-6 bg-slate-100 rounded w-4/6"></div>
+                <div class="animate-pulse h-6 bg-slate-100 dark:bg-slate-800 rounded"></div>
+                <div class="animate-pulse h-6 bg-slate-100 dark:bg-slate-800 rounded w-5/6"></div>
+                <div class="animate-pulse h-6 bg-slate-100 dark:bg-slate-800 rounded w-4/6"></div>
             </div>
         </div>
     </div>
 
     <!-- Metrics Row 3 -->
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
-        <div class="bg-white rounded-xl border border-slate-200 p-5">
+        <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700 p-5">
             <div class="flex items-center justify-between mb-4">
-                <h3 class="text-sm font-medium text-slate-900">Top Health Issues</h3>
+                <h3 class="text-sm font-medium text-slate-900 dark:text-white">Top Health Issues</h3>
             </div>
             <div id="healthIssuesTrend" class="space-y-2 text-sm">
-                <div class="animate-pulse h-4 bg-slate-100 rounded w-full"></div>
-                <div class="animate-pulse h-4 bg-slate-100 rounded w-5/6"></div>
-                <div class="animate-pulse h-4 bg-slate-100 rounded w-4/6"></div>
+                <div class="animate-pulse h-4 bg-slate-100 dark:bg-slate-800 rounded w-full"></div>
+                <div class="animate-pulse h-4 bg-slate-100 dark:bg-slate-800 rounded w-5/6"></div>
+                <div class="animate-pulse h-4 bg-slate-100 dark:bg-slate-800 rounded w-4/6"></div>
             </div>
         </div>
 
-        <div class="bg-white rounded-xl border border-slate-200 p-5">
+        <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700 p-5">
             <div class="flex items-center justify-between mb-4">
-                <h3 class="text-sm font-medium text-slate-900">No-Show Analysis</h3>
+                <h3 class="text-sm font-medium text-slate-900 dark:text-white">No-Show Analysis</h3>
             </div>
             <div id="noShowStats" class="space-y-2 text-sm">
-                <div class="animate-pulse h-6 bg-slate-100 rounded"></div>
-                <div class="animate-pulse h-6 bg-slate-100 rounded w-5/6"></div>
-                <div class="animate-pulse h-6 bg-slate-100 rounded w-4/6"></div>
+                <div class="animate-pulse h-6 bg-slate-100 dark:bg-slate-800 rounded"></div>
+                <div class="animate-pulse h-6 bg-slate-100 dark:bg-slate-800 rounded w-5/6"></div>
+                <div class="animate-pulse h-6 bg-slate-100 dark:bg-slate-800 rounded w-4/6"></div>
             </div>
         </div>
 
-        <div class="bg-white rounded-xl border border-slate-200 p-5">
+        <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700 p-5">
             <div class="flex items-center justify-between mb-4">
-                <h3 class="text-sm font-medium text-slate-900">Medicine Usage</h3>
+                <h3 class="text-sm font-medium text-slate-900 dark:text-white">Medicine Usage</h3>
             </div>
             <div id="inventoryConsumption" class="space-y-2 text-sm">
-                <div class="animate-pulse h-5 bg-slate-100 rounded"></div>
-                <div class="animate-pulse h-5 bg-slate-100 rounded w-5/6"></div>
-                <div class="animate-pulse h-5 bg-slate-100 rounded w-4/6"></div>
+                <div class="animate-pulse h-5 bg-slate-100 dark:bg-slate-800 rounded"></div>
+                <div class="animate-pulse h-5 bg-slate-100 dark:bg-slate-800 rounded w-5/6"></div>
+                <div class="animate-pulse h-5 bg-slate-100 dark:bg-slate-800 rounded w-4/6"></div>
             </div>
         </div>
     </div>
 
     <!-- Campus Comparison -->
-    <div class="bg-white rounded-xl border border-slate-200 p-5">
+    <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700 p-5">
         <div class="flex items-center justify-between mb-4">
-            <h3 class="text-sm font-medium text-slate-900">Campus Comparison</h3>
-            <span class="text-xs text-slate-400">Last 30 days</span>
+            <h3 class="text-sm font-medium text-slate-900 dark:text-white">Campus Comparison</h3>
+            <span class="text-xs text-slate-400 dark:text-slate-500">Last 30 days</span>
         </div>
         <div id="campusComparison" class="grid grid-cols-5 gap-3">
             {% for i in range(5) %}
-            <div class="text-center p-3 bg-slate-50 rounded-lg">
-                <div class="animate-pulse h-5 bg-slate-200 rounded mb-2"></div>
-                <div class="animate-pulse h-4 bg-slate-200 rounded w-3/4 mx-auto"></div>
+            <div class="text-center p-3 bg-slate-50 dark:bg-slate-800/50 rounded-lg">
+                <div class="animate-pulse h-5 bg-slate-200 dark:bg-slate-700 rounded mb-2"></div>
+                <div class="animate-pulse h-4 bg-slate-200 dark:bg-slate-700 rounded w-3/4 mx-auto"></div>
             </div>
             {% endfor %}
         </div>
     </div>
 
     <!-- AI Predictions Section -->
-    <div class="bg-gradient-to-br from-slate-50 to-slate-100 rounded-xl border border-slate-200 p-5">
+    <div class="bg-gradient-to-br from-slate-50 dark:from-slate-900 to-slate-100 dark:to-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 p-5">
         <div class="flex items-center justify-between mb-4">
             <div class="flex items-center gap-3">
                 <div class="w-9 h-9 bg-slate-800 rounded-lg flex items-center justify-center">
@@ -199,20 +199,20 @@
                     </svg>
                 </div>
                 <div>
-                    <h3 class="text-sm font-medium text-slate-900">AI Predictive Insights</h3>
-                    <p class="text-xs text-slate-500">Powered by Gemini AI</p>
+                    <h3 class="text-sm font-medium text-slate-900 dark:text-white">AI Predictive Insights</h3>
+                    <p class="text-xs text-slate-500 dark:text-slate-400">Powered by Gemini AI</p>
                 </div>
             </div>
         </div>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
-            <div class="bg-white rounded-lg border border-slate-200 p-4">
+            <div class="bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-700 p-4">
                 <div class="flex items-center gap-2 mb-2">
-                    <div class="w-7 h-7 bg-blue-50 rounded flex items-center justify-center">
+                    <div class="w-7 h-7 bg-blue-50 dark:bg-blue-950/30 rounded flex items-center justify-center">
                         <svg class="w-3.5 h-3.5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
                         </svg>
                     </div>
-                    <span class="text-xs font-medium text-slate-900">Peak Hours</span>
+                    <span class="text-xs font-medium text-slate-900 dark:text-white">Peak Hours</span>
                 </div>
                 <div id="predictPeakHours" class="min-h-[60px]">
                     <button onclick="runPrediction('peak-hours', 'predictPeakHours')" class="w-full py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-medium rounded-lg transition-colors">
@@ -221,14 +221,14 @@
                 </div>
             </div>
 
-            <div class="bg-white rounded-lg border border-slate-200 p-4">
+            <div class="bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-700 p-4">
                 <div class="flex items-center gap-2 mb-2">
-                    <div class="w-7 h-7 bg-emerald-50 rounded flex items-center justify-center">
+                    <div class="w-7 h-7 bg-emerald-50 dark:bg-emerald-950/30 rounded flex items-center justify-center">
                         <svg class="w-3.5 h-3.5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/>
                         </svg>
                     </div>
-                    <span class="text-xs font-medium text-slate-900">Medicine Demand</span>
+                    <span class="text-xs font-medium text-slate-900 dark:text-white">Medicine Demand</span>
                 </div>
                 <div id="predictMedicine" class="min-h-[60px]">
                     <button onclick="runPrediction('medicine-demand', 'predictMedicine')" class="w-full py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-medium rounded-lg transition-colors">
@@ -237,14 +237,14 @@
                 </div>
             </div>
 
-            <div class="bg-white rounded-lg border border-slate-200 p-4">
+            <div class="bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-700 p-4">
                 <div class="flex items-center gap-2 mb-2">
-                    <div class="w-7 h-7 bg-violet-50 rounded flex items-center justify-center">
+                    <div class="w-7 h-7 bg-violet-50 dark:bg-violet-950/30 rounded flex items-center justify-center">
                         <svg class="w-3.5 h-3.5 text-violet-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
                         </svg>
                     </div>
-                    <span class="text-xs font-medium text-slate-900">Health Trends</span>
+                    <span class="text-xs font-medium text-slate-900 dark:text-white">Health Trends</span>
                 </div>
                 <div id="predictHealth" class="min-h-[60px]">
                     <button onclick="runPrediction('health-trends', 'predictHealth')" class="w-full py-2 bg-violet-600 hover:bg-violet-700 text-white text-xs font-medium rounded-lg transition-colors">
@@ -341,7 +341,7 @@
             const d = await r.json();
             if(charts.serviceDistribution) charts.serviceDistribution.destroy();
             if(!d.labels || d.labels.length === 0) {
-                document.getElementById('serviceDistributionChart').parentElement.innerHTML = '<div class="flex items-center justify-center h-full text-slate-400 text-sm">No data available</div>';
+                document.getElementById('serviceDistributionChart').parentElement.innerHTML = '<div class="flex items-center justify-center h-full text-slate-400 dark:text-slate-500 text-sm">No data available</div>';
                 return;
             }
             const colors = ['rgb(59, 130, 246)', 'rgb(16, 185, 129)', 'rgb(139, 92, 246)', 'rgb(245, 158, 11)', 'rgb(239, 68, 68)', 'rgb(236, 72, 153)'];
@@ -387,15 +387,15 @@
         try {
             const r = await fetch('/analytics/api/daily-overview');
             const d = await r.json();
-            const rateColor = d.no_show_rate > 10 ? 'text-red-600 bg-red-50' : 'text-emerald-600 bg-emerald-50';
+            const rateColor = d.no_show_rate > 10 ? 'text-red-600 bg-red-50 dark:bg-red-950/30' : 'text-emerald-600 bg-emerald-50 dark:bg-emerald-950/30';
             document.getElementById('dailyOverview').innerHTML = `
-                <div class="flex justify-between items-center p-2 bg-blue-50 rounded-lg">
-                    <span class="text-slate-600">Today's Appointments</span>
-                    <span class="font-medium text-slate-900">${d.today_appts || 0}</span>
+                <div class="flex justify-between items-center p-2 bg-blue-50 dark:bg-blue-950/30 rounded-lg">
+                    <span class="text-slate-600 dark:text-slate-400">Today's Appointments</span>
+                    <span class="font-medium text-slate-900 dark:text-white">${d.today_appts || 0}</span>
                 </div>
-                <div class="flex justify-between items-center p-2 bg-emerald-50 rounded-lg">
-                    <span class="text-slate-600">Completed</span>
-                    <span class="font-medium text-slate-900">${d.today_completed || 0}</span>
+                <div class="flex justify-between items-center p-2 bg-emerald-50 dark:bg-emerald-950/30 rounded-lg">
+                    <span class="text-slate-600 dark:text-slate-400">Completed</span>
+                    <span class="font-medium text-slate-900 dark:text-white">${d.today_completed || 0}</span>
                 </div>
                 <div class="flex justify-between items-center p-2 ${rateColor} rounded-lg">
                     <span>No-Show Rate</span>
@@ -410,17 +410,17 @@
             const r = await fetch('/analytics/api/mental-health-stats?days=30');
             const d = await r.json();
             document.getElementById('mentalHealthStats').innerHTML = `
-                <div class="flex justify-between items-center p-2 bg-violet-50 rounded-lg">
-                    <span class="text-slate-600">Mental Health Appts</span>
-                    <span class="font-medium text-slate-900">${d.mental_appts || 0}</span>
+                <div class="flex justify-between items-center p-2 bg-violet-50 dark:bg-violet-950/30 rounded-lg">
+                    <span class="text-slate-600 dark:text-slate-400">Mental Health Appts</span>
+                    <span class="font-medium text-slate-900 dark:text-white">${d.mental_appts || 0}</span>
                 </div>
                 <div class="flex justify-between items-center p-2 bg-purple-50 rounded-lg">
-                    <span class="text-slate-600">Stress-Related Cases</span>
-                    <span class="font-medium text-slate-900">${d.stress_related || 0}</span>
+                    <span class="text-slate-600 dark:text-slate-400">Stress-Related Cases</span>
+                    <span class="font-medium text-slate-900 dark:text-white">${d.stress_related || 0}</span>
                 </div>
                 <div class="flex justify-between items-center p-2 bg-pink-50 rounded-lg">
-                    <span class="text-slate-600">% of Screenings</span>
-                    <span class="font-medium text-slate-900">${d.mental_health_percentage || 0}%</span>
+                    <span class="text-slate-600 dark:text-slate-400">% of Screenings</span>
+                    <span class="font-medium text-slate-900 dark:text-white">${d.mental_health_percentage || 0}%</span>
                 </div>
             `;
         } catch(e) { console.error(e); }
@@ -431,7 +431,7 @@
             const r = await fetch('/analytics/api/health-issues-trend?days=30');
             const d = await r.json();
             if(!d.labels || d.labels.length === 0) {
-                document.getElementById('healthIssuesTrend').innerHTML = '<p class="text-slate-400 text-center py-4">No data available</p>';
+                document.getElementById('healthIssuesTrend').innerHTML = '<p class="text-slate-400 dark:text-slate-500 text-center py-4">No data available</p>';
                 return;
             }
             const maxCount = Math.max(...d.values);
@@ -441,11 +441,11 @@
                 const percentage = (d.values[i] / maxCount * 100);
                 html += `
                     <div class="flex items-center gap-2">
-                        <span class="text-slate-500 w-28 truncate text-xs">${label}</span>
-                        <div class="flex-1 bg-slate-100 rounded-full h-2 overflow-hidden">
+                        <span class="text-slate-500 dark:text-slate-400 w-28 truncate text-xs">${label}</span>
+                        <div class="flex-1 bg-slate-100 dark:bg-slate-800 rounded-full h-2 overflow-hidden">
                             <div class="${colors[i % colors.length]} h-full rounded-full" style="width: ${percentage}%"></div>
                         </div>
-                        <span class="text-slate-400 w-6 text-right text-xs">${d.values[i]}</span>
+                        <span class="text-slate-400 dark:text-slate-500 w-6 text-right text-xs">${d.values[i]}</span>
                     </div>
                 `;
             });
@@ -459,13 +459,13 @@
             const r = await fetch('/analytics/api/no-show-rate');
             const d = await r.json();
             const rate = (d.rate || 0).toFixed(1);
-            const rateClass = parseFloat(rate) > 10 ? 'text-red-600 bg-red-50' : 'text-emerald-600 bg-emerald-50';
+            const rateClass = parseFloat(rate) > 10 ? 'text-red-600 bg-red-50 dark:bg-red-950/30' : 'text-emerald-600 bg-emerald-50 dark:bg-emerald-950/30';
             document.getElementById('noShowStats').innerHTML = `
-                <div class="flex justify-between items-center p-2 bg-slate-50 rounded-lg mb-2">
-                    <span class="text-slate-600">Total Scheduled</span>
-                    <span class="font-medium text-slate-900">${d.total_scheduled || 0}</span>
+                <div class="flex justify-between items-center p-2 bg-slate-50 dark:bg-slate-800/50 rounded-lg mb-2">
+                    <span class="text-slate-600 dark:text-slate-400">Total Scheduled</span>
+                    <span class="font-medium text-slate-900 dark:text-white">${d.total_scheduled || 0}</span>
                 </div>
-                <div class="flex justify-between items-center p-2 bg-red-50 rounded-lg mb-2">
+                <div class="flex justify-between items-center p-2 bg-red-50 dark:bg-red-950/30 rounded-lg mb-2">
                     <span class="text-red-700">No-Shows</span>
                     <span class="font-medium text-red-600">${d.no_shows || 0}</span>
                 </div>
@@ -482,10 +482,10 @@
             const r = await fetch('/analytics/api/inventory-consumption?limit=5');
             const d = await r.json();
             if(!d || d.length === 0) {
-                document.getElementById('inventoryConsumption').innerHTML = '<p class="text-slate-400 text-center py-4">No usage data</p>';
+                document.getElementById('inventoryConsumption').innerHTML = '<p class="text-slate-400 dark:text-slate-500 text-center py-4">No usage data</p>';
                 return;
             }
-            const colors = ['bg-blue-50 text-blue-700', 'bg-emerald-50 text-emerald-700', 'bg-violet-50 text-violet-700', 'bg-amber-50 text-amber-700', 'bg-pink-50 text-pink-700'];
+            const colors = ['bg-blue-50 dark:bg-blue-950/30 text-blue-700', 'bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700', 'bg-violet-50 dark:bg-violet-950/30 text-violet-700', 'bg-amber-50 dark:bg-amber-950/30 text-amber-700', 'bg-pink-50 text-pink-700'];
             let html = '<div class="space-y-1.5">';
             d.forEach((item, i) => {
                 const c = colors[i % colors.length];
@@ -532,12 +532,12 @@
             if(d.summary) {
                 const conf = d.confidence || 'medium';
                 const confColor = conf === 'high' ? 'bg-emerald-100 text-emerald-700' : conf === 'low' ? 'bg-red-100 text-red-700' : 'bg-amber-100 text-amber-700';
-                html += `<div class="flex items-center justify-between"><p class="text-xs font-medium text-slate-700">${d.summary}</p><span class="text-[10px] font-medium ${confColor} px-2 py-0.5 rounded">${conf}</span></div>`;
+                html += `<div class="flex items-center justify-between"><p class="text-xs font-medium text-slate-700 dark:text-slate-300">${d.summary}</p><span class="text-[10px] font-medium ${confColor} px-2 py-0.5 rounded">${conf}</span></div>`;
             }
             if(d.insights && d.insights.length > 0) {
                 html += '<div class="space-y-1.5">';
                 d.insights.slice(0, 3).forEach(insight => {
-                    html += `<div class="text-xs text-slate-600 bg-slate-50 p-2 rounded"><span class="font-medium">${insight.title}:</span> ${insight.description}</div>`;
+                    html += `<div class="text-xs text-slate-600 dark:text-slate-400 bg-slate-50 dark:bg-slate-800/50 p-2 rounded"><span class="font-medium">${insight.title}:</span> ${insight.description}</div>`;
                 });
                 html += '</div>';
             }

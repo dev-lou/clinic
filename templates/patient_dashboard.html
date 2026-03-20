@@ -16,48 +16,48 @@
 
     <!-- Quick Stats -->
     <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-        <div class="bg-white rounded-2xl p-6 border border-gray-100 hover:shadow-lg hover:shadow-blue-500/5 transition-all duration-300 group">
+        <div class="bg-white dark:bg-slate-900 rounded-2xl p-6 border border-gray-100 dark:border-slate-800 hover:shadow-lg hover:shadow-blue-500/5 transition-all duration-300 group">
             <div class="flex items-center justify-between mb-3">
-                <div class="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center group-hover:bg-blue-100 transition">
+                <div class="w-10 h-10 bg-blue-50 dark:bg-blue-950/30 rounded-xl flex items-center justify-center group-hover:bg-blue-100 transition">
                     <i class="fas fa-calendar-check text-blue-500"></i>
                 </div>
-                <span class="text-xs font-medium text-gray-400 uppercase tracking-wider">Upcoming</span>
+                <span class="text-xs font-medium text-gray-400 dark:text-gray-500 uppercase tracking-wider">Upcoming</span>
             </div>
-            <p class="text-3xl font-extrabold text-gray-900">{{ upcoming_appointments|length }}</p>
-            <p class="text-sm text-gray-500 mt-0.5">Appointments</p>
+            <p class="text-3xl font-extrabold text-gray-900 dark:text-white">{{ upcoming_appointments|length }}</p>
+            <p class="text-sm text-gray-500 dark:text-gray-400 mt-0.5">Appointments</p>
         </div>
 
-        <div class="bg-white rounded-2xl p-6 border border-gray-100 hover:shadow-lg hover:shadow-emerald-500/5 transition-all duration-300 group">
+        <div class="bg-white dark:bg-slate-900 rounded-2xl p-6 border border-gray-100 dark:border-slate-800 hover:shadow-lg hover:shadow-emerald-500/5 transition-all duration-300 group">
             <div class="flex items-center justify-between mb-3">
-                <div class="w-10 h-10 bg-emerald-50 rounded-xl flex items-center justify-center group-hover:bg-emerald-100 transition">
+                <div class="w-10 h-10 bg-emerald-50 dark:bg-emerald-950/30 rounded-xl flex items-center justify-center group-hover:bg-emerald-100 dark:bg-emerald-900/50 transition">
                     <i class="fas fa-pills text-emerald-500"></i>
                 </div>
-                <span class="text-xs font-medium text-gray-400 uppercase tracking-wider">Active</span>
+                <span class="text-xs font-medium text-gray-400 dark:text-gray-500 uppercase tracking-wider">Active</span>
             </div>
-            <p class="text-3xl font-extrabold text-gray-900">{{ active_reservations|length }}</p>
-            <p class="text-sm text-gray-500 mt-0.5">Reservations</p>
+            <p class="text-3xl font-extrabold text-gray-900 dark:text-white">{{ active_reservations|length }}</p>
+            <p class="text-sm text-gray-500 dark:text-gray-400 mt-0.5">Reservations</p>
         </div>
 
-        <div class="bg-white rounded-2xl p-6 border border-gray-100 hover:shadow-lg hover:shadow-violet-500/5 transition-all duration-300 group">
+        <div class="bg-white dark:bg-slate-900 rounded-2xl p-6 border border-gray-100 dark:border-slate-800 hover:shadow-lg hover:shadow-violet-500/5 transition-all duration-300 group">
             <div class="flex items-center justify-between mb-3">
-                <div class="w-10 h-10 bg-violet-50 rounded-xl flex items-center justify-center group-hover:bg-violet-100 transition">
+                <div class="w-10 h-10 bg-violet-50 dark:bg-violet-950/30 rounded-xl flex items-center justify-center group-hover:bg-violet-100 transition">
                     <i class="fas fa-heartbeat text-violet-500"></i>
                 </div>
-                <span class="text-xs font-medium text-gray-400 uppercase tracking-wider">Total</span>
+                <span class="text-xs font-medium text-gray-400 dark:text-gray-500 uppercase tracking-wider">Total</span>
             </div>
-            <p class="text-3xl font-extrabold text-gray-900">{{ recent_visits|length }}</p>
-            <p class="text-sm text-gray-500 mt-0.5">Clinic Visits</p>
+            <p class="text-3xl font-extrabold text-gray-900 dark:text-white">{{ recent_visits|length }}</p>
+            <p class="text-sm text-gray-500 dark:text-gray-400 mt-0.5">Clinic Visits</p>
         </div>
 
-        <div class="bg-white rounded-2xl p-6 border border-gray-100 hover:shadow-lg hover:shadow-amber-500/5 transition-all duration-300 group">
+        <div class="bg-white dark:bg-slate-900 rounded-2xl p-6 border border-gray-100 dark:border-slate-800 hover:shadow-lg hover:shadow-amber-500/5 transition-all duration-300 group">
             <div class="flex items-center justify-between mb-3">
-                <div class="w-10 h-10 bg-amber-50 rounded-xl flex items-center justify-center group-hover:bg-amber-100 transition">
+                <div class="w-10 h-10 bg-amber-50 dark:bg-amber-950/30 rounded-xl flex items-center justify-center group-hover:bg-amber-100 dark:bg-amber-900/50 transition">
                     <i class="fas fa-certificate text-amber-500"></i>
                 </div>
-                <span class="text-xs font-medium text-gray-400 uppercase tracking-wider">Issued</span>
+                <span class="text-xs font-medium text-gray-400 dark:text-gray-500 uppercase tracking-wider">Issued</span>
             </div>
-            <p class="text-3xl font-extrabold text-gray-900">{{ certificates|length }}</p>
-            <p class="text-sm text-gray-500 mt-0.5">Certificates</p>
+            <p class="text-3xl font-extrabold text-gray-900 dark:text-white">{{ certificates|length }}</p>
+            <p class="text-sm text-gray-500 dark:text-gray-400 mt-0.5">Certificates</p>
         </div>
     </div>
 
@@ -66,9 +66,9 @@
         <!-- Left Column -->
         <div class="lg:col-span-2 space-y-6">
             <!-- Upcoming Appointments -->
-            <div class="bg-white rounded-2xl border border-gray-100 p-6">
+            <div class="bg-white dark:bg-slate-900 rounded-2xl border border-gray-100 dark:border-slate-800 p-6">
                 <div class="flex items-center justify-between mb-5">
-                    <h2 class="text-lg font-bold text-gray-900">Upcoming Appointments</h2>
+                    <h2 class="text-lg font-bold text-gray-900 dark:text-white">Upcoming Appointments</h2>
                     <a href="{{ url_for('appointments.book') }}" class="px-4 py-2 bg-primary-700 text-white text-sm font-semibold rounded-xl hover:bg-primary-800 transition-all shadow-sm">
                         <i class="fas fa-plus mr-1.5"></i>Book
                     </a>
@@ -76,20 +76,20 @@
                 {% if upcoming_appointments %}
                 <div class="space-y-3">
                     {% for appt in upcoming_appointments %}
-                    <div class="flex items-center gap-4 p-4 rounded-xl bg-blue-50/50 border border-blue-100/50 hover:bg-blue-50 transition">
+                    <div class="flex items-center gap-4 p-4 rounded-xl bg-blue-50/50 dark:bg-blue-950/20 border border-blue-100/50 dark:border-blue-900/50 hover:bg-blue-50 dark:hover:bg-blue-950/30 transition">
                         <div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center flex-shrink-0 shadow-sm">
                             <i class="fas fa-calendar text-white"></i>
                         </div>
                         <div class="flex-1 min-w-0">
-                            <p class="font-semibold text-gray-900 text-sm">{{ appt.service_type }}</p>
-                            <p class="text-xs text-gray-500 mt-0.5">
+                            <p class="font-semibold text-gray-900 dark:text-white text-sm">{{ appt.service_type }}</p>
+                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
                                 <i class="fas fa-calendar-alt mr-1"></i>{{ appt.appointment_date.strftime('%b %d, %Y') }}
                                 <span class="ml-2"><i class="fas fa-clock mr-1"></i>{{ appt.start_time.strftime('%I:%M %p') }}</span>
                             </p>
                         </div>
                         <span class="px-3 py-1 text-xs font-semibold rounded-full
-                            {% if appt.status == 'Confirmed' %}bg-emerald-100 text-emerald-700
-                            {% else %}bg-amber-100 text-amber-700{% endif %}">
+                            {% if appt.status == 'Confirmed' %}bg-emerald-100 dark:bg-emerald-900/50 text-emerald-700 dark:text-emerald-400
+                            {% else %}bg-amber-100 dark:bg-amber-900/50 text-amber-700 dark:text-amber-400{% endif %}">
                             {{ appt.status }}
                         </span>
                     </div>
@@ -97,56 +97,56 @@
                 </div>
                 {% else %}
                 <div class="text-center py-10">
-                    <div class="w-16 h-16 bg-gray-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                    <div class="w-16 h-16 bg-gray-100 dark:bg-slate-800 rounded-2xl flex items-center justify-center mx-auto mb-4">
                         <i class="fas fa-calendar-times text-gray-300 text-2xl"></i>
                     </div>
-                    <p class="text-gray-500 text-sm mb-2">No upcoming appointments</p>
+                    <p class="text-gray-500 dark:text-gray-400 text-sm mb-2">No upcoming appointments</p>
                 </div>
                 {% endif %}
             </div>
 
             <!-- Recent Visits -->
-            <div class="bg-white rounded-2xl border border-gray-100 p-6">
-                <h2 class="text-lg font-bold text-gray-900 mb-5">Recent Clinic Visits</h2>
+            <div class="bg-white dark:bg-slate-900 rounded-2xl border border-gray-100 dark:border-slate-800 p-6">
+                <h2 class="text-lg font-bold text-gray-900 dark:text-white mb-5">Recent Clinic Visits</h2>
                 {% if recent_visits %}
                 <div class="space-y-3">
                     {% for visit in recent_visits[:5] %}
-                    <div class="flex items-start gap-4 p-4 rounded-xl bg-gray-50/50 border border-gray-100/50 hover:bg-gray-50 transition">
+                    <div class="flex items-start gap-4 p-4 rounded-xl bg-gray-50/50 dark:bg-slate-800/50 border border-gray-100/50 dark:border-slate-700/50 hover:bg-gray-50 dark:hover:bg-slate-800 transition">
                         <div class="w-10 h-10 bg-gradient-to-br from-rose-500 to-rose-600 rounded-xl flex items-center justify-center flex-shrink-0 mt-0.5">
                             <i class="fas fa-notes-medical text-white text-sm"></i>
                         </div>
                         <div class="flex-1 min-w-0">
-                            <p class="font-semibold text-gray-900 text-sm">{{ visit.chief_complaint }}</p>
-                            <p class="text-xs text-gray-500 mt-0.5">{{ visit.visit_date.strftime('%B %d, %Y') }}</p>
+                            <p class="font-semibold text-gray-900 dark:text-white text-sm">{{ visit.chief_complaint }}</p>
+                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{{ visit.visit_date.strftime('%B %d, %Y') }}</p>
                             {% if visit.diagnosis %}
-                            <p class="text-xs text-gray-600 mt-1.5 bg-gray-100 rounded-lg px-2.5 py-1 inline-block">
-                                <i class="fas fa-stethoscope mr-1 text-gray-400"></i>{{ visit.diagnosis }}
+                            <p class="text-xs text-gray-600 dark:text-gray-400 mt-1.5 bg-gray-100 dark:bg-slate-800 rounded-lg px-2.5 py-1 inline-block">
+                                <i class="fas fa-stethoscope mr-1 text-gray-400 dark:text-gray-500"></i>{{ visit.diagnosis }}
                             </p>
                             {% endif %}
                         </div>
                     </div>
                     {% endfor %}
                 </div>
-                <p class="text-xs text-gray-400 mt-4">Visit history is updated by clinic staff.</p>
+                <p class="text-xs text-gray-400 dark:text-gray-500 mt-4">Visit history is updated by clinic staff.</p>
                 {% else %}
-                <p class="text-center py-8 text-gray-400 text-sm">No visit history yet</p>
+                <p class="text-center py-8 text-gray-400 dark:text-gray-500 text-sm">No visit history yet</p>
                 {% endif %}
             </div>
 
             {% if pending_feedback %}
-            <div class="bg-amber-50 rounded-2xl border border-amber-100 p-6">
+            <div class="bg-amber-50 dark:bg-amber-950/30 rounded-2xl border border-amber-100 dark:border-amber-900 p-6">
                 <div class="flex items-center gap-3 mb-4">
-                    <div class="w-10 h-10 bg-amber-100 rounded-xl flex items-center justify-center">
+                    <div class="w-10 h-10 bg-amber-100 dark:bg-amber-900/50 rounded-xl flex items-center justify-center">
                         <i class="fas fa-star text-amber-500"></i>
                     </div>
                     <div>
-                        <h3 class="font-bold text-gray-900 text-sm">Feedback Needed</h3>
-                        <p class="text-xs text-gray-500">Help us improve your experience</p>
+                        <h3 class="font-bold text-gray-900 dark:text-white text-sm">Feedback Needed</h3>
+                        <p class="text-xs text-gray-500 dark:text-gray-400">Help us improve your experience</p>
                     </div>
                 </div>
                 <div class="space-y-2">
                     {% for visit in pending_feedback %}
-                    <a href="#" class="block p-3 bg-white rounded-xl hover:shadow-sm transition text-sm font-medium text-gray-700">
+                    <a href="#" class="block p-3 bg-white dark:bg-slate-900 rounded-xl hover:shadow-sm transition text-sm font-medium text-gray-700 dark:text-gray-300">
                         Visit on {{ visit.visit_date.strftime('%b %d') }} &mdash; {{ visit.chief_complaint[:50] }}
                     </a>
                     {% endfor %}
@@ -158,57 +158,57 @@
         <!-- Right Column -->
         <div class="space-y-6">
             <!-- Active Reservations -->
-            <div class="bg-white rounded-2xl border border-gray-100 p-6">
-                <h3 class="font-bold text-gray-900 text-sm mb-4">Medicine Reservations</h3>
+            <div class="bg-white dark:bg-slate-900 rounded-2xl border border-gray-100 dark:border-slate-800 p-6">
+                <h3 class="font-bold text-gray-900 dark:text-white text-sm mb-4">Medicine Reservations</h3>
                 {% if active_reservations %}
                 <div class="space-y-3">
                     {% for res in active_reservations %}
-                    <div class="flex items-center gap-3 p-3 rounded-xl bg-emerald-50/50 border border-emerald-100/50">
-                        <div class="w-9 h-9 bg-emerald-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <div class="flex items-center gap-3 p-3 rounded-xl bg-emerald-50/50 dark:bg-emerald-950/20 border border-emerald-100 dark:border-emerald-900">
+                        <div class="w-9 h-9 bg-emerald-100 dark:bg-emerald-900/50 rounded-lg flex items-center justify-center flex-shrink-0">
                             <i class="fas fa-capsules text-emerald-600 text-sm"></i>
                         </div>
                         <div class="flex-1 min-w-0">
-                            <p class="font-semibold text-gray-900 text-sm truncate">{{ res.medicine_name }}</p>
-                            <p class="text-xs text-gray-500">Qty: {{ res.quantity }}</p>
+                            <p class="font-semibold text-gray-900 dark:text-white text-sm truncate">{{ res.medicine_name }}</p>
+                            <p class="text-xs text-gray-500 dark:text-gray-400">Qty: {{ res.quantity }}</p>
                         </div>
-                        <span class="px-2 py-0.5 bg-emerald-100 text-emerald-700 text-[10px] font-bold rounded-full uppercase">Ready</span>
+                        <span class="px-2 py-0.5 bg-emerald-100 dark:bg-emerald-900/50 text-emerald-700 dark:text-emerald-400 text-[10px] font-bold rounded-full uppercase">Ready</span>
                     </div>
                     {% endfor %}
                 </div>
                 {% else %}
-                <p class="text-sm text-gray-400 text-center py-4">No active reservations</p>
+                <p class="text-sm text-gray-400 dark:text-gray-500 text-center py-4">No active reservations</p>
                 {% endif %}
-                <a href="{{ url_for('reservations.view_medicines') }}" class="flex items-center justify-center w-full mt-4 px-4 py-2.5 bg-emerald-50 text-emerald-700 text-sm font-semibold rounded-xl hover:bg-emerald-100 transition">
+                <a href="{{ url_for('reservations.view_medicines') }}" class="flex items-center justify-center w-full mt-4 px-4 py-2.5 bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-400 text-sm font-semibold rounded-xl hover:bg-emerald-100 dark:hover:bg-emerald-900/50 transition">
                     <i class="fas fa-pills mr-1.5"></i>Reserve Medicine
                 </a>
             </div>
 
             <!-- Quick Actions -->
-            <div class="bg-white rounded-2xl border border-gray-100 p-6">
-                <h3 class="font-bold text-gray-900 text-sm mb-4">Quick Actions</h3>
+            <div class="bg-white dark:bg-slate-900 rounded-2xl border border-gray-100 dark:border-slate-800 p-6">
+                <h3 class="font-bold text-gray-900 dark:text-white text-sm mb-4">Quick Actions</h3>
                 <div class="space-y-2">
-                    <a href="{{ url_for('appointments.book') }}" class="flex items-center gap-3 p-3 rounded-xl hover:bg-blue-50 transition group">
-                        <div class="w-9 h-9 bg-blue-50 rounded-lg flex items-center justify-center group-hover:bg-blue-100 transition">
+                    <a href="{{ url_for('appointments.book') }}" class="flex items-center gap-3 p-3 rounded-xl hover:bg-blue-50 dark:hover:bg-blue-950/30 transition group">
+                        <div class="w-9 h-9 bg-blue-50 dark:bg-blue-950/30 rounded-lg flex items-center justify-center group-hover:bg-blue-100 transition">
                             <i class="fas fa-calendar-plus text-blue-500 text-sm"></i>
                         </div>
-                        <span class="text-sm font-semibold text-gray-700">Book Appointment</span>
+                        <span class="text-sm font-semibold text-gray-700 dark:text-gray-300">Book Appointment</span>
                         <i class="fas fa-chevron-right text-[10px] text-gray-300 ml-auto"></i>
                     </a>
                 </div>
             </div>
 
             {% if certificates %}
-            <div class="bg-white rounded-2xl border border-gray-100 p-6">
-                <h3 class="font-bold text-gray-900 text-sm mb-4">Health Certificates</h3>
+            <div class="bg-white dark:bg-slate-900 rounded-2xl border border-gray-100 dark:border-slate-800 p-6">
+                <h3 class="font-bold text-gray-900 dark:text-white text-sm mb-4">Health Certificates</h3>
                 <div class="space-y-2">
                     {% for cert in certificates %}
-                    <div class="flex items-center gap-3 p-3 rounded-xl bg-blue-50/50 border border-blue-100/50">
-                        <div class="w-9 h-9 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <div class="flex items-center gap-3 p-3 rounded-xl bg-blue-50/50 dark:bg-blue-950/20 border border-blue-100/50 dark:border-blue-900/50">
+                        <div class="w-9 h-9 bg-blue-100 dark:bg-blue-900/50 rounded-lg flex items-center justify-center flex-shrink-0">
                             <i class="fas fa-file-medical text-blue-600 text-sm"></i>
                         </div>
                         <div class="flex-1 min-w-0">
-                            <p class="font-semibold text-gray-900 text-xs">#{{ cert.certificate_number }}</p>
-                            <p class="text-[10px] text-gray-500">{{ cert.issued_at.strftime('%b %d, %Y') }} - {{ cert.purpose }}</p>
+                            <p class="font-semibold text-gray-900 dark:text-white text-xs">#{{ cert.certificate_number }}</p>
+                            <p class="text-[10px] text-gray-500 dark:text-gray-400">{{ cert.issued_at.strftime('%b %d, %Y') }} - {{ cert.purpose }}</p>
                         </div>
                         <a href="{{ url_for('certificates.download_certificate', cert_id=cert.id) }}" class="text-xs text-primary-600 hover:text-primary-700 font-medium transition">
                             <i class="fas fa-download mr-1"></i>PDF
