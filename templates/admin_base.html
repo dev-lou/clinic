@@ -531,16 +531,11 @@
                             current_user.last_name }}</p>
                         <p class="text-[11px] text-blue-300/50 capitalize">{{ current_user.role }}</p>
                     </div>
-                </div>
-                <button onclick="toggleAdminDarkMode()"
-                    class="sidebar-link flex items-center space-x-3 px-3 py-2.5 rounded-xl text-sm font-medium text-blue-200/80 w-full">
-                    <i class="fas fa-moon w-5 text-center text-blue-300/60" id="adminDarkModeIcon"></i>
-                    <span id="adminDarkModeText">Dark Mode</span>
-                </button>
-                <a href="{{ url_for('auth.logout') }}"
-                    class="sidebar-link flex items-center space-x-3 px-3 py-2.5 rounded-xl text-sm font-medium text-red-300/80 hover:text-red-200 hover:bg-red-500/10">
-                    <i class="fas fa-sign-out-alt w-5 text-center"></i><span>Sign Out</span>
-                </a>
+                 </div>
+                 <a href="{{ url_for('auth.logout') }}"
+                     class="sidebar-link flex items-center space-x-3 px-3 py-2.5 rounded-xl text-sm font-medium text-red-300/80 hover:text-red-200 hover:bg-red-500/10">
+                     <i class="fas fa-sign-out-alt w-5 text-center"></i><span>Sign Out</span>
+                 </a>
             </div>
         </aside>
 
@@ -593,28 +588,8 @@
         </div>
     </div>
 
-    <script>
-        // ── Dark Mode Toggle ──
-        function toggleAdminDarkMode() {
-            const html = document.documentElement;
-            const isDark = html.classList.toggle('dark');
-            localStorage.setItem('darkMode', isDark ? 'enabled' : 'disabled');
-            updateAdminDarkModeUI();
-        }
-        function updateAdminDarkModeUI() {
-            const icon = document.getElementById('adminDarkModeIcon');
-            const text = document.getElementById('adminDarkModeText');
-            const isDark = document.documentElement.classList.contains('dark');
-            if (icon) icon.className = isDark ? 'fas fa-sun w-5 text-center text-blue-300/60' : 'fas fa-moon w-5 text-center text-blue-300/60';
-            if (text) text.textContent = isDark ? 'Light Mode' : 'Dark Mode';
-        }
-        // Initialize dark mode from localStorage
-        if (localStorage.getItem('darkMode') === 'enabled') {
-            document.documentElement.classList.add('dark');
-        }
-        document.addEventListener('DOMContentLoaded', updateAdminDarkModeUI);
-
-        function toggleSidebar() {
+     <script>
+         function toggleSidebar() {
             document.getElementById('mobile-sidebar').classList.toggle('active');
             document.getElementById('sidebar-overlay').classList.toggle('active');
             document.body.classList.toggle('overflow-hidden');

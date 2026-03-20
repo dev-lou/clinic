@@ -487,15 +487,12 @@
                     {% endif %}
                 </div>
 
-                 <!-- Right Side Actions -->
+                  <!-- Right Side Actions -->
                 <div class="flex items-center space-x-3">
                     {% if current_user.is_authenticated %}
-                    <!-- Dark Mode Toggle -->
-                    <button id="darkModeToggle" onclick="toggleDarkMode()"
-                        aria-label="Toggle dark mode"
-                        class="w-9 h-9 flex items-center justify-center rounded-lg hover:bg-gray-100 dark:hover:bg-slate-800 transition-all text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200">
-                        <i class="fas fa-moon text-[14px]" id="darkModeIcon"></i>
-                    </button>
+<<<<<<< HEAD
+=======
+>>>>>>> d833e31 (Remove dark mode functionality entirely)
                     <!-- Notification Bell (Desktop) -->
                     <div class="hidden lg:block relative">
                         <button id="notificationBell"
@@ -750,28 +747,8 @@
         </div>
     </footer>
 
-    <script>
-        // ── Dark Mode Toggle ──
-        function toggleDarkMode() {
-            const html = document.documentElement;
-            const isDark = html.classList.toggle('dark');
-            localStorage.setItem('darkMode', isDark ? 'enabled' : 'disabled');
-            updateDarkModeIcon();
-        }
-        function updateDarkModeIcon() {
-            const icon = document.getElementById('darkModeIcon');
-            const isDark = document.documentElement.classList.contains('dark');
-            if (icon) {
-                icon.className = isDark ? 'fas fa-sun text-[14px]' : 'fas fa-moon text-[14px]';
-            }
-        }
-        // Initialize dark mode from localStorage
-        if (localStorage.getItem('darkMode') === 'enabled') {
-            document.documentElement.classList.add('dark');
-        }
-        document.addEventListener('DOMContentLoaded', updateDarkModeIcon);
-
-        // ── Notification Functions ──
+     <script>
+         // ── Notification Functions ──
         function updateNotificationCount() {
             fetch('{{ url_for("patient_dashboard.unread_notification_count") }}')
                  .then(r => r.json()).then(data => {
