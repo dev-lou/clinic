@@ -443,7 +443,7 @@
     {% block extra_css %}{% endblock %}
 </head>
 
-<body class="bg-gray-50/80 dark:bg-slate-950 min-h-screen overflow-x-hidden">
+<body class="bg-gray-50/80 dark:bg-slate-950 min-h-screen overflow-x-hidden flex flex-col">
     <!-- Skip to Content (Accessibility) -->
     <a href="#main-content" class="skip-to-content">Skip to main content</a>
     <!-- Navigation -->
@@ -703,7 +703,7 @@
     {% endwith %}
 
     <!-- Main Content -->
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-16" id="main-content" role="main">
+    <main class="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-16 w-full" id="main-content" role="main">
         {% block content %}{% endblock %}
     </main>
 
