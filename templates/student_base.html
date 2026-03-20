@@ -21,17 +21,9 @@
     
     <title>{% block title %}ISUFST CareHub{% endblock %}</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/fontawesome.min.css') }}">
-    <link
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap"
-        rel="stylesheet">
-    <!-- UI Libraries (Tom Select & Flatpickr) -->
-    <link href="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/css/tom-select.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/animations.css') }}">
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         tailwind.config = {
+            darkMode: 'class',
             theme: {
                 extend: {
                     fontFamily: { 'display': ['"Plus Jakarta Sans"', 'sans-serif'], 'body': ['Inter', 'sans-serif'] },
@@ -43,6 +35,16 @@
             }
         }
     </script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/output.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/fontawesome.min.css') }}">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap"
+        rel="stylesheet">
+    <!-- UI Libraries (Tom Select & Flatpickr) -->
+    <link href="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/css/tom-select.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/animations.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
         /* Tailwind Forms vs SweetAlert2 Fix */
         .swal2-container select.swal2-select,
@@ -398,10 +400,6 @@
             margin-top: 8px !important;
             padding-top: 12px !important;
         }
-        .flatpickr-calendar.arrowTop:before, .flatpickr-calendar.arrowTop:after,
-        .flatpickr-calendar.arrowBottom:before, .flatpickr-calendar.arrowBottom:after {
-            display: none !important;
-        }
         .flatpickr-months {
             margin-bottom: 12px;
         }
@@ -444,8 +442,10 @@
 </head>
 
 <body class="bg-gray-50/80 min-h-screen overflow-x-hidden">
+    <!-- Skip to Content (Accessibility) -->
+    <a href="#main-content" class="skip-to-content">Skip to main content</a>
     <!-- Navigation -->
-    <nav class="fixed top-0 inset-x-0 z-50 nav-blur bg-white/90 border-b border-gray-100/80 transition-all">
+    <nav class="fixed top-0 inset-x-0 z-50 nav-blur bg-white/90 border-b border-gray-100/80 transition-all" role="navigation" aria-label="Main navigation">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-16">
                 <!-- Logo Group -->
@@ -487,10 +487,19 @@
 
                  <!-- Right Side Actions -->
                 <div class="flex items-center space-x-3">
+                    <!-- Dark Mode Toggle -->
+                    <button id="darkModeToggle" onclick="toggleDarkMode()"
+                        aria-label="Toggle dark mode"
+                        class="w-9 h-9 flex items-center justify-center rounded-lg hover:bg-gray-100 transition-all text-gray-500 hover:text-gray-700">
+                        <i class="fas fa-moon text-[14px]" id="darkModeIcon"></i>
+                    </button>
                     {% if current_user.is_authenticated %}
                     <!-- Notification Bell (Desktop) -->
                     <div class="hidden lg:block relative">
                         <button id="notificationBell"
+                            aria-label="Notifications"
+                            aria-haspopup="true"
+                            aria-expanded="false"
                             class="w-9 h-9 flex items-center justify-center rounded-lg hover:bg-gray-100 transition-all relative text-gray-500 hover:text-gray-700">
                             <i class="fas fa-bell text-[15px]"></i>
                             <span id="notifBadge"
@@ -572,6 +581,9 @@
                     <!-- Mobile Notification Bell -->
                     <div class="lg:hidden relative">
                         <button id="mobileNotificationBell"
+                            aria-label="Notifications"
+                            aria-haspopup="true"
+                            aria-expanded="false"
                             class="w-9 h-9 flex items-center justify-center rounded-lg hover:bg-gray-100 transition-all relative text-gray-500 hover:text-gray-700">
                             <i class="fas fa-bell text-[15px]"></i>
                             <span id="mobileNotifBadge"
@@ -587,6 +599,9 @@
                     </div>
                     <!-- Mobile Burger Menu Button -->
                     <button id="mobileMenuBtn" onclick="toggleMobileMenu()"
+                        aria-label="Open menu"
+                        aria-controls="mobile-drawer"
+                        aria-expanded="false"
                         class="lg:hidden w-10 h-10 flex items-center justify-center rounded-xl hover:bg-gray-100 transition text-gray-600 ring-1 ring-gray-100 ml-2">
                         <i class="fas fa-bars text-lg"></i>
                     </button>
@@ -692,7 +707,7 @@
     {% endwith %}
 
     <!-- Main Content -->
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-16">
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-16" id="main-content" role="main">
         {% block content %}{% endblock %}
     </main>
 
@@ -734,6 +749,26 @@
     </footer>
 
     <script>
+        // ── Dark Mode Toggle ──
+        function toggleDarkMode() {
+            const html = document.documentElement;
+            const isDark = html.classList.toggle('dark');
+            localStorage.setItem('darkMode', isDark ? 'enabled' : 'disabled');
+            updateDarkModeIcon();
+        }
+        function updateDarkModeIcon() {
+            const icon = document.getElementById('darkModeIcon');
+            const isDark = document.documentElement.classList.contains('dark');
+            if (icon) {
+                icon.className = isDark ? 'fas fa-sun text-[14px]' : 'fas fa-moon text-[14px]';
+            }
+        }
+        // Initialize dark mode from localStorage
+        if (localStorage.getItem('darkMode') === 'enabled') {
+            document.documentElement.classList.add('dark');
+        }
+        document.addEventListener('DOMContentLoaded', updateDarkModeIcon);
+
         // ── Notification Functions ──
         function updateNotificationCount() {
             fetch('{{ url_for("patient_dashboard.unread_notification_count") }}')

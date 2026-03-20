@@ -1,0 +1,19 @@
+{# 
+  Reusable Empty State Component
+  Usage: {% include 'partials/_empty_state.html' with context %}
+  Variables: empty_icon, empty_title, empty_message, empty_action_url, empty_action_text
+#}
+<div class="flex flex-col items-center justify-center py-10 text-center">
+    <div class="w-16 h-16 rounded-2xl bg-gray-50 flex items-center justify-center mb-4 ring-1 ring-gray-100">
+        <i class="fas {{ empty_icon|default('fa-inbox') }} text-2xl text-gray-300"></i>
+    </div>
+    <p class="text-gray-500 text-sm font-medium">{{ empty_title|default('Nothing here yet') }}</p>
+    {% if empty_message %}
+    <p class="text-gray-400 text-xs mt-1">{{ empty_message }}</p>
+    {% endif %}
+    {% if empty_action_url %}
+    <a href="{{ empty_action_url }}" class="mt-3 px-4 py-2 bg-primary-600 text-white text-xs font-semibold rounded-lg hover:bg-primary-700 transition">
+        {{ empty_action_text|default('Get Started') }}
+    </a>
+    {% endif %}
+</div>

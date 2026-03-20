@@ -1,0 +1,31 @@
+{# 
+  Reusable Breadcrumb Component
+  Usage: 
+    {% set breadcrumbs = [
+      {'label': 'Dashboard', 'url': url_for('admin')},
+      {'label': 'Certificates', 'url': url_for('certificates.admin_certificates')},
+      {'label': 'View', 'url': None}
+    ] %}
+    {% include 'partials/_breadcrumb.html' with context %}
+#}
+{% if breadcrumbs %}
+<nav aria-label="Breadcrumb" class="mb-4">
+    <ol class="flex items-center gap-1.5 text-xs text-gray-500">
+        <li>
+            <a href="/" class="hover:text-primary-600 transition">
+                <i class="fas fa-home"></i>
+            </a>
+        </li>
+        {% for crumb in breadcrumbs %}
+        <li class="flex items-center gap-1.5">
+            <i class="fas fa-chevron-right text-[8px] text-gray-300"></i>
+            {% if crumb.url %}
+            <a href="{{ crumb.url }}" class="hover:text-primary-600 transition font-medium">{{ crumb.label }}</a>
+            {% else %}
+            <span class="text-gray-700 font-semibold">{{ crumb.label }}</span>
+            {% endif %}
+        </li>
+        {% endfor %}
+    </ol>
+</nav>
+{% endif %}

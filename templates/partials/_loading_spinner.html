@@ -1,0 +1,12 @@
+{# 
+  Reusable Loading Spinner Component
+  Usage: {% include 'partials/_loading_spinner.html' with context %}
+  Variables: loading_text, loading_size
+#}
+<div class="flex flex-col items-center justify-center gap-3 py-8" role="status" aria-live="polite">
+    <div class="w-{{ loading_size|default('8') }} h-{{ loading_size|default('8') }} border-2 border-primary-200 border-t-primary-600 rounded-full animate-spin"></div>
+    {% if loading_text %}
+    <p class="text-sm text-gray-500 font-medium">{{ loading_text }}</p>
+    {% endif %}
+    <span class="sr-only">Loading...</span>
+</div>

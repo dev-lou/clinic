@@ -28,3 +28,9 @@ migrations/__pycache__/
 # OS
 .DS_Store
 Thumbs.db
+
+# Node
+node_modules/
+
+# Temp files
+patch_cert.py

@@ -13,6 +13,7 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/fontawesome.min.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/animations.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/output.css') }}">
     <link
         href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap"
         rel="stylesheet">
@@ -21,6 +22,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <script>
         tailwind.config = {
+            darkMode: 'class',
             theme: {
                 extend: {
                     fontFamily: { 'display': ['"Plus Jakarta Sans"', 'sans-serif'], 'body': ['Inter', 'sans-serif'] },
@@ -306,12 +308,15 @@
 </head>
 
 <body class="bg-gray-50 min-h-screen">
+    <!-- Skip to Content (Accessibility) -->
+    <a href="#main-content" class="skip-to-content">Skip to main content</a>
     <!-- MOBILE OVERLAY -->
     <div id="sidebar-overlay" class="fixed inset-0 z-40 lg:hidden" onclick="toggleSidebar()"></div>
 
     <!-- MOBILE SIDEBAR DRAWER -->
     <aside id="mobile-sidebar"
-        class="fixed inset-y-0 left-0 w-[280px] bg-gradient-to-b from-primary-900 via-primary-800 to-primary-900 text-white z-50 flex flex-col lg:hidden">
+        class="fixed inset-y-0 left-0 w-[280px] bg-gradient-to-b from-primary-900 via-primary-800 to-primary-900 text-white z-50 flex flex-col lg:hidden"
+        role="navigation" aria-label="Mobile admin sidebar">
         <div class="flex items-center justify-between p-5">
             <a href="/admin" class="flex items-center space-x-3">
                 <div
@@ -424,7 +429,8 @@
     <div class="flex h-screen overflow-hidden">
         <!-- DESKTOP SIDEBAR -->
         <aside
-            class="w-[260px] bg-gradient-to-b from-primary-900 via-primary-800 to-primary-900 text-white flex-shrink-0 hidden lg:flex flex-col">
+            class="w-[260px] bg-gradient-to-b from-primary-900 via-primary-800 to-primary-900 text-white flex-shrink-0 hidden lg:flex flex-col"
+            role="navigation" aria-label="Admin sidebar">
             <div class="p-6 pb-4">
                 <a href="/admin" class="flex items-center space-x-3">
                     <div
@@ -525,6 +531,11 @@
                         <p class="text-[11px] text-blue-300/50 capitalize">{{ current_user.role }}</p>
                     </div>
                 </div>
+                <button onclick="toggleAdminDarkMode()"
+                    class="sidebar-link flex items-center space-x-3 px-3 py-2.5 rounded-xl text-sm font-medium text-blue-200/80 w-full">
+                    <i class="fas fa-moon w-5 text-center text-blue-300/60" id="adminDarkModeIcon"></i>
+                    <span id="adminDarkModeText">Dark Mode</span>
+                </button>
                 <a href="{{ url_for('auth.logout') }}"
                     class="sidebar-link flex items-center space-x-3 px-3 py-2.5 rounded-xl text-sm font-medium text-red-300/80 hover:text-red-200 hover:bg-red-500/10">
                     <i class="fas fa-sign-out-alt w-5 text-center"></i><span>Sign Out</span>
@@ -564,7 +575,7 @@
                 </div>
             </header>
 
-            <main class="p-4 lg:p-8">
+            <main class="p-4 lg:p-8" id="main-content" role="main">
                 <!-- Flash Messages (Hidden - converted to SweetAlert) -->
                 {% with messages = get_flashed_messages(with_categories=true) %}
                 {% if messages %}
@@ -582,6 +593,26 @@
     </div>
 
     <script>
+        // ── Dark Mode Toggle ──
+        function toggleAdminDarkMode() {
+            const html = document.documentElement;
+            const isDark = html.classList.toggle('dark');
+            localStorage.setItem('darkMode', isDark ? 'enabled' : 'disabled');
+            updateAdminDarkModeUI();
+        }
+        function updateAdminDarkModeUI() {
+            const icon = document.getElementById('adminDarkModeIcon');
+            const text = document.getElementById('adminDarkModeText');
+            const isDark = document.documentElement.classList.contains('dark');
+            if (icon) icon.className = isDark ? 'fas fa-sun w-5 text-center text-blue-300/60' : 'fas fa-moon w-5 text-center text-blue-300/60';
+            if (text) text.textContent = isDark ? 'Light Mode' : 'Dark Mode';
+        }
+        // Initialize dark mode from localStorage
+        if (localStorage.getItem('darkMode') === 'enabled') {
+            document.documentElement.classList.add('dark');
+        }
+        document.addEventListener('DOMContentLoaded', updateAdminDarkModeUI);
+
         function toggleSidebar() {
             document.getElementById('mobile-sidebar').classList.toggle('active');
             document.getElementById('sidebar-overlay').classList.toggle('active');

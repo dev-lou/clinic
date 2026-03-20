@@ -57,6 +57,16 @@ def create_app(config_name=None):
         flash('Session expired. Please try again.', 'error')
         return redirect(req.referrer or url_for('index'))
 
+    @app.errorhandler(404)
+    def not_found_error(e):
+        from flask import render_template as rt
+        return rt('errors/404.html'), 404
+
+    @app.errorhandler(500)
+    def internal_error(e):
+        from flask import render_template as rt
+        return rt('errors/500.html'), 500
+
     # -- Flask-Login config -----------------------
     login_manager.login_view = 'auth.login'
     login_manager.login_message_category = 'info'

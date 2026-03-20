@@ -1,0 +1,21 @@
+{# 
+  Reusable Data Table Component
+  Usage: 
+    {% with table_headers=['Name', 'Status', 'Date'], table_rows=rows %}
+    {% include 'partials/_data_table.html' with context %}
+    {% endwith %}
+#}
+<div class="overflow-x-auto">
+    <table class="w-full text-left" role="table">
+        <thead>
+            <tr class="border-b border-gray-100">
+                {% for header in table_headers %}
+                <th class="px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">{{ header }}</th>
+                {% endfor %}
+            </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-50">
+            {% block table_body %}{% endblock %}
+        </tbody>
+    </table>
+</div>

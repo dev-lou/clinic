@@ -1,0 +1,19 @@
+{# 
+  Reusable Stat Card Component
+  Usage: {% include 'partials/_stat_card.html' with context %}
+  Variables: stat_icon, stat_icon_bg, stat_icon_color, stat_value, stat_label, stat_sub
+#}
+<div class="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm hover:shadow-lg hover:shadow-black/5 transition-all duration-300 hover:-translate-y-1 group">
+    <div class="flex items-center gap-4">
+        <div class="w-12 h-12 rounded-xl flex items-center justify-center {{ stat_icon_bg|default('bg-primary-50') }} group-hover:scale-110 transition-transform">
+            <i class="fas {{ stat_icon }} {{ stat_icon_color|default('text-primary-600') }} text-lg"></i>
+        </div>
+        <div>
+            <p class="text-2xl font-bold text-gray-900">{{ stat_value }}</p>
+            <p class="text-xs text-gray-500 font-medium">{{ stat_label }}</p>
+            {% if stat_sub %}
+            <p class="text-[10px] {{ stat_sub_color|default('text-green-600') }} font-semibold mt-0.5">{{ stat_sub }}</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
