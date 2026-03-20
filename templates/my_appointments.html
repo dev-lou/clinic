@@ -15,15 +15,15 @@
                 <h1 class="text-3xl sm:text-4xl font-extrabold text-white mb-1">My Appointments</h1>
                 <p class="text-blue-200/50 text-sm">View and manage your health appointments</p>
             </div>
-            <a href="{{ url_for('appointments.book') }}" class="inline-flex items-center px-5 py-3 bg-white text-primary-800 font-bold text-sm rounded-xl hover:bg-blue-50 transition-all shadow-lg">
-                <i class="fas fa-plus mr-2"></i>New Appointment
-            </a>
+             <a href="{{ url_for('appointments.book') }}" class="inline-flex items-center px-5 py-3 bg-white dark:bg-slate-900 text-primary-800 font-bold text-sm rounded-xl hover:bg-blue-50 transition-all shadow-lg">
+                 <i class="fas fa-plus mr-2 text-primary-600 dark:text-primary-400"></i>New Appointment
+             </a>
         </div>
     </div>
 
     <!-- Upcoming -->
-    <div class="bg-white rounded-2xl border border-gray-100 p-6 sm:p-8">
-        <h2 class="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+    <div class="bg-white dark:bg-slate-900 rounded-2xl border border-gray-100 dark:border-slate-800 p-6 sm:p-8">
+        <h2 class="text-xl font-bold text-gray-900 dark:text-white mb-6 flex items-center gap-2">
             <div class="w-8 h-8 bg-blue-50 rounded-lg flex items-center justify-center"><i class="fas fa-clock text-blue-500 text-sm"></i></div>
             Upcoming
         </h2>
@@ -31,17 +31,17 @@
         {% if upcoming %}
         <div class="space-y-4">
             {% for appt in upcoming %}
-            <div class="group p-5 rounded-2xl border border-gray-100 hover:border-primary-200 hover:shadow-lg hover:shadow-blue-500/5 transition-all duration-300">
+            <div class="group p-5 rounded-2xl border border-gray-100 dark:border-slate-800 hover:border-primary-200 hover:shadow-lg hover:shadow-blue-500/5 transition-all duration-300">
                 <div class="flex flex-col sm:flex-row justify-between gap-4">
                     <div class="flex-1">
-                        <div class="flex flex-wrap items-center gap-2 mb-3">
-                            <span class="px-3 py-1 rounded-full text-xs font-bold {% if appt.service_type == 'Dental' %}bg-violet-100 text-violet-700{% else %}bg-blue-100 text-blue-700{% endif %}">{{ appt.service_type }}</span>
-                            <span class="px-3 py-1 rounded-full text-xs font-bold {% if appt.status == 'Confirmed' %}bg-emerald-100 text-emerald-700{% else %}bg-amber-100 text-amber-700{% endif %}">{{ appt.status }}</span>
-                        </div>
-                        <div class="flex items-center gap-4 text-sm text-gray-600">
-                            <span><i class="fas fa-calendar-alt text-primary-500 mr-1.5"></i><strong class="text-gray-900">{{ appt.appointment_date.strftime('%B %d, %Y') }}</strong></span>
-                            <span><i class="fas fa-clock text-primary-500 mr-1.5"></i>{{ appt.start_time.strftime('%I:%M %p') }} – {{ appt.end_time.strftime('%I:%M %p') }}</span>
-                        </div>
+                         <div class="flex flex-wrap items-center gap-2 mb-3">
+                             <span class="px-3 py-1 rounded-full text-xs font-bold {% if appt.service_type == 'Dental' %}bg-violet-100 dark:bg-violet-900/20 text-violet-700 dark:text-violet-400{% else %}bg-blue-100 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400{% endif %}">{{ appt.service_type }}</span>
+                             <span class="px-3 py-1 rounded-full text-xs font-bold {% if appt.status == 'Confirmed' %}bg-emerald-100 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-400{% else %}bg-amber-100 dark:bg-amber-900/20 text-amber-700 dark:text-amber-400{% endif %}">{{ appt.status }}</span>
+                         </div>
+                         <div class="flex items-center gap-4 text-sm text-gray-600 dark:text-gray-400">
+                             <span><i class="fas fa-calendar-alt text-primary-500 dark:text-primary-400 mr-1.5"></i><strong class="text-gray-900 dark:text-white">{{ appt.appointment_date.strftime('%B %d, %Y') }}</strong></span>
+                             <span><i class="fas fa-clock text-primary-500 dark:text-primary-400 mr-1.5"></i>{{ appt.start_time.strftime('%I:%M %p') }} – {{ appt.end_time.strftime('%I:%M %p') }}</span>
+                         </div>
                     </div>
                     <div class="flex items-center gap-2">
                         <button data-id="{{ appt.id }}" onclick="viewQRCode(this.getAttribute('data-id'))" class="px-4 py-2.5 bg-primary-50 text-primary-700 rounded-xl hover:bg-primary-100 transition text-sm font-semibold">
@@ -59,32 +59,32 @@
             {% endfor %}
         </div>
         {% else %}
-        <div class="text-center py-14">
-            <div class="w-16 h-16 bg-gray-100 rounded-2xl flex items-center justify-center mx-auto mb-4"><i class="fas fa-calendar-times text-gray-300 text-2xl"></i></div>
-            <p class="text-gray-400 mb-4 text-sm">No upcoming appointments</p>
-            <a href="{{ url_for('appointments.book') }}" class="inline-flex items-center px-5 py-2.5 bg-primary-700 text-white font-semibold rounded-xl hover:bg-primary-800 transition shadow-sm text-sm">
-                <i class="fas fa-calendar-check mr-2"></i>Book Your First
-            </a>
-        </div>
+             <div class="text-center py-14">
+                 <div class="w-16 h-16 bg-gray-100 dark:bg-slate-800 rounded-2xl flex items-center justify-center mx-auto mb-4"><i class="fas fa-calendar-times text-gray-300 dark:text-gray-500 text-2xl"></i></div>
+                 <p class="text-gray-400 dark:text-gray-500 mb-4 text-sm">No upcoming appointments</p>
+                 <a href="{{ url_for('appointments.book') }}" class="inline-flex items-center px-5 py-2.5 bg-primary-700 text-white font-semibold rounded-xl hover:bg-primary-800 transition shadow-sm text-sm">
+                     <i class="fas fa-calendar-check mr-2 text-primary-600 dark:text-primary-400"></i>Book Your First
+                 </a>
+             </div>
         {% endif %}
     </div>
 
     <!-- Past -->
-    <div class="bg-white rounded-2xl border border-gray-100 p-6 sm:p-8">
-        <h2 class="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
-            <div class="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center"><i class="fas fa-history text-gray-400 text-sm"></i></div>
+    <div class="bg-white dark:bg-slate-900 rounded-2xl border border-gray-100 dark:border-slate-800 p-6 sm:p-8">
+        <h2 class="text-xl font-bold text-gray-900 dark:text-white mb-6 flex items-center gap-2">
+            <div class="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center"><i class="fas fa-history text-gray-400 dark:text-gray-500 text-sm"></i></div>
             Past Appointments
         </h2>
 
         {% if past or completed %}
         <div class="space-y-3">
             {% for appt in (past + completed)[:10] %}
-            <div class="p-4 rounded-xl border border-gray-100 opacity-60 hover:opacity-80 transition">
+            <div class="p-4 rounded-xl border border-gray-100 dark:border-slate-800 opacity-60 hover:opacity-80 transition">
                 <div class="flex flex-wrap items-center gap-2 mb-1.5">
-                    <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-gray-100 text-gray-600">{{ appt.service_type }}</span>
-                    <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-gray-100 text-gray-600">{{ appt.status }}</span>
+                    <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-gray-100 text-gray-600 dark:text-gray-400">{{ appt.service_type }}</span>
+                    <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-gray-100 text-gray-600 dark:text-gray-400">{{ appt.status }}</span>
                 </div>
-                <p class="text-gray-600 text-sm"><i class="fas fa-calendar mr-1.5 text-gray-400"></i>{{ appt.appointment_date.strftime('%B %d, %Y') }} &middot; {{ appt.start_time.strftime('%I:%M %p') }}</p>
+                <p class="text-gray-600 dark:text-gray-400 text-sm"><i class="fas fa-calendar mr-1.5 text-gray-400 dark:text-gray-500"></i>{{ appt.appointment_date.strftime('%B %d, %Y') }} &middot; {{ appt.start_time.strftime('%I:%M %p') }}</p>
             </div>
             {% endfor %}
         </div>

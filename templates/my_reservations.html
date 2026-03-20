@@ -15,9 +15,9 @@
                 <h1 class="text-3xl sm:text-4xl font-extrabold text-white mb-1">My Reservations</h1>
                 <p class="text-emerald-200/50 text-sm">Track your reserved medicines and pickup status</p>
             </div>
-            <a href="{{ url_for('reservations.view_medicines') }}" class="inline-flex items-center px-5 py-3 bg-white text-emerald-800 font-bold text-sm rounded-xl hover:bg-emerald-50 transition-all shadow-lg">
-                <i class="fas fa-pills mr-2"></i>Browse Medicines
-            </a>
+             <a href="{{ url_for('reservations.view_medicines') }}" class="inline-flex items-center px-5 py-3 bg-white dark:bg-slate-900 text-emerald-800 font-bold text-sm rounded-xl hover:bg-emerald-50 transition-all shadow-lg">
+                 <i class="fas fa-pills mr-2 text-emerald-600 dark:text-emerald-400"></i>Browse Medicines
+             </a>
         </div>
     </div>
 
@@ -25,25 +25,25 @@
     {% if reservations %}
     <div class="space-y-4">
         {% for res in reservations %}
-        <div class="bg-white rounded-2xl border border-gray-100 p-6 hover:shadow-lg hover:shadow-emerald-500/5 transition-all duration-300">
+        <div class="bg-white dark:bg-slate-900 rounded-2xl border border-gray-100 dark:border-slate-800 p-6 hover:shadow-lg hover:shadow-emerald-500/5 transition-all duration-300">
             <div class="flex flex-col sm:flex-row justify-between gap-4">
                 <div class="flex-1">
-                    <div class="flex flex-wrap items-center gap-2 mb-3">
-                        <h3 class="text-lg font-bold text-gray-900">{{ res.medicine_name }}</h3>
-                        <span class="px-3 py-1 rounded-full text-xs font-bold {% if res.status == 'Reserved' %}bg-amber-100 text-amber-700{% elif res.status == 'Picked Up' %}bg-emerald-100 text-emerald-700{% else %}bg-gray-100 text-gray-600{% endif %}">{{ res.status }}</span>
-                    </div>
+                         <div class="flex flex-wrap items-center gap-2 mb-3">
+                             <h3 class="text-lg font-bold text-gray-900 dark:text-white">{{ res.medicine_name }}</h3>
+                             <span class="px-3 py-1 rounded-full text-xs font-bold {% if res.status == 'Reserved' %}bg-amber-100 dark:bg-amber-900/20 text-amber-700 dark:text-amber-400{% elif res.status == 'Picked Up' %}bg-emerald-100 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-400{% else %}bg-gray-100 dark:bg-slate-800 text-gray-600 dark:text-gray-400{% endif %}">{{ res.status }}</span>
+                         </div>
                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-3">
                         <div>
-                            <p class="text-[10px] text-gray-400 uppercase font-bold mb-0.5">Quantity</p>
-                            <p class="text-sm font-semibold text-gray-900"><i class="fas fa-pills text-emerald-500 mr-1.5"></i>{{ res.quantity }} unit(s)</p>
+                            <p class="text-[10px] text-gray-400 dark:text-gray-500 uppercase font-bold mb-0.5">Quantity</p>
+                            <p class="text-sm font-semibold text-gray-900 dark:text-white"><i class="fas fa-pills text-emerald-500 mr-1.5"></i>{{ res.quantity }} unit(s)</p>
                         </div>
                         <div>
-                            <p class="text-[10px] text-gray-400 uppercase font-bold mb-0.5">Reserved</p>
-                            <p class="text-sm font-semibold text-gray-900"><i class="fas fa-calendar text-primary-500 mr-1.5"></i>{{ res.reserved_at.strftime('%b %d, %Y') }}</p>
+                            <p class="text-[10px] text-gray-400 dark:text-gray-500 uppercase font-bold mb-0.5">Reserved</p>
+                            <p class="text-sm font-semibold text-gray-900 dark:text-white"><i class="fas fa-calendar text-primary-500 mr-1.5"></i>{{ res.reserved_at.strftime('%b %d, %Y') }}</p>
                         </div>
                         <div>
-                            <p class="text-[10px] text-gray-400 uppercase font-bold mb-0.5">Time</p>
-                            <p class="text-sm text-gray-600"><i class="fas fa-clock mr-1.5 text-gray-400"></i>{{ res.reserved_at.strftime('%I:%M %p') }}</p>
+                            <p class="text-[10px] text-gray-400 dark:text-gray-500 uppercase font-bold mb-0.5">Time</p>
+                            <p class="text-sm text-gray-600 dark:text-gray-400"><i class="fas fa-clock mr-1.5 text-gray-400 dark:text-gray-500"></i>{{ res.reserved_at.strftime('%I:%M %p') }}</p>
                         </div>
                     </div>
                     {% if res.status == 'Reserved' %}
@@ -76,10 +76,10 @@
         {% endfor %}
     </div>
     {% else %}
-    <div class="bg-white rounded-2xl border border-gray-100 p-14 text-center">
+    <div class="bg-white dark:bg-slate-900 rounded-2xl border border-gray-100 dark:border-slate-800 p-14 text-center">
         <div class="w-16 h-16 bg-gray-100 rounded-2xl flex items-center justify-center mx-auto mb-4"><i class="fas fa-box-open text-gray-300 text-2xl"></i></div>
-        <h3 class="text-lg font-bold text-gray-900 mb-1">No Reservations Yet</h3>
-        <p class="text-gray-400 text-sm mb-5">Browse available medicines and reserve what you need.</p>
+        <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-1">No Reservations Yet</h3>
+        <p class="text-gray-400 dark:text-gray-500 text-sm mb-5">Browse available medicines and reserve what you need.</p>
         <a href="{{ url_for('reservations.view_medicines') }}" class="inline-flex items-center px-5 py-2.5 bg-emerald-600 text-white font-semibold rounded-xl hover:bg-emerald-700 transition shadow-sm text-sm">
             <i class="fas fa-pills mr-2"></i>Browse Medicines
         </a>
@@ -96,7 +96,7 @@
 
 {% block extra_js %}
 <script>
-function viewReservationQRCode(id){fetch(`/reservations/api/get-qr/${id}`).then(r=>r.json()).then(d=>{if(d.error){Swal.fire({icon:'error',title:'Error',text:d.error});return}Swal.fire({title:'<strong>Reservation QR Code</strong>',html:`<div class="text-center"><img src="${d.qr_image}" alt="QR" class="mx-auto mb-4" style="max-width:280px"><p class="text-sm font-semibold text-gray-700">${d.reservation.medicine_name} (${d.reservation.quantity} unit(s))</p><p class="text-xs text-gray-400 mt-2">Show at clinic for pickup</p></div>`,confirmButtonText:'Close',customClass:{popup:'rounded-2xl',confirmButton:'bg-primary-600 text-white font-bold py-3 px-6 rounded-xl'},buttonsStyling:false})}).catch(()=>{Swal.fire({icon:'error',title:'Error',text:'Failed to load QR'})})}
+function viewReservationQRCode(id){fetch(`/reservations/api/get-qr/${id}`).then(r=>r.json()).then(d=>{if(d.error){Swal.fire({icon:'error',title:'Error',text:d.error});return}Swal.fire({title:'<strong>Reservation QR Code</strong>',html:`<div class="text-center"><img src="${d.qr_image}" alt="QR" class="mx-auto mb-4" style="max-width:280px"><p class="text-sm font-semibold text-gray-700 dark:text-gray-300">${d.reservation.medicine_name} (${d.reservation.quantity} unit(s))</p><p class="text-xs text-gray-400 mt-2">Show at clinic for pickup</p></div>`,confirmButtonText:'Close',customClass:{popup:'rounded-2xl',confirmButton:'bg-primary-600 text-white font-bold py-3 px-6 rounded-xl'},buttonsStyling:false})}).catch(()=>{Swal.fire({icon:'error',title:'Error',text:'Failed to load QR'})})}
 function confirmCancelReservation(e){e.preventDefault();const f=e.target;Swal.fire({title:'Cancel Reservation?',text:'Are you sure?',icon:'warning',showCancelButton:true,confirmButtonText:'Yes, cancel',cancelButtonText:'Keep it',customClass:{popup:'rounded-2xl',confirmButton:'bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-6 rounded-xl ml-2',cancelButton:'bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-3 px-6 rounded-xl mr-2'},buttonsStyling:false,reverseButtons:true}).then(r=>{if(r.isConfirmed)f.submit()});return false}
 </script>
 {% endblock %}
