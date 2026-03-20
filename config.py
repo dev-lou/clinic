@@ -42,8 +42,11 @@ class Config:
     SQLALCHEMY_DATABASE_URI = get_database_uri()
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     SQLALCHEMY_ENGINE_OPTIONS = {
-        'pool_pre_ping': True,
-        'pool_recycle': 300,
+        'pool_pre_ping':  True,   # drops stale connections before using them
+        'pool_recycle':   300,    # recycle connections every 5 min
+        'pool_size':      10,     # keep 10 connections warm
+        'max_overflow':   20,     # allow 20 extra under burst load
+        'pool_timeout':   30,     # wait max 30s for a free connection
     }
 
 
