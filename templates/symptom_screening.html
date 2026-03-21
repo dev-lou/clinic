@@ -548,6 +548,16 @@ function toggleVoice() {
 }
 
 function startVoice() {
+    recognitionClass = getSpeechRecognition();
+    
+    if (!recognitionClass) {
+        // Speech API not available, go straight to MediaRecorder
+        console.log('Speech API not available, using MediaRecorder directly');
+        useMediaRecorder = true;
+        startMediaRecording();
+        return;
+    }
+
     recognition = new recognitionClass();
     recognition.continuous = true;
     recognition.interimResults = true;
