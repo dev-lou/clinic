@@ -9,6 +9,7 @@ from flask_login import login_required, current_user
 from models import db
 from models_extended import SymptomScreening, AppointmentStatus
 from advanced_utils import analyze_symptoms, calculate_severity_score
+import groq as groq_client
 
 symptom_screening = Blueprint('symptom_screening', __name__, url_prefix='/screening')
 
@@ -120,25 +121,31 @@ def get_symptom_categories():
 # ---------------------------------------------------------------------------
 _voice_model = None
 
-VOICE_TRIAGE_PROMPT = """You are a medical triage AI assistant for the ISUFST University Clinic. A student has described their symptoms via voice input.
+VOICE_TRIAGE_PROMPT = """You are a clinical triage assessor at the ISUFST University Clinic. A patient has described their symptoms via voice input.
 
 Analyze the transcript and return a JSON response with EXACTLY this structure:
 {
-  "detected_symptoms": ["symptom1", "symptom2"],
+  "detected_symptoms": ["Headache", "Fever"],
   "recommended_service": "Medical",
-  "severity": 3,
-  "severity_label": "Routine",
-  "suggestions": "Your analysis and advice here",
-  "summary": "Brief one-line summary of the condition"
+  "severity": 2,
+  "severity_label": "Urgent",
+  "suggestions": "Clinical assessment and recommended course of action here.",
+  "summary": "One-line clinical summary of the patient's presentation."
 }
 
+SEVERITY SCALE:
+- 1 = Emergency: Life-threatening symptoms requiring immediate evaluation (e.g., chest pain, difficulty breathing, severe bleeding, loss of consciousness, anaphylaxis)
+- 2 = Urgent: Symptoms requiring prompt evaluation within 24 hours (e.g., high fever, persistent vomiting, moderate pain, acute injury)
+- 3 = Routine: Non-urgent symptoms suitable for scheduled appointment (e.g., mild persistent symptoms, follow-up, wellness checks)
+
 RULES:
-- detected_symptoms: Extract specific symptoms from the transcript. Use standard medical symptom names.
-- recommended_service: One of: "Medical", "Dental", "Mental Health", "Physical Therapy", "Laboratory", "Emergency"
-- severity: 1 = Emergency (life-threatening), 2 = Urgent (needs prompt attention), 3 = Routine (can wait)
-- severity_label: Must match severity number — "Emergency", "Urgent", or "Routine"
-- suggestions: Provide helpful, empathetic advice. Mention they can book a FREE appointment at ISUFST Clinic through CareHub. Do NOT diagnose — use hedging language. For serious symptoms, urge immediately seeking help.
-- summary: One concise sentence describing their likely issue.
+- Use standard clinical terminology. Be direct and professional — no casual language.
+- recommendations: Specific, actionable guidance. State the appropriate clinic service: Medical, Dental, Mental Health, Physical Therapy, Laboratory, or Emergency.
+- For severity 1: "Immediate evaluation at the Emergency Room is recommended."
+- For severity 2: "Prompt evaluation recommended. Please schedule a clinic appointment within 24 hours."
+- For severity 3: "Non-urgent. Schedule an appointment at your earliest convenience through CareHub."
+- Never diagnose. Use hedging language: "suggests", "consistent with", "may indicate".
+- For serious symptoms, advise prompt medical attention.
 
 IMPORTANT: Return ONLY valid JSON. No markdown, no code fences, no extra text."""
 
@@ -212,21 +219,21 @@ def voice_analyze():
             'recommended_service': 'Medical',
             'severity': 3,
             'severity_label': 'Routine',
-            'suggestions': 'I understood your symptoms but had trouble processing them. Please try the manual symptom checker or visit the clinic directly.',
+            'suggestions': 'We were unable to fully process your description. Please try the manual symptom checklist or visit the clinic directly for assessment.',
             'summary': 'Unable to parse AI response',
             'should_book': True
         })
     except Exception as e:
         print(f'[Voice Triage Error] {e}')
         return jsonify({
-            'error': 'AI analysis temporarily unavailable. Please use the manual symptom checker.'
+            'error': 'AI analysis temporarily unavailable. Please use the manual symptom checklist or visit the clinic.'
         }), 500
 
 
 @symptom_screening.route('/transcribe', methods=['POST'])
 @login_required
 def transcribe_audio():
-    """Transcribe audio file using Gemini AI (fallback for browsers where Speech API fails)."""
+    """Transcribe audio file using Groq Whisper V3 (fast) with Gemini fallback."""
     if 'audio' not in request.files:
         return jsonify({'error': 'No audio file provided'}), 400
 
@@ -237,6 +244,26 @@ def transcribe_audio():
     if not audio_bytes:
         return jsonify({'error': 'Empty audio file'}), 400
 
+    # Try Groq first (fast transcription)
+    try:
+        groq_key = os.environ.get('GROQ_API_KEY')
+        if not groq_key:
+            raise RuntimeError('GROQ_API_KEY not set')
+
+        client = groq_client.Client(api_key=groq_key)
+        result = client.audio.transcriptions.create(
+            model="whisper-large-v3-turbo",
+            file=("recording.webm", audio_bytes, mime_type),
+            response_format="text"
+        )
+        transcript = result.strip() if isinstance(result, str) else str(result).strip()
+        print(f'[Groq Transcription] {len(transcript)} chars')
+        return jsonify({'transcript': transcript})
+
+    except Exception as e:
+        print(f'[Groq Transcription Error] {e}')
+
+    # Fallback to Gemini
     try:
         model = _get_voice_model()
         response = model.generate_content([
@@ -244,15 +271,13 @@ def transcribe_audio():
             "Transcribe this audio exactly as spoken. Return ONLY the plain text transcript, nothing else."
         ])
         transcript = response.text.strip()
-
-        # Clean potential markdown fences or quotes
         if transcript.startswith('```'):
             transcript = transcript.split('\n', 1)[1] if '\n' in transcript else transcript[3:]
             if transcript.endswith('```'):
                 transcript = transcript[:-3]
             transcript = transcript.strip()
         transcript = transcript.strip('"').strip("'")
-
+        print(f'[Gemini Transcription Fallback] {len(transcript)} chars')
         return jsonify({'transcript': transcript})
 
     except Exception as e:

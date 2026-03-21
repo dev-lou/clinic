@@ -699,6 +699,8 @@ function resetVoiceUI() {
 }
 
 // MediaRecorder fallback for browsers where Speech API network fails
+let mediaRecorderMimeType = '';
+
 async function startMediaRecording() {
     try {
         mediaStream = await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -708,12 +710,17 @@ async function startMediaRecording() {
             if (MediaRecorder.isTypeSupported(type)) { selectedType = type; break; }
         }
         mediaRecorder = new MediaRecorder(mediaStream, selectedType ? { mimeType: selectedType } : {});
+        mediaRecorderMimeType = mediaRecorder.mimeType || 'audio/webm';
         mediaChunks = [];
 
         mediaRecorder.ondataavailable = (e) => { if (e.data.size > 0) mediaChunks.push(e.data); };
         mediaRecorder.onstop = async () => {
-            const blob = new Blob(mediaChunks, { type: mediaRecorder.mimeType || 'audio/webm' });
+            const blob = new Blob(mediaChunks, { type: mediaRecorderMimeType });
             mediaChunks = [];
+            if (mediaStream) {
+                mediaStream.getTracks().forEach(t => t.stop());
+                mediaStream = null;
+            }
             document.getElementById('voiceStatus').textContent = 'Processing your audio...';
             await transcribeAudio(blob);
         };
@@ -744,12 +751,12 @@ function stopMediaRecording() {
     isRecording = false;
     if (mediaRecorder && mediaRecorder.state !== 'inactive') {
         try { mediaRecorder.stop(); } catch(e) {}
+    } else {
+        if (mediaStream) {
+            mediaStream.getTracks().forEach(t => t.stop());
+            mediaStream = null;
+        }
     }
-    if (mediaStream) {
-        mediaStream.getTracks().forEach(t => t.stop());
-        mediaStream = null;
-    }
-    mediaRecorder = null;
     resetVoiceUI();
 }
 
@@ -759,10 +766,9 @@ async function transcribeAudio(blob) {
         formData.append('audio', blob, 'recording.webm');
         formData.append('mime_type', blob.type || 'audio/webm');
 
-        const csrfToken = document.querySelector('input[name="csrf_token"]').value;
         const r = await fetch('{{ url_for("symptom_screening.transcribe_audio") }}', {
             method: 'POST',
-            headers: { 'X-CSRFToken': csrfToken },
+            headers: { 'X-CSRFToken': '{{ csrf_token() }}' },
             body: formData
         });
         const d = await r.json();
