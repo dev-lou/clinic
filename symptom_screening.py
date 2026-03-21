@@ -4,6 +4,7 @@ AI-powered symptom analysis before appointment booking.
 """
 import os
 import json
+import re
 from flask import Blueprint, render_template, request, jsonify, redirect, url_for
 from flask_login import login_required, current_user
 from models import db
@@ -164,7 +165,7 @@ def _get_voice_model():
             system_instruction=VOICE_TRIAGE_PROMPT,
             generation_config={
                 'temperature': 0.3,
-                'max_output_tokens': 1024,
+                'max_output_tokens': 2048,
             },
         )
     return _voice_model
@@ -188,14 +189,29 @@ def voice_analyze():
         response = model.generate_content(f"Patient voice transcript: \"{transcript}\"")
         result_text = response.text.strip()
 
-        # Clean potential markdown fences
+        # Clean markdown fences
         if result_text.startswith('```'):
             result_text = result_text.split('\n', 1)[1] if '\n' in result_text else result_text[3:]
             if result_text.endswith('```'):
                 result_text = result_text[:-3]
             result_text = result_text.strip()
 
-        ai_result = json.loads(result_text)
+        # Try direct JSON parse first
+        try:
+            ai_result = json.loads(result_text)
+        except json.JSONDecodeError:
+            # Try to extract JSON from response (handles extra text before/after)
+            match = re.search(r'\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\}', result_text, re.DOTALL)
+            if match:
+                candidate = match.group()
+                # Try to repair truncated JSON (missing closing braces)
+                open_braces = candidate.count('{')
+                close_braces = candidate.count('}')
+                candidate += '}' * (open_braces - close_braces)
+                ai_result = json.loads(candidate)
+                print(f'[Triage] Recovered truncated JSON ({len(candidate)} chars)')
+            else:
+                raise json.JSONDecodeError('No JSON found', result_text, 0)
 
         # Save screening record
         symptoms_list = ai_result.get('detected_symptoms', [])
@@ -254,10 +270,10 @@ def transcribe_audio():
         result = client.audio.transcriptions.create(
             model="whisper-large-v3-turbo",
             file=("recording.webm", audio_bytes, mime_type),
-            response_format="text"
+            response_format="json"
         )
-        transcript = result.strip() if isinstance(result, str) else str(result).strip()
-        print(f'[Groq Transcription] {len(transcript)} chars')
+        transcript = result.text.strip() if hasattr(result, 'text') else str(result).strip()
+        print(f'[Groq Transcription] {len(transcript)} chars: {transcript[:80]}...')
         return jsonify({'transcript': transcript})
 
     except Exception as e:
