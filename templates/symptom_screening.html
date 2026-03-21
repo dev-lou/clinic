@@ -510,6 +510,10 @@ let isRecording = false;
 let fullTranscript = '';
 let currentInterim = '';
 let recognitionClass = null;
+let useMediaRecorder = false;
+let mediaRecorder = null;
+let mediaStream = null;
+let mediaChunks = [];
 
 // Detect browser
 function getBrowserInfo() {
@@ -532,20 +536,15 @@ function getSpeechRecognition() {
 }
 
 function toggleVoice() {
-    recognitionClass = getSpeechRecognition();
-    
-    if (!recognitionClass) {
-        document.getElementById('textInput').classList.remove('hidden');
-        document.getElementById('voiceStatus').textContent = 
-            'Voice not supported in this browser. Type your symptoms below.';
+    if (isRecording && useMediaRecorder) {
+        stopMediaRecording();
         return;
     }
-
     if (isRecording) {
         finishRecording();
-    } else {
-        startVoice();
+        return;
     }
+    startVoice();
 }
 
 function startVoice() {
@@ -558,6 +557,7 @@ function startVoice() {
     fullTranscript = '';
     currentInterim = '';
     isRecording = true;
+    useMediaRecorder = false;
 
     const btn = document.getElementById('micButton');
     const icon = document.getElementById('micIcon');
@@ -608,15 +608,28 @@ function startVoice() {
             'service-not-allowed': 'Speech service blocked. Try Chrome or check network.',
             'no-speech': 'No speech detected. Try speaking louder or closer to mic.',
             'audio-capture': 'No microphone found. Check device mic settings.',
-            'network': 'Network error. Speech recognition needs internet. Check your connection.',
+            'network': 'Switching to local recording...',
             'aborted': 'Recognition was stopped.',
             'bad-grammar': 'Grammar error in recognition.',
             'language-not-supported': 'Language not supported.'
         };
         const msg = msgMap[e.error] || 'Speech error: ' + e.error;
+        
+        if (e.error === 'network' || e.error === 'service-not-allowed') {
+            // Fall back to MediaRecorder + Gemini transcription
+            console.log('Speech API network error, falling back to MediaRecorder');
+            isRecording = false;
+            const oldRecognition = recognition;
+            recognition = null;
+            try { oldRecognition.stop(); } catch(err) {}
+            useMediaRecorder = true;
+            startMediaRecording();
+            return;
+        }
+        
         document.getElementById('voiceStatus').textContent = msg;
         
-        if (e.error === 'not-allowed' || e.error === 'service-not-allowed' || e.error === 'audio-capture') {
+        if (e.error === 'not-allowed' || e.error === 'audio-capture') {
             isRecording = false;
             document.getElementById('textInput').classList.remove('hidden');
             resetVoiceUI();
@@ -673,6 +686,97 @@ function resetVoiceUI() {
     btn.className = 'mic-btn idle group';
     icon.className = 'fas fa-microphone text-2xl text-white drop-shadow-md group-hover:scale-110 transition-transform';
     document.getElementById('voiceWave').classList.add('hidden');
+}
+
+// MediaRecorder fallback for browsers where Speech API network fails
+async function startMediaRecording() {
+    try {
+        mediaStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        const mimeTypes = ['audio/webm;codecs=opus', 'audio/webm', 'audio/ogg;codecs=opus', 'audio/mp4', ''];
+        let selectedType = '';
+        for (const type of mimeTypes) {
+            if (MediaRecorder.isTypeSupported(type)) { selectedType = type; break; }
+        }
+        mediaRecorder = new MediaRecorder(mediaStream, selectedType ? { mimeType: selectedType } : {});
+        mediaChunks = [];
+
+        mediaRecorder.ondataavailable = (e) => { if (e.data.size > 0) mediaChunks.push(e.data); };
+        mediaRecorder.onstop = async () => {
+            const blob = new Blob(mediaChunks, { type: mediaRecorder.mimeType || 'audio/webm' });
+            mediaChunks = [];
+            document.getElementById('voiceStatus').textContent = 'Processing your audio...';
+            await transcribeAudio(blob);
+        };
+
+        mediaRecorder.start(250);
+        isRecording = true;
+        useMediaRecorder = true;
+
+        const btn = document.getElementById('micButton');
+        const icon = document.getElementById('micIcon');
+        btn.className = 'mic-btn recording group';
+        icon.className = 'fas fa-stop text-2xl text-white drop-shadow-md group-hover:scale-110 transition-transform';
+        document.getElementById('voiceStatus').textContent = 'Recording... Tap stop when done';
+        document.getElementById('voiceWave').classList.remove('hidden');
+        document.getElementById('transcriptBox').classList.remove('hidden');
+        document.getElementById('transcriptText').textContent = '';
+    } catch (err) {
+        console.error('MediaRecorder error:', err);
+        document.getElementById('voiceStatus').textContent = 'Could not access microphone. Check permissions.';
+        document.getElementById('textInput').classList.remove('hidden');
+        useMediaRecorder = false;
+        isRecording = false;
+        resetVoiceUI();
+    }
+}
+
+function stopMediaRecording() {
+    isRecording = false;
+    if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+        try { mediaRecorder.stop(); } catch(e) {}
+    }
+    if (mediaStream) {
+        mediaStream.getTracks().forEach(t => t.stop());
+        mediaStream = null;
+    }
+    mediaRecorder = null;
+    resetVoiceUI();
+}
+
+async function transcribeAudio(blob) {
+    try {
+        const formData = new FormData();
+        formData.append('audio', blob, 'recording.webm');
+        formData.append('mime_type', blob.type || 'audio/webm');
+
+        const csrfToken = document.querySelector('input[name="csrf_token"]').value;
+        const r = await fetch('{{ url_for("symptom_screening.transcribe_audio") }}', {
+            method: 'POST',
+            headers: { 'X-CSRFToken': csrfToken },
+            body: formData
+        });
+        const d = await r.json();
+
+        if (d.error) {
+            document.getElementById('voiceStatus').textContent = d.error;
+            document.getElementById('textInput').classList.remove('hidden');
+            return;
+        }
+
+        const transcript = (d.transcript || '').trim();
+        if (transcript.length > 0) {
+            document.getElementById('transcriptText').textContent = transcript;
+            document.getElementById('voiceStatus').textContent = 'Analyzing your symptoms...';
+            analyzeVoice(transcript);
+        } else {
+            document.getElementById('voiceStatus').textContent = 'Could not understand audio. Try speaking louder or use text input.';
+            document.getElementById('textInput').classList.remove('hidden');
+        }
+    } catch (err) {
+        console.error('Transcription error:', err);
+        document.getElementById('voiceStatus').textContent = 'Error processing audio. Try again or use text input.';
+        document.getElementById('textInput').classList.remove('hidden');
+    }
 }
 
 // Text input fallback function

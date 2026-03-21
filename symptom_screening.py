@@ -221,3 +221,40 @@ def voice_analyze():
         return jsonify({
             'error': 'AI analysis temporarily unavailable. Please use the manual symptom checker.'
         }), 500
+
+
+@symptom_screening.route('/transcribe', methods=['POST'])
+@login_required
+def transcribe_audio():
+    """Transcribe audio file using Gemini AI (fallback for browsers where Speech API fails)."""
+    if 'audio' not in request.files:
+        return jsonify({'error': 'No audio file provided'}), 400
+
+    audio_file = request.files['audio']
+    mime_type = request.form.get('mime_type', 'audio/webm')
+    audio_bytes = audio_file.read()
+
+    if not audio_bytes:
+        return jsonify({'error': 'Empty audio file'}), 400
+
+    try:
+        model = _get_voice_model()
+        response = model.generate_content([
+            {'mime_type': mime_type, 'data': audio_bytes},
+            "Transcribe this audio exactly as spoken. Return ONLY the plain text transcript, nothing else."
+        ])
+        transcript = response.text.strip()
+
+        # Clean potential markdown fences or quotes
+        if transcript.startswith('```'):
+            transcript = transcript.split('\n', 1)[1] if '\n' in transcript else transcript[3:]
+            if transcript.endswith('```'):
+                transcript = transcript[:-3]
+            transcript = transcript.strip()
+        transcript = transcript.strip('"').strip("'")
+
+        return jsonify({'transcript': transcript})
+
+    except Exception as e:
+        print(f'[Transcription Error] {e}')
+        return jsonify({'error': 'Transcription failed. Try again or use text input.'}), 500
