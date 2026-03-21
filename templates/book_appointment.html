@@ -9,7 +9,7 @@
 <div class="space-y-6 fade-in">
     <!-- Header -->
     <div class="relative bg-gradient-to-br from-primary-800 via-primary-700 to-indigo-800 rounded-3xl p-8 sm:p-10 overflow-hidden">
-        <div class="absolute top-0 right-0 w-72 h-72 bg-white dark:bg-slate-900/[0.04] rounded-full -translate-y-1/3 translate-x-1/4"></div>
+        <div class="absolute top-0 right-0 w-72 h-72 bg-white/10 dark:bg-slate-900/10 rounded-full -translate-y-1/3 translate-x-1/4"></div>
         <div class="relative z-10">
             <h1 class="text-3xl sm:text-4xl font-extrabold text-white mb-1">Book Appointment</h1>
             <p class="text-blue-200/50 text-sm">Schedule your free clinic appointment</p>
@@ -31,42 +31,42 @@
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 <label class="relative cursor-pointer group">
                     <input type="radio" name="service_type" value="Dental" class="peer sr-only" required onchange="loadCalendar()">
-                    <div class="p-6 border-2 border-gray-200 dark:border-slate-700 rounded-2xl peer-checked:border-primary-600 peer-checked:bg-primary-50 dark:bg-primary-950/30 transition-all hover:border-primary-300 group-hover:shadow-md">
+                    <div class="p-6 border-2 border-gray-200 dark:border-slate-700 rounded-2xl bg-white dark:bg-slate-900 peer-checked:border-primary-600 peer-checked:bg-primary-50 dark:peer-checked:bg-primary-950/30 transition-all hover:border-primary-300 group-hover:shadow-md">
                         <i class="fas fa-tooth text-3xl text-primary-600 mb-3"></i>
                         <h3 class="font-bold text-gray-900 dark:text-white text-lg">Dental Care</h3>
-                        <p class="text-sm text-gray-500 dark:text-gray-400 dark:text-gray-500 mt-1">Checkup, cleaning, consultation</p>
+                        <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Checkup, cleaning, consultation</p>
                     </div>
                 </label>
                 <label class="relative cursor-pointer group">
                     <input type="radio" name="service_type" value="Medical" class="peer sr-only" onchange="loadCalendar()">
-                    <div class="p-6 border-2 border-gray-200 dark:border-slate-700 rounded-2xl peer-checked:border-primary-600 peer-checked:bg-primary-50 dark:bg-primary-950/30 transition-all hover:border-primary-300 group-hover:shadow-md">
+                    <div class="p-6 border-2 border-gray-200 dark:border-slate-700 rounded-2xl bg-white dark:bg-slate-900 peer-checked:border-primary-600 peer-checked:bg-primary-50 dark:peer-checked:bg-primary-950/30 transition-all hover:border-primary-300 group-hover:shadow-md">
                         <i class="fas fa-user-md text-3xl text-primary-600 mb-3"></i>
                         <h3 class="font-bold text-gray-900 dark:text-white text-lg">Medical Care</h3>
-                        <p class="text-sm text-gray-500 dark:text-gray-400 dark:text-gray-500 mt-1">Consultation, treatment, checkup</p>
+                        <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Consultation, treatment, checkup</p>
                     </div>
                 </label>
                 <label class="relative cursor-pointer group">
                     <input type="radio" name="service_type" value="Mental Health" class="peer sr-only" onchange="loadCalendar()">
-                    <div class="p-6 border-2 border-gray-200 dark:border-slate-700 rounded-2xl peer-checked:border-primary-600 peer-checked:bg-primary-50 dark:bg-primary-950/30 transition-all hover:border-primary-300 group-hover:shadow-md">
+                    <div class="p-6 border-2 border-gray-200 dark:border-slate-700 rounded-2xl bg-white dark:bg-slate-900 peer-checked:border-primary-600 peer-checked:bg-primary-50 dark:peer-checked:bg-primary-950/30 transition-all hover:border-primary-300 group-hover:shadow-md">
                         <i class="fas fa-brain text-3xl text-primary-600 mb-3"></i>
                         <h3 class="font-bold text-gray-900 dark:text-white text-lg">Mental Health</h3>
-                        <p class="text-sm text-gray-500 dark:text-gray-400 dark:text-gray-500 mt-1">Counseling, stress management</p>
+                        <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Counseling, stress management</p>
                     </div>
                 </label>
                 <label class="relative cursor-pointer group">
                     <input type="radio" name="service_type" value="Physical Therapy" class="peer sr-only" onchange="loadCalendar()">
-                    <div class="p-6 border-2 border-gray-200 dark:border-slate-700 rounded-2xl peer-checked:border-primary-600 peer-checked:bg-primary-50 dark:bg-primary-950/30 transition-all hover:border-primary-300 group-hover:shadow-md">
+                    <div class="p-6 border-2 border-gray-200 dark:border-slate-700 rounded-2xl bg-white dark:bg-slate-900 peer-checked:border-primary-600 peer-checked:bg-primary-50 dark:peer-checked:bg-primary-950/30 transition-all hover:border-primary-300 group-hover:shadow-md">
                         <i class="fas fa-child text-3xl text-primary-600 mb-3"></i>
                         <h3 class="font-bold text-gray-900 dark:text-white text-lg">Physical Therapy</h3>
-                        <p class="text-sm text-gray-500 dark:text-gray-400 dark:text-gray-500 mt-1">Rehabilitation, pain relief</p>
+                        <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Rehabilitation, pain relief</p>
                     </div>
                 </label>
                 <label class="relative cursor-pointer group">
                     <input type="radio" name="service_type" value="Laboratory" class="peer sr-only" onchange="loadCalendar()">
-                    <div class="p-6 border-2 border-gray-200 dark:border-slate-700 rounded-2xl peer-checked:border-primary-600 peer-checked:bg-primary-50 dark:bg-primary-950/30 transition-all hover:border-primary-300 group-hover:shadow-md">
+                    <div class="p-6 border-2 border-gray-200 dark:border-slate-700 rounded-2xl bg-white dark:bg-slate-900 peer-checked:border-primary-600 peer-checked:bg-primary-50 dark:peer-checked:bg-primary-950/30 transition-all hover:border-primary-300 group-hover:shadow-md">
                         <i class="fas fa-flask text-3xl text-primary-600 mb-3"></i>
                         <h3 class="font-bold text-gray-900 dark:text-white text-lg">Laboratory</h3>
-                        <p class="text-sm text-gray-500 dark:text-gray-400 dark:text-gray-500 mt-1">Blood tests, urinalysis, exams</p>
+                        <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Blood tests, urinalysis, exams</p>
                     </div>
                 </label>
             </div>
@@ -80,9 +80,9 @@
                     Select Date
                 </h2>
                 <div class="flex items-center gap-2">
-                    <button type="button" onclick="changeMonth(-1)" class="w-9 h-9 hover:bg-gray-100 dark:hover:bg-slate-700 dark:bg-slate-800 rounded-lg flex items-center justify-center transition"><i class="fas fa-chevron-left text-gray-500 dark:text-gray-400 dark:text-gray-500"></i></button>
+                    <button type="button" onclick="changeMonth(-1)" class="w-9 h-9 hover:bg-gray-100 rounded-lg flex items-center justify-center transition"><i class="fas fa-chevron-left text-gray-500"></i></button>
                     <span id="currentMonth" class="text-sm font-semibold text-gray-700 dark:text-gray-300 min-w-[150px] text-center"></span>
-                    <button type="button" onclick="changeMonth(1)" class="w-9 h-9 hover:bg-gray-100 dark:hover:bg-slate-700 dark:bg-slate-800 rounded-lg flex items-center justify-center transition"><i class="fas fa-chevron-right text-gray-500 dark:text-gray-400 dark:text-gray-500"></i></button>
+                    <button type="button" onclick="changeMonth(1)" class="w-9 h-9 hover:bg-gray-100 rounded-lg flex items-center justify-center transition"><i class="fas fa-chevron-right text-gray-500"></i></button>
                 </div>
             </div>
             <div class="grid grid-cols-7 gap-2 mb-2">
@@ -144,9 +144,9 @@ function selectDate(ds, el) {
     document.getElementById('selectedDate').value = ds;
     document.querySelectorAll('.calendar-day').forEach(e => {
         e.classList.remove('bg-primary-600', 'text-white', 'font-bold', 'shadow-lg', 'scale-110');
-        if (!e.classList.contains('opacity-50')) e.classList.add('text-gray-900 dark:text-white', 'hover:bg-gray-100 dark:hover:bg-slate-700 dark:bg-slate-800');
+        if (!e.classList.contains('opacity-50')) e.classList.add('text-gray-900', 'dark:text-white', 'hover:bg-gray-100');
     });
-    el.classList.remove('text-gray-900 dark:text-white', 'hover:bg-gray-100 dark:hover:bg-slate-700 dark:bg-slate-800');
+    el.classList.remove('text-gray-900', 'dark:text-white', 'hover:bg-gray-100');
     el.classList.add('bg-primary-600', 'text-white', 'font-bold', 'shadow-lg', 'scale-110');
     loadTimeSlots(ds);
 }
@@ -157,24 +157,24 @@ function selectTime(v, d, el) {
     document.getElementById('selectedTimeSlot').value = v;
     document.querySelectorAll('.time-slot').forEach(e => {
         e.classList.remove('bg-primary-600', 'text-white', 'border-primary-600', 'font-bold', 'shadow-lg');
-        e.classList.add('border-gray-200 dark:border-slate-700', 'text-gray-900 dark:text-white', 'hover:border-primary-600', 'hover:bg-primary-600', 'hover:text-white');
+        e.classList.add('border-gray-200', 'dark:border-slate-700', 'text-gray-900', 'dark:text-white', 'hover:border-primary-600', 'hover:bg-primary-600', 'hover:text-white');
         
         // Reset subtext color
         const subtext = e.querySelector('.slot-subtext');
         if (subtext) {
             subtext.classList.remove('text-primary-100');
-            subtext.classList.add('text-gray-500 dark:text-gray-400 dark:text-gray-500', 'group-hover:text-primary-100');
+            subtext.classList.add('text-gray-500', 'dark:text-gray-400');
         }
     });
     
     // Remove hover states from the selected element so it stays solid
-    el.classList.remove('border-gray-200 dark:border-slate-700', 'text-gray-900 dark:text-white', 'hover:border-primary-600', 'hover:bg-primary-600', 'hover:text-white');
+    el.classList.remove('border-gray-200', 'dark:border-slate-700', 'text-gray-900', 'dark:text-white', 'hover:border-primary-600', 'hover:bg-primary-600', 'hover:text-white');
     el.classList.add('bg-primary-600', 'text-white', 'border-primary-600', 'font-bold', 'shadow-lg');
     
     // Set subtext color for selected
     const subtext = el.querySelector('.slot-subtext');
     if (subtext) {
-        subtext.classList.remove('text-gray-500 dark:text-gray-400 dark:text-gray-500', 'group-hover:text-primary-100');
+        subtext.classList.remove('text-gray-500', 'dark:text-gray-400');
         subtext.classList.add('text-primary-100');
     }
     
@@ -196,6 +196,16 @@ async function loadTimeSlots(date) {
     try {
         const r = await fetch(`/appointments/check-availability?date=${date}&service=${st}`);
         const d = await r.json();
+        
+        if (d.error) {
+            lst.innerHTML = `<div class="col-span-full text-center text-amber-600 py-8 flex flex-col items-center gap-2">
+                <i class="fas fa-exclamation-triangle text-2xl"></i>
+                <p class="font-bold">${d.error}</p>
+                <p class="text-xs text-gray-500">Please choose a weekday (Mon-Fri)</p>
+            </div>`;
+            return;
+        }
+
         if (!d.availableSlots || d.availableSlots.length === 0) {
             lst.innerHTML = '<div class="col-span-full text-center text-amber-600 py-4 text-sm">No slots available</div>';
             return;
@@ -219,7 +229,10 @@ async function loadTimeSlots(date) {
 
 async function loadCalendar() {
     const st = document.querySelector('input[name="service_type"]:checked')?.value;
-    if (!st) return;
+    if (!st) {
+        renderCalendar();
+        return;
+    }
     const y = currentDate.getFullYear(), m = currentDate.getMonth() + 1;
     try {
         const r = await fetch(`/appointments/check-date-availability?year=${y}&month=${m}&service=${st}`);
@@ -253,12 +266,12 @@ function renderCalendar() {
         if (ip) {
             classes += 'text-gray-300 cursor-not-allowed opacity-50';
         } else {
-            classes += 'cursor-pointer hover:bg-gray-100 dark:hover:bg-slate-700 dark:bg-slate-800 hover:scale-110 text-gray-900 dark:text-white';
+            classes += 'cursor-pointer hover:bg-gray-100 hover:scale-110 text-gray-900 dark:text-white';
             if (it && selectedDate !== ds) classes += ' border-2 border-primary-400 font-bold';
         }
         
         if (selectedDate === ds) {
-            classes = classes.replace('text-gray-900 dark:text-white', '').replace('hover:bg-gray-100 dark:hover:bg-slate-700 dark:bg-slate-800', '') + ' bg-primary-600 text-white font-bold shadow-lg scale-110';
+            classes = classes.replace('text-gray-900', '').replace('hover:bg-gray-100', '') + ' bg-primary-600 text-white font-bold shadow-lg scale-110';
         }
         
         div.className = classes;
@@ -266,7 +279,7 @@ function renderCalendar() {
         
         if (fb && !ip) {
             const dot = document.createElement('div');
-            dot.className = 'absolute bottom-1 w-1.5 h-1.5 bg-red-50 dark:bg-red-950/300 rounded-full';
+            dot.className = 'absolute bottom-1 w-1.5 h-1.5 bg-red-500 rounded-full';
             div.appendChild(dot);
         }
         
@@ -278,14 +291,15 @@ function renderCalendar() {
 document.addEventListener('DOMContentLoaded', () => {
     const urlParams = new URLSearchParams(window.location.search);
     const serviceParam = urlParams.get('service');
+    
     if (serviceParam) {
-        const rb = document.querySelector(`input[name="service_type"][value="${serviceParam}"]`);
-        if (rb) {
-            rb.checked = true;
-            loadCalendar();
-        }
+        const rb = document.querySelector(`input[name="service_type"][value="${serviceParam}"]`) || 
+                   document.querySelector(`input[name="service_type"][value="${serviceParam.split(' ')[0]}"]`);
+        if (rb) rb.checked = true;
     }
-    renderCalendar();
+    
+    loadCalendar();
+    
     const fc = document.getElementById('flash-messages');
     if (fc) {
         fc.querySelectorAll('[data-category]').forEach(m => {

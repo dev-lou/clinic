@@ -199,23 +199,23 @@ def analyze_symptoms(symptoms_text):
     # Check for emergency
     for symptom in SYMPTOM_RULES['emergency']:
         if symptom in symptoms_lower:
-            return 'Emergency', 1, 'Please go to the nearest hospital emergency room immediately.'
+            return 'Emergency', 1, 'Our analysis indicates high-priority emergency indicators. Please seek immediate evaluation at the nearest hospital Emergency Room or call emergency services right away.'
     
     # Check specific services
     if any(symptom in symptoms_lower for symptom in SYMPTOM_RULES['dental']):
-        return 'Dental', 3, 'Your symptoms suggest you may need dental care.'
+        return 'Dental', 3, 'Your reported symptoms are highly consistent with dental-related issues. We recommend scheduling a Medical Care appointment with the University Dentist for an oral examination.'
     
     if any(symptom in symptoms_lower for symptom in SYMPTOM_RULES['mental_health']):
-        return 'Mental Health', 2, 'Consider booking a mental health counseling appointment.'
+        return 'Mental Health', 2, 'The patterns in your report suggest significant emotional or psychological distress. Speaking with our Mental Health professionals can provide immediate support and coping strategies.'
     
     if any(symptom in symptoms_lower for symptom in SYMPTOM_RULES['physical_therapy']):
-        return 'Physical Therapy', 3, 'Your symptoms may benefit from physical therapy.'
+        return 'Physical Therapy', 3, 'The localized physical discomfort you described is often best managed through Physical Therapy. A clinical assessment can help determine the best rehabilitation path.'
     
     if any(symptom in symptoms_lower for symptom in SYMPTOM_RULES['laboratory']):
-        return 'Laboratory', 3, 'You may need laboratory tests. Book a laboratory appointment.'
+        return 'Laboratory', 3, 'To accurately assess your condition, specific diagnostic tests may be required. Please schedule a Laboratory visit so we can gather more data.'
     
     # Default to medical
-    return 'Medical', 3, 'Please book a general medical consultation.'
+    return 'Medical', 3, 'Your symptoms appear to be non-emergency but warrant a professional evaluation. We suggest booking a Medical Care appointment to discuss these further.'
 
 
 def calculate_severity_score(symptoms_list):

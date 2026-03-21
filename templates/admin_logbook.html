@@ -90,8 +90,10 @@
                     <option value="all" {{ 'selected' if filter_purpose=='all' }}>All Purposes</option>
                     <option value="Medical" {{ 'selected' if filter_purpose=='Medical' }}>Medical</option>
                     <option value="Dental" {{ 'selected' if filter_purpose=='Dental' }}>Dental</option>
-                    <option value="Medicine Pickup" {{ 'selected' if filter_purpose=='Medicine Pickup' }}>Medicine
-                        Pickup</option>
+                    <option value="Mental Health" {{ 'selected' if filter_purpose=='Mental Health' }}>Mental Health</option>
+                    <option value="Physical Therapy" {{ 'selected' if filter_purpose=='Physical Therapy' }}>Physical Therapy</option>
+                    <option value="Laboratory" {{ 'selected' if filter_purpose=='Laboratory' }}>Laboratory</option>
+                    <option value="Medicine Pickup" {{ 'selected' if filter_purpose=='Medicine Pickup' }}>Medicine Pickup</option>
                     <option value="Walk-in" {{ 'selected' if filter_purpose=='Walk-in' }}>Walk-in</option>
                 </select>
             </div>
@@ -150,6 +152,9 @@
                             <span class="inline-flex px-2.5 py-1 text-xs font-semibold rounded-lg
                                 {% if entry.purpose == 'Medical' %}bg-blue-100 text-blue-700
                                 {% elif entry.purpose == 'Dental' %}bg-purple-100 text-purple-700
+                                {% elif entry.purpose == 'Mental Health' %}bg-pink-100 text-pink-700
+                                {% elif entry.purpose == 'Physical Therapy' %}bg-orange-100 text-orange-700
+                                {% elif entry.purpose == 'Laboratory' %}bg-indigo-100 text-indigo-700
                                 {% elif entry.purpose == 'Medicine Pickup' %}bg-emerald-100 text-emerald-700
                                 {% else %}bg-gray-100 text-gray-700{% endif %}">
                                 {{ entry.purpose }}
@@ -241,6 +246,9 @@
                         class="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
                         <option value="Medical">Medical Consultation</option>
                         <option value="Dental">Dental Consultation</option>
+                        <option value="Mental Health">Mental Health / Counseling</option>
+                        <option value="Physical Therapy">Physical Therapy</option>
+                        <option value="Laboratory">Laboratory / Tests</option>
                         <option value="Medicine Pickup">Medicine Pickup</option>
                         <option value="Walk-in">Walk-in / Other</option>
                     </select>

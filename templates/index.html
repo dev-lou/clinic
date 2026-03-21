@@ -472,6 +472,14 @@
                 class="flex items-center space-x-3 px-4 py-3 rounded-xl text-blue-200/80 hover:bg-white/10 hover:text-white transition text-sm font-medium">
                 <i class="fas fa-route w-5 text-center text-blue-300/60"></i><span>How It Works</span>
             </a>
+            <a href="{{ url_for('patient_dashboard.index') }}" onclick="toggleMobileMenu()"
+                class="flex items-center space-x-3 px-4 py-3 rounded-xl text-blue-200/80 hover:bg-white/10 hover:text-white transition text-sm font-medium">
+                <i class="fas fa-th-large w-5 text-center text-blue-300/60"></i><span>Dashboard</span>
+            </a>
+            <a href="{{ url_for('symptom_screening.index') }}" onclick="toggleMobileMenu()"
+                class="flex items-center space-x-3 px-4 py-3 rounded-xl text-blue-200/80 hover:bg-white/10 hover:text-white transition text-sm font-medium">
+                <i class="fas fa-stethoscope w-5 text-center text-blue-300/60"></i><span>Symptom Checker</span>
+            </a>
             <a href="#team" onclick="toggleMobileMenu()"
                 class="flex items-center space-x-3 px-4 py-3 rounded-xl text-blue-200/80 hover:bg-white/10 hover:text-white transition text-sm font-medium">
                 <i class="fas fa-user-md w-5 text-center text-blue-300/60"></i><span>Our Team</span>

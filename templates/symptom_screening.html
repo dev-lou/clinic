@@ -48,19 +48,7 @@
         --region-default: #94a3b8;
     }
 
-    /* Voice UI */
-    .mic-btn { width: 72px; height: 72px; border-radius: 50%; border: none; cursor: pointer; transition: all 0.3s; display: flex; align-items: center; justify-content: center; }
-    .mic-btn.idle { background: linear-gradient(135deg, #6366f1, #4f46e5); color: white; box-shadow: 0 4px 20px rgba(99,102,241,0.35); }
-    .mic-btn.idle:hover { transform: scale(1.1); box-shadow: 0 8px 28px rgba(99,102,241,0.5); }
-    .mic-btn.recording { background: linear-gradient(135deg, #ef4444, #dc2626); color: white; animation: micPulse 1.5s infinite; }
-    @keyframes micPulse { 0% { box-shadow: 0 0 0 0 rgba(239,68,68,0.5); } 70% { box-shadow: 0 0 0 20px rgba(239,68,68,0); } 100% { box-shadow: 0 0 0 0 rgba(239,68,68,0); } }
-    .voice-wave { display: flex; align-items: center; gap: 3px; height: 32px; }
-    .voice-wave span { width: 3px; background: #6366f1; border-radius: 2px; animation: wave 1s ease-in-out infinite; }
-    .voice-wave span:nth-child(2) { animation-delay: 0.1s; }
-    .voice-wave span:nth-child(3) { animation-delay: 0.2s; }
-    .voice-wave span:nth-child(4) { animation-delay: 0.3s; }
-    .voice-wave span:nth-child(5) { animation-delay: 0.4s; }
-    @keyframes wave { 0%,100% { height: 8px; } 50% { height: 28px; } }
+
 
     .view-toggle { display: inline-flex; background: #f1f5f9; border-radius: 12px; padding: 4px; }
     .view-toggle button { padding: 8px 20px; border-radius: 8px; border: none; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s; background: transparent; color: #64748b; }
@@ -74,76 +62,9 @@
     <div class="relative bg-gradient-to-br from-violet-800 via-violet-700 to-indigo-800 rounded-3xl p-8 sm:p-10 overflow-hidden">
         <div class="absolute top-0 right-0 w-72 h-72 bg-white/[0.04] rounded-full -translate-y-1/3 translate-x-1/4"></div>
         <div class="relative z-10">
-            <h1 class="text-3xl sm:text-4xl font-extrabold text-white mb-2">Symptom Checker</h1>
-            <p class="text-violet-200/50 text-sm">Tell us what you're experiencing using voice, body map, or checklist.</p>
+            <h1 class="text-3xl sm:text-4xl font-extrabold text-white mb-2">Health Assessment</h1>
+            <p class="text-violet-200/80 text-sm font-medium">Automated clinical priority assessment system.</p>
         </div>
-    </div>
-
-    <!-- =================== VOICE AI TRIAGE =================== -->
-    <div class="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl border border-blue-100 p-6 sm:p-8">
-        <div class="flex items-center gap-3 mb-4">
-             <div class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center shadow-md shadow-blue-600/20">
-                 <i class="fas fa-microphone text-white dark:text-gray-100"></i>
-             </div>
-            <div>
-                <h2 class="text-lg font-bold text-gray-900 dark:text-white">Voice AI Triage</h2>
-                <p class="text-xs text-gray-500">Describe your symptoms by speaking — AI will analyze and recommend services</p>
-            </div>
-            <span class="ml-auto px-2.5 py-1 bg-blue-600 text-white text-[10px] font-bold rounded-lg uppercase tracking-wider">AI Powered</span>
-        </div>
-
-         <div class="flex flex-col items-center py-6">
-             <button id="micButton" class="mic-btn idle group" onclick="toggleVoice()">
-                 <i class="fas fa-microphone text-2xl text-white drop-shadow-md group-hover:scale-110 transition-transform" id="micIcon"></i>
-             </button>
-            <p id="voiceStatus" class="mt-3 text-sm font-medium text-gray-500">Tap to start speaking</p>
-
-            <!-- Waveform -->
-            <div id="voiceWave" class="voice-wave hidden mt-3">
-                <span></span><span></span><span></span><span></span><span></span>
-            </div>
-
-            <!-- Live Transcript -->
-            <div id="transcriptBox" class="hidden mt-4 w-full max-w-lg">
-                <div class="bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-700 p-4">
-                    <p class="text-xs font-bold text-gray-400 uppercase tracking-wide mb-2"><i class="fas fa-closed-captioning mr-1"></i>Live Transcript</p>
-                    <p id="transcriptText" class="text-sm text-gray-800 min-h-[40px]"></p>
-                </div>
-            </div>
-
-            <!-- Analyzing spinner -->
-            <div id="voiceAnalyzing" class="hidden mt-4 flex items-center gap-2">
-                <div class="w-5 h-5 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
-                <span class="text-sm font-medium text-blue-600">AI is analyzing your symptoms...</span>
-            </div>
-
-            <!-- Text Input Fallback -->
-            <div id="textInput" class="hidden mt-6 w-full max-w-lg">
-                <div class="bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-700 p-4">
-                    <p class="text-xs font-bold text-gray-400 uppercase tracking-wide mb-2">
-                        <i class="fas fa-keyboard mr-1"></i>Type Your Symptoms
-                    </p>
-                    <textarea 
-                        id="symptomText" 
-                        class="w-full p-3 border border-gray-200 dark:border-slate-700 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-blue-500" 
-                        rows="3" 
-                        placeholder="Describe your symptoms here..."
-                    ></textarea>
-                    <button 
-                        onclick="analyzeText()" 
-                        class="mt-3 w-full py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-medium"
-                    >
-                        Analyze Symptoms
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Divider -->
-    <div class="flex items-center gap-4">
-        <hr class="flex-1 border-gray-200 dark:border-slate-700">
-        <span class="text-xs text-gray-400 uppercase tracking-wider font-medium">or use manual checker</span>
-        <hr class="flex-1 border-gray-200 dark:border-slate-700">
     </div>
 
     <!-- =================== VIEW TOGGLE =================== -->
@@ -460,427 +381,77 @@ document.getElementById('symptomForm').addEventListener('submit', function(e) {
         alert('Please select at least one symptom');
         return;
     }
+
+    // Show AI Scanning state
+    Swal.fire({
+        title: '<div class="flex flex-col items-center gap-2"><div class="w-12 h-12 border-4 border-primary-500 border-t-transparent rounded-full animate-spin"></div><span class="text-xl font-bold mt-2">Professional Assessment</span></div>',
+        html: '<p class="text-gray-500">Processing reported symptoms and correlating with clinical priority data...</p>',
+        showConfirmButton: false,
+        allowOutsideClick: false,
+        customClass: { popup: 'rounded-2xl' }
+    });
+
     fetch('{{ url_for("symptom_screening.analyze") }}', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'X-CSRFToken': '{{ csrf_token() }}' },
         body: JSON.stringify({ symptoms: checked, additional_info: document.getElementById('additionalInfo').value })
     }).then(r => r.json()).then(d => {
-        let badgeClass = 'px-4 py-1.5 rounded-full text-sm font-bold ';
-        if (d.severity === 1) badgeClass += 'bg-red-100 text-red-700';
-        else if (d.severity === 2) badgeClass += 'bg-amber-100 text-amber-700';
-        else badgeClass += 'bg-emerald-100 text-emerald-700';
-
-        let bookBtnHtml = '';
-        if (d.severity === 1) {
-            bookBtnHtml = `<a href="#" class="w-full inline-block py-3 bg-red-600 text-white text-sm font-bold rounded-xl text-center hover:bg-red-700 transition mt-4">Go to Emergency Room</a>`;
-        } else {
-            bookBtnHtml = `<a href="{{ url_for("appointments.book") }}?service=${encodeURIComponent(d.recommended_service || 'Medical')}" class="w-full inline-block py-3 bg-primary-700 text-white text-sm font-bold rounded-xl text-center hover:bg-primary-800 transition mt-4"><i class="fas fa-calendar-plus mr-1.5"></i>Book ${d.recommended_service || 'Medical'} Appointment</a>`;
-        }
-
-        Swal.fire({
-            title: '<div class="flex items-center justify-center gap-3"><i class="fas fa-stethoscope text-primary-500"></i><span class="text-xl font-bold">Analysis Results</span></div>',
-            html: `
-                <div class="text-left mt-2">
-                    <div class="mb-4 text-center">
-                        <span class="${badgeClass}">${d.severity_label}</span>
-                    </div>
-                    <div class="bg-gray-50 p-4 rounded-xl border border-gray-100 dark:border-slate-800">
-                        <h3 class="font-bold text-sm text-gray-900 mb-1"><i class="fas fa-lightbulb text-amber-500 mr-1.5"></i>Recommendation</h3>
-                        <p class="text-primary-700 font-semibold text-sm mb-1">Recommended: ${d.recommended_service} Service</p>
-                        <p class="text-gray-600 text-sm">${d.suggestions}</p>
-                    </div>
-                    ${bookBtnHtml}
-                </div>
-            `,
-            showConfirmButton: true,
-            confirmButtonText: 'Close',
-            customClass: {
-                popup: 'rounded-2xl',
-                confirmButton: 'bg-gray-200 text-gray-800 font-bold py-2.5 px-6 rounded-xl hover:bg-gray-300 transition w-full mt-2'
-            },
-            buttonsStyling: false
-        });
-    }).catch(() => { alert('Error analyzing symptoms. Try again.'); });
-});
-
-// UNIVERSAL VOICE AI TRIAGE (All Browsers)
-// ═══════════════════════════════════════════
-let recognition = null;
-let isRecording = false;
-let fullTranscript = '';
-let currentInterim = '';
-let recognitionClass = null;
-let useMediaRecorder = false;
-let mediaRecorder = null;
-let mediaStream = null;
-let mediaChunks = [];
-
-// Detect browser
-function getBrowserInfo() {
-    const ua = navigator.userAgent;
-    const isBrave = navigator.brave && navigator.brave.isBrave;
-    const isChrome = /Chrome/.test(ua) && !/Edg/.test(ua) && !isBrave;
-    const isSafari = /Safari/.test(ua) && !/Chrome/.test(ua);
-    const isEdge = /Edg/.test(ua);
-    const isFirefox = /Firefox/.test(ua);
-    
-    return { isBrave, isChrome, isSafari, isEdge, isFirefox };
-}
-
-// Get speech recognition class for current browser
-function getSpeechRecognition() {
-    if (window.SpeechRecognition || window.webkitSpeechRecognition) {
-        return window.SpeechRecognition || window.webkitSpeechRecognition;
-    }
-    return null;
-}
-
-function toggleVoice() {
-    if (isRecording && useMediaRecorder) {
-        stopMediaRecording();
-        return;
-    }
-    if (isRecording) {
-        finishRecording();
-        return;
-    }
-    startVoice();
-}
-
-function startVoice() {
-    recognitionClass = getSpeechRecognition();
-    
-    if (!recognitionClass) {
-        // Speech API not available, go straight to MediaRecorder
-        console.log('Speech API not available, using MediaRecorder directly');
-        useMediaRecorder = true;
-        startMediaRecording();
-        return;
-    }
-
-    recognition = new recognitionClass();
-    recognition.continuous = true;
-    recognition.interimResults = true;
-    recognition.lang = 'en-US';
-    recognition.maxAlternatives = 1;
-
-    fullTranscript = '';
-    currentInterim = '';
-    isRecording = true;
-    useMediaRecorder = false;
-
-    const btn = document.getElementById('micButton');
-    const icon = document.getElementById('micIcon');
-    btn.className = 'mic-btn recording group';
-    icon.className = 'fas fa-stop text-2xl text-white drop-shadow-md group-hover:scale-110 transition-transform';
-    document.getElementById('voiceStatus').textContent = 'Listening... Speak your symptoms now';
-    document.getElementById('voiceWave').classList.remove('hidden');
-    document.getElementById('transcriptBox').classList.remove('hidden');
-    document.getElementById('transcriptText').textContent = '';
-
-    recognition.onstart = () => {
-        console.log('Speech recognition started');
-        document.getElementById('voiceStatus').textContent = 'Listening... Speak your symptoms now';
-    };
-
-    recognition.onaudiostart = () => {
-        console.log('Audio capture started');
-        document.getElementById('voiceStatus').textContent = 'Audio captured, speak now...';
-    };
-
-    recognition.onresult = (e) => {
-        try {
-            let interim = '';
-            let final = '';
-            for (let i = e.resultIndex; i < e.results.length; i++) {
-                if (e.results[i].isFinal) {
-                    final += e.results[i][0].transcript;
-                } else {
-                    interim += e.results[i][0].transcript;
-                }
-            }
-            if (final) fullTranscript += final + ' ';
-            currentInterim = interim;
-            
-            document.getElementById('transcriptText').innerHTML = 
-                fullTranscript + '<span class="text-gray-400 italic">' + interim + '</span>';
-            document.getElementById('voiceStatus').textContent = 'Listening... Tap stop when done';
-        } catch (err) {
-            console.error('onresult error:', err);
-            document.getElementById('voiceStatus').textContent = 'Processing error. Tap stop to try again.';
-        }
-    };
-
-    recognition.onerror = (e) => {
-        console.error('Speech recognition error:', e.error, e.message || '');
-        const msgMap = {
-            'not-allowed': 'Microphone access denied. Check browser/app settings.',
-            'service-not-allowed': 'Speech service blocked. Try Chrome or check network.',
-            'no-speech': 'No speech detected. Try speaking louder or closer to mic.',
-            'audio-capture': 'No microphone found. Check device mic settings.',
-            'network': 'Switching to local recording...',
-            'aborted': 'Recognition was stopped.',
-            'bad-grammar': 'Grammar error in recognition.',
-            'language-not-supported': 'Language not supported.'
-        };
-        const msg = msgMap[e.error] || 'Speech error: ' + e.error;
-        
-        if (e.error === 'network' || e.error === 'service-not-allowed') {
-            // Fall back to MediaRecorder + Gemini transcription
-            console.log('Speech API network error, falling back to MediaRecorder');
-            isRecording = false;
-            const oldRecognition = recognition;
-            recognition = null;
-            try { oldRecognition.stop(); } catch(err) {}
-            useMediaRecorder = true;
-            startMediaRecording();
-            return;
-        }
-        
-        document.getElementById('voiceStatus').textContent = msg;
-        
-        if (e.error === 'not-allowed' || e.error === 'audio-capture') {
-            isRecording = false;
-            document.getElementById('textInput').classList.remove('hidden');
-            resetVoiceUI();
-        }
-    };
-
-    recognition.onend = () => {
-        if (isRecording && recognition) {
-            try {
-                recognition.start();
-            } catch (err) {
-                console.warn('Could not restart recognition:', err);
-            }
-        }
-    };
-
-    try {
-        recognition.start();
-        console.log('recognition.start() called');
-    } catch (err) {
-        console.error('Failed to start recognition:', err);
-        document.getElementById('voiceStatus').textContent = 'Could not start voice. Use text input.';
-        document.getElementById('textInput').classList.remove('hidden');
-        isRecording = false;
-        resetVoiceUI();
-    }
-}
-
-function finishRecording() {
-    isRecording = false;
-    
-    if (recognition) {
-        try { recognition.stop(); } catch(e) {}
-        recognition = null;
-    }
-
-    resetVoiceUI();
-
-    const transcript = (fullTranscript + ' ' + currentInterim).trim();
-    
-    if (transcript.length > 0) {
-        document.getElementById('transcriptText').textContent = transcript;
-        document.getElementById('voiceStatus').textContent = 'Analyzing your symptoms...';
-        analyzeVoice(transcript);
-    } else {
-        document.getElementById('voiceStatus').textContent = 'No speech detected. Tap the mic and try again.';
-        document.getElementById('textInput').classList.remove('hidden');
-    }
-}
-
-function resetVoiceUI() {
-    const btn = document.getElementById('micButton');
-    const icon = document.getElementById('micIcon');
-    btn.className = 'mic-btn idle group';
-    icon.className = 'fas fa-microphone text-2xl text-white drop-shadow-md group-hover:scale-110 transition-transform';
-    document.getElementById('voiceWave').classList.add('hidden');
-}
-
-// MediaRecorder fallback for browsers where Speech API network fails
-let mediaRecorderMimeType = '';
-
-async function startMediaRecording() {
-    try {
-        mediaStream = await navigator.mediaDevices.getUserMedia({ audio: true });
-        const mimeTypes = ['audio/webm;codecs=opus', 'audio/webm', 'audio/ogg;codecs=opus', 'audio/mp4', ''];
-        let selectedType = '';
-        for (const type of mimeTypes) {
-            if (MediaRecorder.isTypeSupported(type)) { selectedType = type; break; }
-        }
-        mediaRecorder = new MediaRecorder(mediaStream, selectedType ? { mimeType: selectedType } : {});
-        mediaRecorderMimeType = mediaRecorder.mimeType || 'audio/webm';
-        mediaChunks = [];
-
-        mediaRecorder.ondataavailable = (e) => { if (e.data.size > 0) mediaChunks.push(e.data); };
-        mediaRecorder.onstop = async () => {
-            const blob = new Blob(mediaChunks, { type: mediaRecorderMimeType });
-            mediaChunks = [];
-            if (mediaStream) {
-                mediaStream.getTracks().forEach(t => t.stop());
-                mediaStream = null;
-            }
-            document.getElementById('voiceStatus').textContent = 'Processing your audio...';
-            await transcribeAudio(blob);
-        };
-
-        mediaRecorder.start(250);
-        isRecording = true;
-        useMediaRecorder = true;
-
-        const btn = document.getElementById('micButton');
-        const icon = document.getElementById('micIcon');
-        btn.className = 'mic-btn recording group';
-        icon.className = 'fas fa-stop text-2xl text-white drop-shadow-md group-hover:scale-110 transition-transform';
-        document.getElementById('voiceStatus').textContent = 'Recording... Tap stop when done';
-        document.getElementById('voiceWave').classList.remove('hidden');
-        document.getElementById('transcriptBox').classList.remove('hidden');
-        document.getElementById('transcriptText').textContent = '';
-    } catch (err) {
-        console.error('MediaRecorder error:', err);
-        document.getElementById('voiceStatus').textContent = 'Could not access microphone. Check permissions.';
-        document.getElementById('textInput').classList.remove('hidden');
-        useMediaRecorder = false;
-        isRecording = false;
-        resetVoiceUI();
-    }
-}
-
-function stopMediaRecording() {
-    isRecording = false;
-    if (mediaRecorder && mediaRecorder.state !== 'inactive') {
-        try { mediaRecorder.stop(); } catch(e) {}
-    } else {
-        if (mediaStream) {
-            mediaStream.getTracks().forEach(t => t.stop());
-            mediaStream = null;
-        }
-    }
-    resetVoiceUI();
-}
-
-async function transcribeAudio(blob) {
-    try {
-        const formData = new FormData();
-        formData.append('audio', blob, 'recording.webm');
-        formData.append('mime_type', blob.type || 'audio/webm');
-
-        const r = await fetch('{{ url_for("symptom_screening.transcribe_audio") }}', {
-            method: 'POST',
-            headers: { 'X-CSRFToken': '{{ csrf_token() }}' },
-            body: formData
-        });
-        const d = await r.json();
-
-        if (d.error) {
-            document.getElementById('voiceStatus').textContent = d.error;
-            document.getElementById('textInput').classList.remove('hidden');
-            return;
-        }
-
-        const transcript = (d.transcript || '').trim();
-        if (transcript.length > 0) {
-            document.getElementById('transcriptText').textContent = transcript;
-            document.getElementById('voiceStatus').textContent = 'Analyzing your symptoms...';
-            analyzeVoice(transcript);
-        } else {
-            document.getElementById('voiceStatus').textContent = 'Could not understand audio. Try speaking louder or use text input.';
-            document.getElementById('textInput').classList.remove('hidden');
-        }
-    } catch (err) {
-        console.error('Transcription error:', err);
-        document.getElementById('voiceStatus').textContent = 'Error processing audio. Try again or use text input.';
-        document.getElementById('textInput').classList.remove('hidden');
-    }
-}
-
-// Text input fallback function
-function analyzeText() {
-    const text = document.getElementById('symptomText').value.trim();
-    if (text.length < 5) {
-        alert('Please enter more details about your symptoms');
-        return;
-    }
-    analyzeVoice(text);
-}
-
-async function analyzeVoice(transcript) {
-    document.getElementById('voiceStatus').textContent = '';
-    document.getElementById('voiceAnalyzing').classList.remove('hidden');
-
-    try {
-        const r = await fetch('{{ url_for("symptom_screening.voice_analyze") }}', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'X-CSRFToken': '{{ csrf_token() }}' },
-            body: JSON.stringify({ transcript })
-        });
-        const d = await r.json();
-        document.getElementById('voiceAnalyzing').classList.add('hidden');
-
-        if (d.error) {
-            document.getElementById('voiceStatus').textContent = d.error;
-            return;
-        }
-
-        document.getElementById('voiceStatus').textContent = 'Analysis complete';
-
         let badgeClass = 'px-3 py-1 rounded-full text-xs font-bold ';
         if (d.severity === 1) badgeClass += 'bg-red-100 text-red-700';
         else if (d.severity === 2) badgeClass += 'bg-amber-100 text-amber-700';
         else badgeClass += 'bg-emerald-100 text-emerald-700';
 
         let detectedSymptomsHtml = (d.detected_symptoms || []).map(s =>
-            `<span class="px-2.5 py-1 bg-blue-50 text-blue-700 text-xs font-semibold rounded-lg m-0.5 inline-block">${s}</span>`
+            `<span class="px-2.5 py-1 bg-blue-50 text-blue-700 text-[11px] font-semibold rounded-lg m-0.5 inline-block border border-blue-100"><i class="fas fa-check-circle mr-1 text-[9px]"></i>${s}</span>`
         ).join('');
 
         let bookBtnHtml = '';
         if (d.severity === 1) {
-            bookBtnHtml = `<a href="#" class="w-full inline-block py-3 bg-red-600 text-white text-sm font-bold rounded-xl text-center hover:bg-red-700 transition mt-4">Go to Emergency Room</a>`;
+            bookBtnHtml = `<a href="#" class="w-full inline-block py-3 bg-red-600 text-white text-sm font-bold rounded-xl text-center hover:bg-red-700 transition mt-4 shadow-lg shadow-red-600/20">Go to Emergency Room</a>`;
         } else {
-            bookBtnHtml = `<a href="{{ url_for("appointments.book") }}?service=${encodeURIComponent(d.recommended_service || 'Medical')}" class="w-full inline-block py-3 bg-primary-700 text-white text-sm font-bold rounded-xl text-center hover:bg-primary-800 transition mt-4"><i class="fas fa-calendar-plus mr-1.5"></i>Book ${d.recommended_service || 'Medical'} Appointment</a>`;
+            let serviceDisplay = d.recommended_service === 'Medical' ? 'Medical Care' : (d.recommended_service === 'Dental' ? 'Dental Care' : d.recommended_service);
+            bookBtnHtml = `<a href="{{ url_for("appointments.book") }}?service=${encodeURIComponent(d.recommended_service || 'Medical')}" class="w-full inline-block py-3 bg-primary-700 text-white text-sm font-bold rounded-xl text-center hover:bg-primary-800 transition mt-4 shadow-lg shadow-primary-700/20"><i class="fas fa-calendar-plus mr-1.5"></i>Book ${serviceDisplay} Appointment</a>`;
         }
 
-        Swal.fire({
-            title: '<div class="flex items-center justify-center gap-3"><i class="fas fa-stethoscope text-primary-500"></i><span class="text-xl font-bold">AI Analysis</span></div>',
-            html: `
-                <div class="text-left mt-2">
-                    <div class="flex items-center justify-between mb-3">
-                        <span class="${badgeClass}">${d.severity_label || 'Routine'}</span>
-                    </div>
-                    <p class="text-sm text-gray-600 italic mb-3">${d.summary || ''}</p>
-                    <div class="mb-4">
-                        ${detectedSymptomsHtml}
-                    </div>
-                    <div class="bg-gray-50 p-4 rounded-xl border border-gray-100 dark:border-slate-800">
-                        <h3 class="font-bold text-sm text-gray-900 mb-1"><i class="fas fa-lightbulb text-amber-500 mr-1.5"></i>Recommendation</h3>
-                        <p class="text-primary-700 font-semibold text-sm mb-1">Recommended: ${d.recommended_service || 'General'} Service</p>
-                        <p class="text-gray-600 text-sm mt-1">${d.suggestions || ''}</p>
-                    </div>
-                    ${bookBtnHtml}
-                </div>
-            `,
-            showConfirmButton: true,
-            confirmButtonText: 'Close',
-            customClass: {
-                popup: 'rounded-2xl',
-                confirmButton: 'bg-gray-200 text-gray-800 font-bold py-2.5 px-6 rounded-xl hover:bg-gray-300 transition w-full mt-2'
-            },
-            buttonsStyling: false
-        }).then(() => resetVoice());
+        setTimeout(() => {
+            Swal.fire({
+                title: '<div class="flex items-center justify-center gap-3"><i class="fas fa-file-medical text-primary-500"></i><span class="text-xl font-bold">Health Assessment Report</span></div>',
+                html: `
+                    <div class="text-left mt-2 px-1">
+                        <div class="flex items-center justify-between mb-4">
+                            <span class="text-xs font-bold text-gray-400 uppercase tracking-widest">Clinical Priority</span>
+                            <span class="${badgeClass}">${d.severity_label}</span>
+                        </div>
+                        
+                        <p class="text-sm text-gray-600 italic mb-4 p-3 bg-gray-50 rounded-xl border-l-4 border-primary-500">${d.assessment_summary}</p>
+                        
+                        <div class="mb-5">
+                            <p class="text-[10px] font-bold text-gray-400 uppercase mb-2 tracking-wide">Identified Concerns</p>
+                            <div class="flex flex-wrap">
+                                ${detectedSymptomsHtml}
+                            </div>
+                        </div>
 
-    } catch (e) {
-        document.getElementById('voiceAnalyzing').classList.add('hidden');
-        document.getElementById('voiceStatus').textContent = 'Error analyzing. Tap to try again.';
-        console.error(e);
-    }
-}
+                        <div class="bg-blue-50/50 p-4 rounded-2xl border border-blue-100 dark:border-slate-800">
+                            <h3 class="font-bold text-sm text-gray-900 mb-1.5 flex items-center"><i class="fas fa-stethoscope text-primary-500 mr-2"></i>Clinical Recommendation</h3>
+                            <p class="text-primary-800 font-bold text-sm mb-1">Recommended Action: ${d.recommended_service === 'Medical' ? 'Medical Consultation' : (d.recommended_service === 'Dental' ? 'Dental Consultation' : d.recommended_service)}</p>
+                            <p class="text-gray-600 text-xs leading-relaxed">${d.suggestions}</p>
+                        </div>
+                        ${bookBtnHtml}
+                    </div>
+                `,
+                showConfirmButton: true,
+                confirmButtonText: 'Done',
+                customClass: {
+                    popup: 'rounded-2xl',
+                    confirmButton: 'bg-gray-100 text-gray-800 font-bold py-2.5 px-6 rounded-xl hover:bg-gray-200 transition w-full mt-2'
+                },
+                buttonsStyling: false
+            });
+        }, 800); // Artificial delay to make it "feel" like it's calculating
+    }).catch(() => { Swal.fire('Error', 'Analysis failed. Please try again.', 'error'); });
+});
 
-function resetVoice() {
-    fullTranscript = '';
-    document.getElementById('transcriptBox').classList.add('hidden');
-    document.getElementById('transcriptText').textContent = '';
-    document.getElementById('voiceStatus').textContent = 'Tap to start speaking';
-}
+
 </script>
 {% endblock %}

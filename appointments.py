@@ -58,6 +58,15 @@ def check_availability_api():
     except ValueError:
         return jsonify({'error': 'Invalid date format'}), 400
     
+    # Block weekends
+    if check_date.weekday() >= 5: # 5=Saturday, 6=Sunday
+        return jsonify({
+            'date': date_str,
+            'service': service_type,
+            'availableSlots': [],
+            'error': 'Clinic is closed on weekends.'
+        })
+    
     # Get all appointments for this date and service
     appointments = Appointment.query.filter(
         Appointment.appointment_date == check_date,
@@ -70,18 +79,24 @@ def check_availability_api():
     available_slots = []
     
     max_per_slot = MAX_APPOINTMENTS_PER_SLOT.get(service_type, 2)
+    now = datetime.now()
     
     for slot_dict in time_slots:
         slot_time = datetime.strptime(slot_dict['value'], '%H:%M').time()
         
+        # Check if slot is in the past (for today)
+        is_past = False
+        if check_date == now.date() and slot_time < now.time():
+            is_past = True
+            
         # Count appointments in this slot
         count = sum(1 for appt in appointments 
                    if appt.start_time == slot_time)
         
         available_slots.append({
             'time': slot_dict['value'],
-            'available': count < max_per_slot,
-            'remaining': max(0, max_per_slot - count)
+            'available': count < max_per_slot and not is_past,
+            'remaining': max(0, max_per_slot - count) if not is_past else 0
         })
     
     return jsonify({
@@ -140,14 +155,19 @@ def check_date_availability():
         
         # Count available slots for this date using our pre-fetched data
         available_count: int = 0
-        date_bookings = bookings_by_date.get(check_date, {})
         
-        for slot in time_slots:
-            slot_time = datetime.strptime(slot['value'], '%H:%M').time()
-            existing_count = date_bookings.get(slot_time, 0)
+        # Block weekends
+        if check_date.weekday() >= 5:
+            available_count = 0
+        else:
+            date_bookings = bookings_by_date.get(check_date, {})
             
-            if existing_count < max_per_slot:
-                available_count = int(available_count) + 1
+            for slot in time_slots:
+                slot_time = datetime.strptime(slot['value'], '%H:%M').time()
+                existing_count = date_bookings.get(slot_time, 0)
+                
+                if existing_count < max_per_slot:
+                    available_count = int(available_count) + 1
         
         # If no slots available, mark as fully booked
         if available_count == 0:
@@ -182,12 +202,12 @@ def book():
             end_time = (datetime.strptime(time_slot_str, '%H:%M') + timedelta(minutes=SLOT_DURATION_MINUTES)).time()
         except ValueError:
             flash('Invalid date or time format.', 'error')
-            return render_template('book_appointment.html')
+            return render_template('book_appointment.html', time_slots=generate_time_slots())
         
         # Check if date is in the past
         if appointment_date < date.today():
             flash('Cannot book appointments in the past.', 'error')
-            return render_template('book_appointment.html')
+            return render_template('book_appointment.html', time_slots=generate_time_slots())
         
         # Check slot availability
         max_per_slot = MAX_APPOINTMENTS_PER_SLOT.get(service_type, 2)
@@ -200,7 +220,7 @@ def book():
         
         if existing_count >= max_per_slot:
             flash('This time slot is fully booked. Please choose another.', 'error')
-            return render_template('book_appointment.html')
+            return render_template('book_appointment.html', time_slots=generate_time_slots())
         
         # Create appointment
         appointment = Appointment(

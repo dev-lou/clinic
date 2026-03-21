@@ -118,7 +118,6 @@
             background-color: transparent !important;
             background-image: none !important; /* Kill tailwind chevron completely */
             box-shadow: none !important;
-            width: 100% !important;
             position: relative !important;
         }
         
@@ -128,20 +127,21 @@
             background-color: #fff !important;
             background-image: none !important;
             min-height: 42px !important;
+            height: 42px !important; /* Force fixed height to prevent any shifting */
             display: flex !important;
             align-items: center !important;
-            flex-wrap: wrap !important;
-            padding: 4px 36px 4px 12px !important;
+            padding: 0 36px 0 12px !important;
             box-shadow: none !important;
             outline: none !important;
             cursor: pointer !important;
+            overflow: hidden !important;
         }
 
-        .ts-control > input {
-            display: block !important;
-            flex: 1 1 auto !important;
+        .ts-control > input, .ts-control > .item {
+            display: flex !important;
+            align-items: center !important;
+            height: 100% !important;
             width: 100% !important;
-            height: 32px !important; /* Hardcode internal height so text centers perfectly! */
             color: #1f2937 !important;
             border: none !important;
             background: transparent !important;
@@ -149,9 +149,11 @@
             padding: 0 !important;
             margin: 0 !important;
             font-size: 0.875rem !important;
-            line-height: 32px !important; /* Exactly matches height */
-            vertical-align: middle !important;
+            line-height: normal !important;
             cursor: pointer !important;
+            white-space: nowrap !important;
+            overflow: hidden !important;
+            text-overflow: ellipsis !important;
         }
 
         .ts-control > input::placeholder {
@@ -159,42 +161,32 @@
             opacity: 1 !important;
         }
 
-        /* Enforce custom single-select chevron right in the middle */
-        .ts-wrapper.single .ts-control::after {
-            content: "" !important;
-            position: absolute !important;
-            top: 50% !important;
-            right: 16px !important;
-            transform: translateY(-50%) !important;
-            margin: 0 !important;
-            width: 0 !important;
-            height: 0 !important;
-            border-style: solid !important;
-            border-width: 5px 4px 0 4px !important;
-            border-color: #6b7280 transparent transparent transparent !important;
-            display: block !important;
-            background: none !important;
-            pointer-events: none !important;
-        }
         .ts-wrapper.focus .ts-control {
             border-color: #3b82f6 !important;
             box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15) !important;
         }
-        /* Dropdown arrow */
-        .ts-control::after {
-            content: '';
-            border: solid #9ca3af;
-            border-width: 0 2px 2px 0;
-            display: inline-block;
-            padding: 3px;
-            transform: rotate(45deg);
-            margin-left: auto;
-            margin-top: -3px;
-            flex-shrink: 0;
+
+        /* Hide default and redundant arrows */
+        .ts-wrapper.single .ts-control::after, .ts-control::after {
+            content: "" !important;
+            position: absolute !important;
+            top: 50% !important;
+            right: 14px !important;
+            width: 8px !important;
+            height: 8px !important;
+            border-right: 1.5px solid #94a3b8 !important;
+            border-bottom: 1.5px solid #94a3b8 !important;
+            transform: translateY(-65%) rotate(45deg) !important;
+            transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+            pointer-events: none !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            border-left: none !important;
+            border-top: none !important;
         }
+
         .ts-wrapper.is-open .ts-control::after {
-            transform: rotate(-135deg);
-            margin-top: 3px;
+            transform: translateY(-25%) rotate(-135deg) !important;
         }
         .ts-dropdown {
             border-radius: 0.75rem !important;

@@ -1,6 +1,6 @@
 """
 Symptom Pre-Screening Blueprint for ISUFST CareHub.
-AI-powered symptom analysis before appointment booking.
+Automated health priority assessment system.
 """
 import os
 import json
@@ -10,7 +10,6 @@ from flask_login import login_required, current_user
 from models import db
 from models_extended import SymptomScreening, AppointmentStatus
 from advanced_utils import analyze_symptoms, calculate_severity_score
-import groq as groq_client
 
 symptom_screening = Blueprint('symptom_screening', __name__, url_prefix='/screening')
 
@@ -58,12 +57,17 @@ def analyze():
     db.session.add(screening)
     db.session.commit()
     
+    # Generate a professional summary for better UX
+    assessment_summary = f"Based on the {len(symptoms)} symptoms you've reported, our system has prioritized your case as {('Emergency' if severity_score == 1 else 'Urgent' if severity_score == 2 else 'Routine')}."
+
     return jsonify({
         'screening_id': screening.id,
         'recommended_service': service_type,
         'severity': severity_score,
         'severity_label': {1: 'Emergency', 2: 'Urgent', 3: 'Routine'}.get(severity_score, 'Routine'),
         'suggestions': suggestions,
+        'assessment_summary': assessment_summary,
+        'detected_symptoms': symptoms,
         'should_book': severity_score > 1
     })
 
@@ -117,185 +121,3 @@ def get_symptom_categories():
     return jsonify(SYMPTOM_CATEGORIES)
 
 
-# ---------------------------------------------------------------------------
-# Voice AI Triage — Gemini-powered voice symptom analysis
-# ---------------------------------------------------------------------------
-_voice_model = None
-
-VOICE_TRIAGE_PROMPT = """You are a clinical triage assessor at the ISUFST University Clinic. A patient has described their symptoms via voice input.
-
-Analyze the transcript and return a JSON response with EXACTLY this structure:
-{
-  "detected_symptoms": ["Headache", "Fever"],
-  "recommended_service": "Medical",
-  "severity": 2,
-  "severity_label": "Urgent",
-  "suggestions": "Clinical assessment and recommended course of action here.",
-  "summary": "One-line clinical summary of the patient's presentation."
-}
-
-SEVERITY SCALE:
-- 1 = Emergency: Life-threatening symptoms requiring immediate evaluation (e.g., chest pain, difficulty breathing, severe bleeding, loss of consciousness, anaphylaxis)
-- 2 = Urgent: Symptoms requiring prompt evaluation within 24 hours (e.g., high fever, persistent vomiting, moderate pain, acute injury)
-- 3 = Routine: Non-urgent symptoms suitable for scheduled appointment (e.g., mild persistent symptoms, follow-up, wellness checks)
-
-RULES:
-- Use standard clinical terminology. Be direct and professional — no casual language.
-- recommendations: Specific, actionable guidance. State the appropriate clinic service: Medical, Dental, Mental Health, Physical Therapy, Laboratory, or Emergency.
-- For severity 1: "Immediate evaluation at the Emergency Room is recommended."
-- For severity 2: "Prompt evaluation recommended. Please schedule a clinic appointment within 24 hours."
-- For severity 3: "Non-urgent. Schedule an appointment at your earliest convenience through CareHub."
-- Never diagnose. Use hedging language: "suggests", "consistent with", "may indicate".
-- For serious symptoms, advise prompt medical attention.
-
-IMPORTANT: Return ONLY valid JSON. No markdown, no code fences, no extra text."""
-
-
-def _get_voice_model():
-    global _voice_model
-    if _voice_model is None:
-        import google.generativeai as genai
-        api_key = os.environ.get('GEMINI_API_KEY')
-        if not api_key:
-            raise RuntimeError('GEMINI_API_KEY environment variable is not set.')
-        genai.configure(api_key=api_key)
-        model_name = os.environ.get('GEMINI_MODEL', 'gemini-2.0-flash')
-        _voice_model = genai.GenerativeModel(
-            model_name=model_name,
-            system_instruction=VOICE_TRIAGE_PROMPT,
-            generation_config={
-                'temperature': 0.3,
-                'max_output_tokens': 2048,
-            },
-        )
-    return _voice_model
-
-
-@symptom_screening.route('/voice-analyze', methods=['POST'])
-@login_required
-def voice_analyze():
-    """Analyze voice transcript using Gemini AI for intelligent triage."""
-    data = request.get_json()
-    transcript = (data.get('transcript') or '').strip()
-
-    if not transcript:
-        return jsonify({'error': 'No voice transcript provided'}), 400
-
-    if len(transcript) > 3000:
-        return jsonify({'error': 'Transcript too long (max 3000 characters)'}), 400
-
-    try:
-        model = _get_voice_model()
-        response = model.generate_content(f"Patient voice transcript: \"{transcript}\"")
-        result_text = response.text.strip()
-
-        # Clean markdown fences
-        if result_text.startswith('```'):
-            result_text = result_text.split('\n', 1)[1] if '\n' in result_text else result_text[3:]
-            if result_text.endswith('```'):
-                result_text = result_text[:-3]
-            result_text = result_text.strip()
-
-        # Try direct JSON parse first
-        try:
-            ai_result = json.loads(result_text)
-        except json.JSONDecodeError:
-            # Try to extract JSON from response (handles extra text before/after)
-            match = re.search(r'\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\}', result_text, re.DOTALL)
-            if match:
-                candidate = match.group()
-                # Try to repair truncated JSON (missing closing braces)
-                open_braces = candidate.count('{')
-                close_braces = candidate.count('}')
-                candidate += '}' * (open_braces - close_braces)
-                ai_result = json.loads(candidate)
-                print(f'[Triage] Recovered truncated JSON ({len(candidate)} chars)')
-            else:
-                raise json.JSONDecodeError('No JSON found', result_text, 0)
-
-        # Save screening record
-        symptoms_list = ai_result.get('detected_symptoms', [])
-        screening = SymptomScreening(
-            student_id=current_user.id,
-            symptoms_json=json.dumps(symptoms_list),
-            severity_level=ai_result.get('severity', 3),
-            recommended_service=ai_result.get('recommended_service', 'Medical'),
-            ai_suggestions=ai_result.get('suggestions', '')
-        )
-        db.session.add(screening)
-        db.session.commit()
-
-        ai_result['screening_id'] = screening.id
-        ai_result['should_book'] = ai_result.get('severity', 3) > 1
-        return jsonify(ai_result)
-
-    except json.JSONDecodeError:
-        return jsonify({
-            'detected_symptoms': [],
-            'recommended_service': 'Medical',
-            'severity': 3,
-            'severity_label': 'Routine',
-            'suggestions': 'We were unable to fully process your description. Please try the manual symptom checklist or visit the clinic directly for assessment.',
-            'summary': 'Unable to parse AI response',
-            'should_book': True
-        })
-    except Exception as e:
-        print(f'[Voice Triage Error] {e}')
-        return jsonify({
-            'error': 'AI analysis temporarily unavailable. Please use the manual symptom checklist or visit the clinic.'
-        }), 500
-
-
-@symptom_screening.route('/transcribe', methods=['POST'])
-@login_required
-def transcribe_audio():
-    """Transcribe audio file using Groq Whisper V3 (fast) with Gemini fallback."""
-    if 'audio' not in request.files:
-        return jsonify({'error': 'No audio file provided'}), 400
-
-    audio_file = request.files['audio']
-    mime_type = request.form.get('mime_type', 'audio/webm')
-    audio_bytes = audio_file.read()
-
-    if not audio_bytes:
-        return jsonify({'error': 'Empty audio file'}), 400
-
-    # Try Groq first (fast transcription)
-    try:
-        groq_key = os.environ.get('GROQ_API_KEY')
-        if not groq_key:
-            raise RuntimeError('GROQ_API_KEY not set')
-
-        client = groq_client.Client(api_key=groq_key)
-        result = client.audio.transcriptions.create(
-            model="whisper-large-v3-turbo",
-            file=("recording.webm", audio_bytes, mime_type),
-            response_format="json"
-        )
-        transcript = result.text.strip() if hasattr(result, 'text') else str(result).strip()
-        print(f'[Groq Transcription] {len(transcript)} chars: {transcript[:80]}...')
-        return jsonify({'transcript': transcript})
-
-    except Exception as e:
-        print(f'[Groq Transcription Error] {e}')
-
-    # Fallback to Gemini
-    try:
-        model = _get_voice_model()
-        response = model.generate_content([
-            {'mime_type': mime_type, 'data': audio_bytes},
-            "Transcribe this audio exactly as spoken. Return ONLY the plain text transcript, nothing else."
-        ])
-        transcript = response.text.strip()
-        if transcript.startswith('```'):
-            transcript = transcript.split('\n', 1)[1] if '\n' in transcript else transcript[3:]
-            if transcript.endswith('```'):
-                transcript = transcript[:-3]
-            transcript = transcript.strip()
-        transcript = transcript.strip('"').strip("'")
-        print(f'[Gemini Transcription Fallback] {len(transcript)} chars')
-        return jsonify({'transcript': transcript})
-
-    except Exception as e:
-        print(f'[Transcription Error] {e}')
-        return jsonify({'error': 'Transcription failed. Try again or use text input.'}), 500
