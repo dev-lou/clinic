@@ -568,35 +568,58 @@ function startVoice() {
     document.getElementById('transcriptBox').classList.remove('hidden');
     document.getElementById('transcriptText').textContent = '';
 
+    recognition.onstart = () => {
+        console.log('Speech recognition started');
+        document.getElementById('voiceStatus').textContent = 'Listening... Speak your symptoms now';
+    };
+
+    recognition.onaudiostart = () => {
+        console.log('Audio capture started');
+        document.getElementById('voiceStatus').textContent = 'Audio captured, speak now...';
+    };
+
     recognition.onresult = (e) => {
-        let interim = '';
-        let final = '';
-        for (let i = e.resultIndex; i < e.results.length; i++) {
-            if (e.results[i].isFinal) {
-                final += e.results[i][0].transcript;
-            } else {
-                interim += e.results[i][0].transcript;
+        try {
+            let interim = '';
+            let final = '';
+            for (let i = e.resultIndex; i < e.results.length; i++) {
+                if (e.results[i].isFinal) {
+                    final += e.results[i][0].transcript;
+                } else {
+                    interim += e.results[i][0].transcript;
+                }
             }
+            if (final) fullTranscript += final + ' ';
+            currentInterim = interim;
+            
+            document.getElementById('transcriptText').innerHTML = 
+                fullTranscript + '<span class="text-gray-400 italic">' + interim + '</span>';
+            document.getElementById('voiceStatus').textContent = 'Listening... Tap stop when done';
+        } catch (err) {
+            console.error('onresult error:', err);
+            document.getElementById('voiceStatus').textContent = 'Processing error. Tap stop to try again.';
         }
-        if (final) fullTranscript += final + ' ';
-        currentInterim = interim;
-        
-        document.getElementById('transcriptText').innerHTML = 
-            fullTranscript + '<span class="text-gray-400 italic">' + interim + '</span>';
-        document.getElementById('voiceStatus').textContent = 'Listening... Tap stop when done';
     };
 
     recognition.onerror = (e) => {
-        console.warn('Speech recognition error:', e.error);
-        if (e.error === 'not-allowed' || e.error === 'service-not-allowed') {
+        console.error('Speech recognition error:', e.error, e.message || '');
+        const msgMap = {
+            'not-allowed': 'Microphone access denied. Check browser/app settings.',
+            'service-not-allowed': 'Speech service blocked. Try Chrome or check network.',
+            'no-speech': 'No speech detected. Try speaking louder or closer to mic.',
+            'audio-capture': 'No microphone found. Check device mic settings.',
+            'network': 'Network error. Speech recognition needs internet. Check your connection.',
+            'aborted': 'Recognition was stopped.',
+            'bad-grammar': 'Grammar error in recognition.',
+            'language-not-supported': 'Language not supported.'
+        };
+        const msg = msgMap[e.error] || 'Speech error: ' + e.error;
+        document.getElementById('voiceStatus').textContent = msg;
+        
+        if (e.error === 'not-allowed' || e.error === 'service-not-allowed' || e.error === 'audio-capture') {
             isRecording = false;
-            alert('Microphone access denied or unsupported. Please check browser settings.');
             document.getElementById('textInput').classList.remove('hidden');
             resetVoiceUI();
-            return;
-        }
-        if (e.error === 'no-speech') {
-            document.getElementById('voiceStatus').textContent = 'Still listening... speak now';
         }
     };
 
@@ -612,7 +635,7 @@ function startVoice() {
 
     try {
         recognition.start();
-        console.log('Speech recognition started');
+        console.log('recognition.start() called');
     } catch (err) {
         console.error('Failed to start recognition:', err);
         document.getElementById('voiceStatus').textContent = 'Could not start voice. Use text input.';
