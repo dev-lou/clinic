@@ -542,7 +542,6 @@ function toggleVoice() {
     }
 
     if (isRecording) {
-        // User clicked STOP — process whatever we have
         finishRecording();
     } else {
         startVoice();
@@ -551,8 +550,8 @@ function toggleVoice() {
 
 function startVoice() {
     recognition = new recognitionClass();
-    recognition.continuous = true;       // Keep listening until user clicks stop
-    recognition.interimResults = true;   // Show live text as user speaks
+    recognition.continuous = true;
+    recognition.interimResults = true;
     recognition.lang = 'en-US';
     recognition.maxAlternatives = 1;
 
@@ -580,10 +579,11 @@ function startVoice() {
             }
         }
         if (final) fullTranscript += final + ' ';
-        currentInterim = interim; // Save globally so finishRecording can grab it
+        currentInterim = interim;
         
         document.getElementById('transcriptText').innerHTML = 
             fullTranscript + '<span class="text-gray-400 italic">' + interim + '</span>';
+        document.getElementById('voiceStatus').textContent = 'Listening... Tap stop when done';
     };
 
     recognition.onerror = (e) => {
@@ -601,13 +601,11 @@ function startVoice() {
     };
 
     recognition.onend = () => {
-        // If user hasn't clicked stop yet, auto-restart the recognition (Chrome stops on pause)
-        if (isRecording) {
+        if (isRecording && recognition) {
             try {
                 recognition.start();
             } catch (err) {
-                console.warn('Could not restart:', err);
-                finishRecording();
+                console.warn('Could not restart recognition:', err);
             }
         }
     };
@@ -619,23 +617,26 @@ function startVoice() {
         console.error('Failed to start recognition:', err);
         document.getElementById('voiceStatus').textContent = 'Could not start voice. Use text input.';
         document.getElementById('textInput').classList.remove('hidden');
+        isRecording = false;
         resetVoiceUI();
     }
 }
 
 function finishRecording() {
     isRecording = false;
-    if (recognition) { 
-        try { recognition.stop(); } catch(e) {} 
-        recognition = null; 
+    
+    if (recognition) {
+        try { recognition.stop(); } catch(e) {}
+        recognition = null;
     }
 
     resetVoiceUI();
 
-    // Combine final + whatever was interim when they hit stop!
     const transcript = (fullTranscript + ' ' + currentInterim).trim();
     
     if (transcript.length > 0) {
+        document.getElementById('transcriptText').textContent = transcript;
+        document.getElementById('voiceStatus').textContent = 'Analyzing your symptoms...';
         analyzeVoice(transcript);
     } else {
         document.getElementById('voiceStatus').textContent = 'No speech detected. Tap the mic and try again.';
