@@ -163,7 +163,7 @@
 
     async function performGlobalSearch() {
         const query = document.getElementById('globalSearchInput').value;
-        if (!query.trim()) return;
+        if (query.trim().length < 2) return;
         const response = await fetch(`/search/api/global?q=${encodeURIComponent(query)}`);
         const data = await response.json();
         let html = '<div class="space-y-6">';

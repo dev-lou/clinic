@@ -1,6 +1,7 @@
 """
 Search & Filtering System for ISUFST CareHub.
 Provides full-text search across patients, appointments, inventory, and records.
+Supports fuzzy matching for typo tolerance.
 """
 from flask import Blueprint, render_template, request, jsonify
 from flask_login import login_required
@@ -8,8 +9,51 @@ from rbac import require_staff
 from models import db, User, Appointment, ClinicVisit, Inventory, MedicineReservation
 from sqlalchemy import or_, and_, func
 from datetime import datetime
+from difflib import SequenceMatcher
 
 search = Blueprint('search', __name__, url_prefix='/search')
+
+
+def _fuzzy_score(query, text):
+    """Calculate fuzzy similarity score between query and text (0.0 to 1.0)."""
+    query_lower = query.lower().strip()
+    text_lower = text.lower().strip()
+    
+    # Exact match or contains = best score
+    if query_lower == text_lower:
+        return 1.0
+    if query_lower in text_lower:
+        return 0.95
+    
+    # Check each word in text for partial match
+    words = text_lower.split()
+    for word in words:
+        if word.startswith(query_lower):
+            return 0.9
+        if query_lower.startswith(word):
+            return 0.85
+    
+    # Sequence similarity (handles typos)
+    return SequenceMatcher(None, query_lower, text_lower).ratio()
+
+
+def _fuzzy_search(query_text, all_items, fields, threshold=0.6):
+    """Filter items by fuzzy matching query against specified fields."""
+    query_lower = query_text.lower().strip()
+    scored = []
+    
+    for item in all_items:
+        best_score = 0
+        for field in fields:
+            val = str(getattr(item, field, '') or '')
+            score = _fuzzy_score(query_lower, val)
+            if score > best_score:
+                best_score = score
+        if best_score >= threshold:
+            scored.append((best_score, item))
+    
+    scored.sort(key=lambda x: x[0], reverse=True)
+    return [item for _, item in scored]
 
 
 @search.route('/')
@@ -24,14 +68,14 @@ def index():
 @login_required
 @require_staff
 def search_patients():
-    """Search patients by name, email, student ID."""
+    """Search patients by name, email, student ID with fuzzy matching."""
     query_text = request.args.get('q', '').strip()
     
     if len(query_text) < 2:
         return jsonify([])
     
-    # Search across multiple fields
-    results = User.query.join(User.student_profile).filter(
+    # Try exact substring match first (fast)
+    exact_results = User.query.join(User.student_profile).filter(
         User.role == 'student',
         or_(
             func.lower(User.first_name).contains(query_text.lower()),
@@ -41,13 +85,24 @@ def search_patients():
         )
     ).limit(20).all()
     
+    # If few exact results, supplement with fuzzy matching
+    if len(exact_results) < 5:
+        all_students = User.query.join(User.student_profile).filter(User.role == 'student').all()
+        fuzzy_results = _fuzzy_search(query_text, all_students, ['first_name', 'last_name', 'email'])
+        # Merge: exact first, then fuzzy (deduplicate)
+        seen_ids = {u.id for u in exact_results}
+        for u in fuzzy_results:
+            if u.id not in seen_ids:
+                exact_results.append(u)
+                seen_ids.add(u.id)
+    
     return jsonify([{
         'id': user.id,
         'name': f'{user.first_name} {user.last_name}',
         'email': user.email,
         'student_id': user.student_profile.student_id_number if user.student_profile else None,
         'course': user.student_profile.course if user.student_profile else None
-    } for user in results])
+    } for user in exact_results[:20]])
 
 
 @search.route('/api/appointments')
@@ -237,20 +292,18 @@ def search_reservations():
 @login_required
 @require_staff
 def global_search():
-    """Global search across all entities."""
+    """Global search across all entities with fuzzy matching."""
     query_text = request.args.get('q', '').strip()
     
-    if len(query_text) < 3:
-        return jsonify({'results': []})
+    if len(query_text) < 2:
+        return jsonify({'patients': [], 'inventory': []})
     
     results = {
         'patients': [],
-        'appointments': [],
-        'inventory': [],
-        'visits': []
+        'inventory': []
     }
     
-    # Search patients
+    # Search patients (exact match first)
     patients = User.query.join(User.student_profile).filter(
         User.role == 'student',
         or_(
@@ -260,18 +313,38 @@ def global_search():
         )
     ).limit(5).all()
     
+    # Fuzzy supplement for patients
+    if len(patients) < 3:
+        all_students = User.query.join(User.student_profile).filter(User.role == 'student').all()
+        fuzzy_patients = _fuzzy_search(query_text, all_students, ['first_name', 'last_name'])
+        seen = {u.id for u in patients}
+        for u in fuzzy_patients:
+            if u.id not in seen:
+                patients.append(u)
+                seen.add(u.id)
+    
     results['patients'] = [{
         'type': 'patient',
         'id': u.id,
         'title': f'{u.first_name} {u.last_name}',
         'subtitle': u.student_profile.student_id_number if u.student_profile else None,
         'url': f'/admin/user/{u.id}'
-    } for u in patients]
+    } for u in patients[:5]]
     
-    # Search inventory
+    # Search inventory (exact match first)
     inventory = Inventory.query.filter(
         func.lower(Inventory.name).contains(query_text.lower())
     ).limit(5).all()
+    
+    # Fuzzy supplement for inventory
+    if len(inventory) < 3:
+        all_items = Inventory.query.all()
+        fuzzy_items = _fuzzy_search(query_text, all_items, ['name'])
+        seen = {i.id for i in inventory}
+        for i in fuzzy_items:
+            if i.id not in seen:
+                inventory.append(i)
+                seen.add(i.id)
     
     results['inventory'] = [{
         'type': 'medicine',
@@ -279,6 +352,6 @@ def global_search():
         'title': item.name,
         'subtitle': f'{item.quantity} in stock',
         'url': f'/inventory'
-    } for item in inventory]
+    } for item in inventory[:5]]
     
     return jsonify(results)
