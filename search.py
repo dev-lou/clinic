@@ -16,8 +16,10 @@ search = Blueprint('search', __name__, url_prefix='/search')
 
 def _fuzzy_score(query, text):
     """Calculate fuzzy similarity score between query and text (0.0 to 1.0)."""
+    if not text:
+        return 0.0
     query_lower = query.lower().strip()
-    text_lower = text.lower().strip()
+    text_lower = str(text).lower().strip()
     
     # Exact match or contains = best score
     if query_lower == text_lower:
@@ -45,8 +47,8 @@ def _fuzzy_search(query_text, all_items, fields, threshold=0.6):
     for item in all_items:
         best_score = 0
         for field in fields:
-            val = str(getattr(item, field, '') or '')
-            score = _fuzzy_score(query_lower, val)
+            val = getattr(item, field, '')
+            score = _fuzzy_score(query_lower, val or '')
             if score > best_score:
                 best_score = score
         if best_score >= threshold:
