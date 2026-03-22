@@ -305,11 +305,19 @@
         'rgb(236, 72, 153)'    // pink
     ];
 
-    // Create gradient helper
+    // Create gradient helper (for area charts - fades down)
     function createGradient(ctx, startColor, endColor, height = 220) {
         const gradient = ctx.createLinearGradient(0, 0, 0, height);
         gradient.addColorStop(0, startColor);
         gradient.addColorStop(1, endColor);
+        return gradient;
+    }
+
+    // Create bar gradient (strong at bottom, fading to top)
+    function createBarGradient(ctx, strongColor, lightColor, height = 200) {
+        const gradient = ctx.createLinearGradient(0, height, 0, 0);
+        gradient.addColorStop(0, strongColor);
+        gradient.addColorStop(1, lightColor);
         return gradient;
     }
 
@@ -493,8 +501,8 @@
             const canvas = document.getElementById('peakHoursChart');
             const ctx = canvas.getContext('2d');
             
-            // Create gradient for bars
-            const gradient = createGradient(ctx, 'rgba(139, 92, 246, 0.9)', 'rgba(99, 102, 241, 0.7)', 180);
+            // Create bar gradient: strong violet at bottom, fading to light at top
+            const barGradient = createBarGradient(ctx, 'rgba(139, 92, 246, 0.95)', 'rgba(196, 167, 255, 0.35)', 200);
             
             charts.peakHours = new Chart(canvas, {
                 type: 'bar',
@@ -503,10 +511,10 @@
                     datasets: [{
                         label: 'Appointments',
                         data: d.values || [],
-                        backgroundColor: gradient,
-                        borderRadius: 6,
+                        backgroundColor: barGradient,
+                        borderRadius: 8,
                         borderSkipped: false,
-                        maxBarThickness: 32
+                        maxBarThickness: 36
                     }]
                 },
                 options: {
