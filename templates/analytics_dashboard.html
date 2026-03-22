@@ -24,56 +24,68 @@
 
     <!-- Key Metrics Grid -->
     <div class="grid grid-cols-2 md:grid-cols-4 gap-4" id="statsGrid">
-        <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700 p-4">
-            <div class="flex items-center gap-3 mb-3">
-                <div class="w-8 h-8 bg-blue-50 dark:bg-blue-950/30 rounded-lg flex items-center justify-center">
-                    <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                    </svg>
+        <div class="relative overflow-hidden bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700 p-4 group hover:shadow-lg transition-shadow">
+            <div class="absolute top-0 right-0 w-20 h-20 bg-gradient-to-br from-blue-500/10 to-blue-600/5 rounded-bl-[40px]"></div>
+            <div class="relative z-10">
+                <div class="flex items-center gap-3 mb-3">
+                    <div class="w-9 h-9 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center shadow-md shadow-blue-500/25">
+                        <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                        </svg>
+                    </div>
+                    <span class="text-xs text-slate-500 dark:text-slate-400 font-medium">Today</span>
                 </div>
-                <span class="text-xs text-slate-500 dark:text-slate-400 font-medium">Today</span>
+                <div class="text-2xl font-bold text-slate-900 dark:text-white" id="todayAppointments">-</div>
+                <div class="text-xs text-slate-400 dark:text-slate-500 mt-1">Appointments</div>
             </div>
-            <div class="text-2xl font-semibold text-slate-900 dark:text-white" id="todayAppointments">-</div>
-            <div class="text-xs text-slate-400 dark:text-slate-500 mt-1">Appointments</div>
         </div>
 
-        <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700 p-4">
-            <div class="flex items-center gap-3 mb-3">
-                <div class="w-8 h-8 bg-emerald-50 dark:bg-emerald-950/30 rounded-lg flex items-center justify-center">
-                    <svg class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                    </svg>
+        <div class="relative overflow-hidden bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700 p-4 group hover:shadow-lg transition-shadow">
+            <div class="absolute top-0 right-0 w-20 h-20 bg-gradient-to-br from-emerald-500/10 to-emerald-600/5 rounded-bl-[40px]"></div>
+            <div class="relative z-10">
+                <div class="flex items-center gap-3 mb-3">
+                    <div class="w-9 h-9 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-lg flex items-center justify-center shadow-md shadow-emerald-500/25">
+                        <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                    </div>
+                    <span class="text-xs text-slate-500 dark:text-slate-400 font-medium">This Month</span>
                 </div>
-                <span class="text-xs text-slate-500 dark:text-slate-400 font-medium">This Month</span>
+                <div class="text-2xl font-bold text-slate-900 dark:text-white" id="monthlyAppointments">-</div>
+                <div class="text-xs text-slate-400 dark:text-slate-500 mt-1">Total Visits</div>
             </div>
-            <div class="text-2xl font-semibold text-slate-900 dark:text-white" id="monthlyAppointments">-</div>
-            <div class="text-xs text-slate-400 dark:text-slate-500 mt-1">Total Visits</div>
         </div>
 
-        <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700 p-4">
-            <div class="flex items-center gap-3 mb-3">
-                <div class="w-8 h-8 bg-violet-50 dark:bg-violet-950/30 rounded-lg flex items-center justify-center">
-                    <svg class="w-4 h-4 text-violet-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                    </svg>
+        <div class="relative overflow-hidden bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700 p-4 group hover:shadow-lg transition-shadow">
+            <div class="absolute top-0 right-0 w-20 h-20 bg-gradient-to-br from-violet-500/10 to-violet-600/5 rounded-bl-[40px]"></div>
+            <div class="relative z-10">
+                <div class="flex items-center gap-3 mb-3">
+                    <div class="w-9 h-9 bg-gradient-to-br from-violet-500 to-violet-600 rounded-lg flex items-center justify-center shadow-md shadow-violet-500/25">
+                        <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                    </div>
+                    <span class="text-xs text-slate-500 dark:text-slate-400 font-medium">Active</span>
                 </div>
-                <span class="text-xs text-slate-500 dark:text-slate-400 font-medium">Active</span>
+                <div class="text-2xl font-bold text-slate-900 dark:text-white" id="activeReservations">-</div>
+                <div class="text-xs text-slate-400 dark:text-slate-500 mt-1">Reservations</div>
             </div>
-            <div class="text-2xl font-semibold text-slate-900 dark:text-white" id="activeReservations">-</div>
-            <div class="text-xs text-slate-400 dark:text-slate-500 mt-1">Reservations</div>
         </div>
 
-        <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700 p-4">
-            <div class="flex items-center gap-3 mb-3">
-                <div class="w-8 h-8 bg-amber-50 dark:bg-amber-950/30 rounded-lg flex items-center justify-center">
-                    <svg class="w-4 h-4 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/>
-                    </svg>
+        <div class="relative overflow-hidden bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700 p-4 group hover:shadow-lg transition-shadow">
+            <div class="absolute top-0 right-0 w-20 h-20 bg-gradient-to-br from-amber-500/10 to-amber-600/5 rounded-bl-[40px]"></div>
+            <div class="relative z-10">
+                <div class="flex items-center gap-3 mb-3">
+                    <div class="w-9 h-9 bg-gradient-to-br from-amber-500 to-amber-600 rounded-lg flex items-center justify-center shadow-md shadow-amber-500/25">
+                        <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/>
+                        </svg>
+                    </div>
+                    <span class="text-xs text-slate-500 dark:text-slate-400 font-medium">Rating</span>
                 </div>
-                <span class="text-xs text-slate-500 dark:text-slate-400 font-medium">Rating</span>
+                <div class="text-2xl font-bold text-slate-900 dark:text-white" id="avgSatisfaction">-</div>
+                <div class="text-xs text-slate-400 dark:text-slate-500 mt-1">Patient Satisfaction</div>
             </div>
-            <div class="text-2xl font-semibold text-slate-900 dark:text-white" id="avgSatisfaction">-</div>
-            <div class="text-xs text-slate-400 dark:text-slate-500 mt-1">Patient Satisfaction</div>
         </div>
     </div>
 
@@ -88,7 +100,7 @@
                     <option value="30" selected>Last 30 days</option>
                 </select>
             </div>
-            <div class="h-[220px]">
+            <div class="h-[280px]">
                 <canvas id="appointmentsTrendChart"></canvas>
             </div>
         </div>
@@ -97,7 +109,7 @@
             <div class="flex items-center justify-between mb-4">
                 <h3 class="text-sm font-medium text-slate-900 dark:text-white">Service Distribution</h3>
             </div>
-            <div class="h-[220px] flex items-center justify-center">
+            <div class="h-[280px] flex items-center justify-center">
                 <canvas id="serviceDistributionChart" class="max-h-full"></canvas>
             </div>
         </div>
@@ -109,7 +121,7 @@
             <div class="flex items-center justify-between mb-4">
                 <h3 class="text-sm font-medium text-slate-900 dark:text-white">Peak Hours</h3>
             </div>
-            <div class="h-[180px]">
+            <div class="h-[200px]">
                 <canvas id="peakHoursChart"></canvas>
             </div>
         </div>
@@ -173,19 +185,21 @@
         </div>
     </div>
 
-    <!-- Campus Comparison -->
+    <!-- Student Demographics -->
     <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700 p-5">
         <div class="flex items-center justify-between mb-4">
-            <h3 class="text-sm font-medium text-slate-900 dark:text-white">Campus Comparison</h3>
-            <span class="text-xs text-slate-400 dark:text-slate-500">Last 30 days</span>
+            <h3 class="text-sm font-medium text-slate-900 dark:text-white">Student Demographics</h3>
+            <span class="text-xs text-slate-400 dark:text-slate-500">By Course</span>
         </div>
-        <div id="campusComparison" class="grid grid-cols-5 gap-3">
-            {% for i in range(5) %}
-            <div class="text-center p-3 bg-slate-50 dark:bg-slate-800/50 rounded-lg">
-                <div class="animate-pulse h-5 bg-slate-200 dark:bg-slate-700 rounded mb-2"></div>
-                <div class="animate-pulse h-4 bg-slate-200 dark:bg-slate-700 rounded w-3/4 mx-auto"></div>
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <div class="h-[220px] flex items-center justify-center">
+                <canvas id="courseDistributionChart" class="max-h-full"></canvas>
             </div>
-            {% endfor %}
+            <div id="demographicsStats" class="space-y-2 text-sm">
+                <div class="animate-pulse h-5 bg-slate-100 dark:bg-slate-800 rounded"></div>
+                <div class="animate-pulse h-5 bg-slate-100 dark:bg-slate-800 rounded w-5/6"></div>
+                <div class="animate-pulse h-5 bg-slate-100 dark:bg-slate-800 rounded w-4/6"></div>
+            </div>
         </div>
     </div>
 
@@ -268,6 +282,37 @@
         scales: {}
     };
 
+    // Modern 2026 color palette with gradients
+    const modernColors = {
+        blue: { base: 'rgb(59, 130, 246)', light: 'rgba(59, 130, 246, 0.08)' },
+        emerald: { base: 'rgb(16, 185, 129)', light: 'rgba(16, 185, 129, 0.08)' },
+        violet: { base: 'rgb(139, 92, 246)', light: 'rgba(139, 92, 246, 0.08)' },
+        amber: { base: 'rgb(245, 158, 11)', light: 'rgba(245, 158, 11, 0.08)' },
+        rose: { base: 'rgb(244, 63, 94)', light: 'rgba(244, 63, 94, 0.08)' },
+        cyan: { base: 'rgb(6, 182, 212)', light: 'rgba(6, 182, 212, 0.08)' },
+        indigo: { base: 'rgb(99, 102, 241)', light: 'rgba(99, 102, 241, 0.08)' },
+        pink: { base: 'rgb(236, 72, 153)', light: 'rgba(236, 72, 153, 0.08)' }
+    };
+
+    const doughnutPalette = [
+        'rgb(59, 130, 246)',   // blue
+        'rgb(16, 185, 129)',   // emerald
+        'rgb(139, 92, 246)',   // violet
+        'rgb(245, 158, 11)',   // amber
+        'rgb(244, 63, 94)',    // rose
+        'rgb(6, 182, 212)',    // cyan
+        'rgb(99, 102, 241)',   // indigo
+        'rgb(236, 72, 153)'    // pink
+    ];
+
+    // Create gradient helper
+    function createGradient(ctx, startColor, endColor, height = 220) {
+        const gradient = ctx.createLinearGradient(0, 0, 0, height);
+        gradient.addColorStop(0, startColor);
+        gradient.addColorStop(1, endColor);
+        return gradient;
+    }
+
     // Format date for display
     function formatDate(date) {
         return date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
@@ -287,7 +332,7 @@
             loadHealthIssuesTrend(),
             loadNoShowRate(),
             loadInventoryConsumption(),
-            loadCampusComparison()
+            loadStudentDemographics()
         ]);
     }
 
@@ -308,7 +353,14 @@
             const r = await fetch(`/analytics/api/appointments-trend?days=${days}`);
             const d = await r.json();
             if(charts.appointmentsTrend) charts.appointmentsTrend.destroy();
-            charts.appointmentsTrend = new Chart(document.getElementById('appointmentsTrendChart'), {
+            
+            const canvas = document.getElementById('appointmentsTrendChart');
+            const ctx = canvas.getContext('2d');
+            
+            // Create gradient fill
+            const gradientFill = createGradient(ctx, 'rgba(59, 130, 246, 0.25)', 'rgba(59, 130, 246, 0.01)', 220);
+            
+            charts.appointmentsTrend = new Chart(canvas, {
                 type: 'line',
                 data: {
                     labels: d.labels || [],
@@ -316,19 +368,43 @@
                         label: 'Appointments',
                         data: d.values || [],
                         borderColor: 'rgb(59, 130, 246)',
-                        backgroundColor: 'rgba(59, 130, 246, 0.08)',
+                        backgroundColor: gradientFill,
+                        borderWidth: 2.5,
                         tension: 0.4,
                         fill: true,
-                        pointRadius: 2,
-                        pointHoverRadius: 5
+                        pointRadius: 0,
+                        pointHoverRadius: 6,
+                        pointHoverBackgroundColor: 'rgb(59, 130, 246)',
+                        pointHoverBorderColor: '#fff',
+                        pointHoverBorderWidth: 2
                     }]
                 },
                 options: {
                     ...chartDefaults,
-                    plugins: { legend: { display: false } },
+                    interaction: { mode: 'index', intersect: false },
+                    plugins: { 
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: 'rgba(15, 23, 42, 0.9)',
+                            titleFont: { family: 'Inter', size: 12 },
+                            bodyFont: { family: 'Inter', size: 13 },
+                            padding: 12,
+                            cornerRadius: 8,
+                            displayColors: false
+                        }
+                    },
                     scales: {
-                        y: { beginAtZero: true, ticks: { stepSize: 1, font: chartFont }, grid: { color: 'rgba(0,0,0,.04)' } },
-                        x: { grid: { display: false }, ticks: { font: chartFont } }
+                        y: { 
+                            beginAtZero: true, 
+                            ticks: { stepSize: 1, font: chartFont, color: 'rgb(148, 163, 184)' }, 
+                            grid: { color: 'rgba(148, 163, 184, 0.08)' },
+                            border: { display: false }
+                        },
+                        x: { 
+                            grid: { display: false }, 
+                            ticks: { font: chartFont, color: 'rgb(148, 163, 184)', maxRotation: 0, autoSkip: true, maxTicksLimit: 10 },
+                            border: { display: false }
+                        }
                     }
                 }
             });
@@ -344,18 +420,66 @@
                 document.getElementById('serviceDistributionChart').parentElement.innerHTML = '<div class="flex items-center justify-center h-full text-slate-400 dark:text-slate-500 text-sm">No data available</div>';
                 return;
             }
-            const colors = ['rgb(59, 130, 246)', 'rgb(16, 185, 129)', 'rgb(139, 92, 246)', 'rgb(245, 158, 11)', 'rgb(239, 68, 68)', 'rgb(236, 72, 153)'];
             charts.serviceDistribution = new Chart(document.getElementById('serviceDistributionChart'), {
                 type: 'doughnut',
                 data: {
                     labels: d.labels,
-                    datasets: [{ data: d.values, backgroundColor: colors, borderWidth: 0 }]
+                    datasets: [{
+                        data: d.values,
+                        backgroundColor: doughnutPalette.slice(0, d.labels.length),
+                        borderWidth: 3,
+                        borderColor: '#ffffff',
+                        hoverOffset: 8,
+                        hoverBorderColor: '#ffffff'
+                    }]
                 },
                 options: {
                     ...chartDefaults,
-                    cutout: '65%',
-                    plugins: { legend: { position: 'right', labels: { font: chartFont, usePointStyle: true, pointStyle: 'circle', padding: 12 } } }
-                }
+                    cutout: '68%',
+                    plugins: { 
+                        legend: { 
+                            position: 'right', 
+                            labels: { 
+                                font: { family: 'Inter', size: 11 }, 
+                                usePointStyle: true, 
+                                pointStyle: 'circle', 
+                                padding: 14,
+                                color: 'rgb(100, 116, 139)'
+                            } 
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(15, 23, 42, 0.9)',
+                            titleFont: { family: 'Inter', size: 12 },
+                            bodyFont: { family: 'Inter', size: 13 },
+                            padding: 12,
+                            cornerRadius: 8,
+                            callbacks: {
+                                label: function(context) {
+                                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                    const pct = ((context.raw / total) * 100).toFixed(1);
+                                    return ` ${context.label}: ${context.raw} (${pct}%)`;
+                                }
+                            }
+                        }
+                    }
+                },
+                plugins: [{
+                    id: 'centerText',
+                    beforeDraw(chart) {
+                        const { width, height, ctx: context } = chart;
+                        const total = chart.data.datasets[0].data.reduce((a, b) => a + b, 0);
+                        context.save();
+                        context.textAlign = 'center';
+                        context.textBaseline = 'middle';
+                        context.font = '600 22px Inter';
+                        context.fillStyle = 'rgb(15, 23, 42)';
+                        context.fillText(total, width / 2, height / 2 - 8);
+                        context.font = '400 11px Inter';
+                        context.fillStyle = 'rgb(148, 163, 184)';
+                        context.fillText('Total', width / 2, height / 2 + 12);
+                        context.restore();
+                    }
+                }]
             });
         } catch(e) { console.error(e); }
     }
@@ -365,18 +489,51 @@
             const r = await fetch('/analytics/api/peak-hours');
             const d = await r.json();
             if(charts.peakHours) charts.peakHours.destroy();
-            charts.peakHours = new Chart(document.getElementById('peakHoursChart'), {
+            
+            const canvas = document.getElementById('peakHoursChart');
+            const ctx = canvas.getContext('2d');
+            
+            // Create gradient for bars
+            const gradient = createGradient(ctx, 'rgba(139, 92, 246, 0.9)', 'rgba(99, 102, 241, 0.7)', 180);
+            
+            charts.peakHours = new Chart(canvas, {
                 type: 'bar',
                 data: {
                     labels: d.labels || [],
-                    datasets: [{ label: 'Appointments', data: d.values || [], backgroundColor: 'rgba(139, 92, 246, 0.8)', borderRadius: 4 }]
+                    datasets: [{
+                        label: 'Appointments',
+                        data: d.values || [],
+                        backgroundColor: gradient,
+                        borderRadius: 6,
+                        borderSkipped: false,
+                        maxBarThickness: 32
+                    }]
                 },
                 options: {
                     ...chartDefaults,
-                    plugins: { legend: { display: false } },
+                    plugins: { 
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: 'rgba(15, 23, 42, 0.9)',
+                            titleFont: { family: 'Inter', size: 12 },
+                            bodyFont: { family: 'Inter', size: 13 },
+                            padding: 12,
+                            cornerRadius: 8,
+                            displayColors: false
+                        }
+                    },
                     scales: {
-                        y: { beginAtZero: true, ticks: { stepSize: 1, font: chartFont }, grid: { color: 'rgba(0,0,0,.04)' } },
-                        x: { grid: { display: false }, ticks: { font: chartFont } }
+                        y: { 
+                            beginAtZero: true, 
+                            ticks: { stepSize: 1, font: chartFont, color: 'rgb(148, 163, 184)' }, 
+                            grid: { color: 'rgba(148, 163, 184, 0.08)' },
+                            border: { display: false }
+                        },
+                        x: { 
+                            grid: { display: false }, 
+                            ticks: { font: { family: 'Inter', size: 10 }, color: 'rgb(148, 163, 184)' },
+                            border: { display: false }
+                        }
                     }
                 }
             });
@@ -496,23 +653,100 @@
         } catch(e) { console.error(e); }
     }
 
-    async function loadCampusComparison() {
+    async function loadStudentDemographics() {
         try {
-            const r = await fetch('/analytics/api/campus-stats');
+            const r = await fetch('/analytics/api/student-demographics');
             const d = await r.json();
-            const colors = ['bg-blue-100 text-blue-700', 'bg-emerald-100 text-emerald-700', 'bg-violet-100 text-violet-700', 'bg-amber-100 text-amber-700', 'bg-rose-100 text-rose-700'];
-            let html = '';
-            d.forEach((campus, i) => {
-                html += `
-                    <div class="text-center p-3 ${colors[i]} rounded-lg">
-                        <p class="text-xs font-medium mb-1">${campus.campus}</p>
-                        <p class="text-lg font-semibold">${campus.appointments || 0}</p>
-                        <p class="text-xs opacity-70">visits</p>
-                    </div>
-                `;
+            
+            // Course Distribution Doughnut Chart
+            if(charts.courseDistribution) charts.courseDistribution.destroy();
+            
+            const courses = d.by_course || [];
+            if(courses.length === 0) {
+                document.getElementById('demographicsStats').innerHTML = '<p class="text-slate-400 dark:text-slate-500 text-center py-4">No student data available</p>';
+                document.getElementById('courseDistributionChart').parentElement.innerHTML = '<div class="flex items-center justify-center h-full text-slate-400 dark:text-slate-500 text-sm">No data available</div>';
+                return;
+            }
+            
+            const courseLabels = courses.map(c => c.course || 'Unknown');
+            const courseValues = courses.map(c => c.count);
+            const totalStudents = courseValues.reduce((a, b) => a + b, 0);
+            
+            const canvas = document.getElementById('courseDistributionChart');
+            if(canvas) {
+                charts.courseDistribution = new Chart(canvas, {
+                    type: 'doughnut',
+                    data: {
+                        labels: courseLabels,
+                        datasets: [{
+                            data: courseValues,
+                            backgroundColor: doughnutPalette.slice(0, courseLabels.length),
+                            borderWidth: 3,
+                            borderColor: '#ffffff',
+                            hoverOffset: 8
+                        }]
+                    },
+                    options: {
+                        ...chartDefaults,
+                        cutout: '68%',
+                        plugins: { 
+                            legend: { 
+                                position: 'bottom', 
+                                labels: { 
+                                    font: { family: 'Inter', size: 10 }, 
+                                    usePointStyle: true, 
+                                    pointStyle: 'circle', 
+                                    padding: 10,
+                                    color: 'rgb(100, 116, 139)'
+                                } 
+                            },
+                            tooltip: {
+                                backgroundColor: 'rgba(15, 23, 42, 0.9)',
+                                padding: 10,
+                                cornerRadius: 8,
+                                callbacks: {
+                                    label: function(ctx) {
+                                        const pct = ((ctx.raw / totalStudents) * 100).toFixed(1);
+                                        return ` ${ctx.label}: ${ctx.raw} (${pct}%)`;
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    plugins: [{
+                        id: 'centerText',
+                        beforeDraw(chart) {
+                            const { width, height, ctx: context } = chart;
+                            context.save();
+                            context.textAlign = 'center';
+                            context.textBaseline = 'middle';
+                            context.font = '600 22px Inter';
+                            context.fillStyle = 'rgb(15, 23, 42)';
+                            context.fillText(totalStudents, width / 2, height / 2 - 8);
+                            context.font = '400 11px Inter';
+                            context.fillStyle = 'rgb(148, 163, 184)';
+                            context.fillText('Students', width / 2, height / 2 + 12);
+                            context.restore();
+                        }
+                    }]
+                });
+            }
+            
+            // Year level stats
+            const years = d.by_year || [];
+            let statsHtml = '';
+            const yearColors = ['bg-blue-50 dark:bg-blue-950/30', 'bg-emerald-50 dark:bg-emerald-950/30', 'bg-violet-50 dark:bg-violet-950/30', 'bg-amber-50 dark:bg-amber-950/30', 'bg-rose-50 dark:bg-rose-950/30'];
+            years.sort((a, b) => (a.year || 0) - (b.year || 0));
+            years.forEach((y, i) => {
+                const pct = totalStudents > 0 ? ((y.count / totalStudents) * 100).toFixed(1) : 0;
+                statsHtml += `<div class="flex justify-between items-center p-2 ${yearColors[i % yearColors.length]} rounded-lg"><span class="text-slate-600 dark:text-slate-400">Year ${y.year || 'N/A'}</span><div class="text-right"><span class="font-medium text-slate-900 dark:text-white">${y.count}</span><span class="text-xs text-slate-400 ml-2">${pct}%</span></div></div>`;
             });
-            document.getElementById('campusComparison').innerHTML = html;
-        } catch(e) { console.error(e); }
+            document.getElementById('demographicsStats').innerHTML = statsHtml;
+            
+        } catch(e) { 
+            console.error(e); 
+            document.getElementById('demographicsStats').innerHTML = '<p class="text-slate-400 text-center py-4">Error loading demographics</p>';
+        }
     }
 
     // AI Predictions
