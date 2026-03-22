@@ -333,7 +333,7 @@ def global_search():
         'id': u.id,
         'title': f'{u.first_name} {u.last_name}',
         'subtitle': u.student_profile.student_id_number if u.student_profile else None,
-        'url': f'/admin/user/{u.id}'
+        'url': f'/users/{u.id}/edit'
     } for u in patients[:5]]
     
     # Search inventory (exact match first)
