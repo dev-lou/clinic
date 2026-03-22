@@ -6,7 +6,7 @@ Supports fuzzy matching for typo tolerance.
 from flask import Blueprint, render_template, request, jsonify
 from flask_login import login_required
 from rbac import require_staff
-from models import db, User, Appointment, ClinicVisit, Inventory, MedicineReservation
+from models import db, User, Appointment, ClinicVisit, Inventory, MedicineReservation, StudentProfile
 from sqlalchemy import or_, and_, func
 from datetime import datetime
 from difflib import SequenceMatcher
@@ -16,10 +16,13 @@ search = Blueprint('search', __name__, url_prefix='/search')
 
 def _fuzzy_score(query, text):
     """Calculate fuzzy similarity score between query and text (0.0 to 1.0)."""
-    if not text:
+    if not text or not query:
         return 0.0
     query_lower = query.lower().strip()
     text_lower = str(text).lower().strip()
+    
+    if not query_lower or not text_lower:
+        return 0.0
     
     # Exact match or contains = best score
     if query_lower == text_lower:
@@ -77,19 +80,19 @@ def search_patients():
         return jsonify([])
     
     # Try exact substring match first (fast)
-    exact_results = User.query.join(User.student_profile).filter(
+    exact_results = User.query.join(StudentProfile).filter(
         User.role == 'student',
         or_(
             func.lower(User.first_name).contains(query_text.lower()),
             func.lower(User.last_name).contains(query_text.lower()),
             func.lower(User.email).contains(query_text.lower()),
-            func.lower(User.student_profile.student_id_number).contains(query_text.lower())
+            func.lower(StudentProfile.student_id_number).contains(query_text.lower())
         )
     ).limit(20).all()
     
     # If few exact results, supplement with fuzzy matching
     if len(exact_results) < 5:
-        all_students = User.query.join(User.student_profile).filter(User.role == 'student').all()
+        all_students = User.query.join(StudentProfile).filter(User.role == 'student').all()
         fuzzy_results = _fuzzy_search(query_text, all_students, ['first_name', 'last_name', 'email'])
         # Merge: exact first, then fuzzy (deduplicate)
         seen_ids = {u.id for u in exact_results}
@@ -306,18 +309,18 @@ def global_search():
     }
     
     # Search patients (exact match first)
-    patients = User.query.join(User.student_profile).filter(
+    patients = User.query.join(StudentProfile).filter(
         User.role == 'student',
         or_(
             func.lower(User.first_name).contains(query_text.lower()),
             func.lower(User.last_name).contains(query_text.lower()),
-            func.lower(User.student_profile.student_id_number).contains(query_text.lower())
+            func.lower(StudentProfile.student_id_number).contains(query_text.lower())
         )
     ).limit(5).all()
     
     # Fuzzy supplement for patients
     if len(patients) < 3:
-        all_students = User.query.join(User.student_profile).filter(User.role == 'student').all()
+        all_students = User.query.join(StudentProfile).filter(User.role == 'student').all()
         fuzzy_patients = _fuzzy_search(query_text, all_students, ['first_name', 'last_name'])
         seen = {u.id for u in patients}
         for u in fuzzy_patients:
