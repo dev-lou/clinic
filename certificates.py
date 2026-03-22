@@ -469,7 +469,7 @@ def download_certificate(cert_id):
     issuer = cert.issuer
     
     # Generate QR code for verification
-    verification_url = f"https://isufst-clinic.onrender.com/verify/{cert.certificate_number}"
+    verification_url = f"https://isufst-clinic.onrender.com/certificates/verify/{cert.certificate_number}"
     qr = qrcode.QRCode(version=1, box_size=4, border=1)
     qr.add_data(verification_url)
     qr.make(fit=True)

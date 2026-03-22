@@ -169,42 +169,44 @@
         let html = '<div class="space-y-6">';
         if (data.patients?.length) {
             html += '<div><h3 class="font-bold text-sm text-gray-900 mb-3 flex items-center gap-2"><i class="fas fa-users text-primary-600"></i>Patients</h3><div class="space-y-2">';
-            data.patients.forEach(p => { html += `<div class="p-4 bg-gray-50 rounded-xl border border-gray-100 text-sm"><span class="font-semibold text-gray-900">${p.first_name} ${p.last_name}</span> <span class="text-gray-400 mx-1">&middot;</span> ${p.email}</div>`; });
+            data.patients.forEach(p => {
+                const url = p.url || '#';
+                html += `<a href="${url}" class="block p-4 bg-gray-50 rounded-xl border border-gray-100 hover:bg-gray-100 transition text-sm"><span class="font-semibold text-gray-900">${p.title}</span> <span class="text-gray-400 mx-1">&middot;</span> ${p.subtitle || ''}</a>`;
+            });
             html += '</div></div>';
         }
-        if (data.appointments?.length) {
-            html += '<div><h3 class="font-bold text-sm text-gray-900 mb-3 flex items-center gap-2"><i class="fas fa-calendar text-primary-600"></i>Appointments</h3><div class="space-y-2">';
-            data.appointments.forEach(a => { html += `<div class="p-4 bg-gray-50 rounded-xl border border-gray-100 text-sm"><span class="font-semibold text-gray-900">${a.service_type}</span> <span class="text-gray-400 mx-1">&middot;</span> ${a.appointment_date} <span class="px-2 py-0.5 rounded-full text-xs font-bold ${a.status==='Completed'?'bg-emerald-100 text-emerald-700':a.status==='Cancelled'?'bg-red-100 text-red-700':'bg-amber-100 text-amber-700'}">${a.status}</span></div>`; });
-            html += '</div></div>';
-        }
-        if (data.medicines?.length) {
+        if (data.inventory?.length) {
             html += '<div><h3 class="font-bold text-sm text-gray-900 mb-3 flex items-center gap-2"><i class="fas fa-pills text-emerald-600"></i>Medicines</h3><div class="space-y-2">';
-            data.medicines.forEach(m => { html += `<div class="p-4 bg-gray-50 rounded-xl border border-gray-100 text-sm"><span class="font-semibold text-gray-900">${m.medicine_name}</span> <span class="text-gray-400 mx-1">&middot;</span> Stock: <span class="font-bold">${m.quantity}</span></div>`; });
+            data.inventory.forEach(m => {
+                const url = m.url || '/inventory';
+                html += `<a href="${url}" class="block p-4 bg-gray-50 rounded-xl border border-gray-100 hover:bg-gray-100 transition text-sm"><span class="font-semibold text-gray-900">${m.title}</span> <span class="text-gray-400 mx-1">&middot;</span> ${m.subtitle || ''}</a>`;
+            });
             html += '</div></div>';
         }
         html += '</div>';
-        document.getElementById('globalResults').innerHTML = (data.patients?.length||data.appointments?.length||data.medicines?.length) ? html : '<div class="text-center py-8 text-gray-400 text-sm"><i class="fas fa-search text-2xl mb-2 block"></i>No results found</div>';
+        document.getElementById('globalResults').innerHTML = (data.patients?.length||data.inventory?.length) ? html : '<div class="text-center py-8 text-gray-400 text-sm"><i class="fas fa-search text-2xl mb-2 block"></i>No results found</div>';
     }
 
     async function searchPatients() {
-        const params = new URLSearchParams({ name: document.getElementById('patientName').value, email: document.getElementById('patientEmail').value, student_id: document.getElementById('patientStudentId').value });
+        const params = new URLSearchParams({ q: document.getElementById('patientName').value || document.getElementById('patientEmail').value || document.getElementById('patientStudentId').value });
         const response = await fetch(`/search/api/patients?${params}`);
         const data = await response.json();
         let html = '<div class="grid grid-cols-1 md:grid-cols-2 gap-3">';
         data.forEach(p => {
-            html += `<div class="p-4 bg-gray-50 rounded-xl border border-gray-100"><div class="flex items-center gap-3 mb-2"><div class="w-9 h-9 bg-primary-100 rounded-lg flex items-center justify-center text-primary-700 font-bold text-xs">${(p.first_name||'')[0]||''}${(p.last_name||'')[0]||''}</div><div><h4 class="font-bold text-sm text-gray-900">${p.first_name} ${p.last_name}</h4><p class="text-xs text-gray-500">${p.email}</p></div></div><div class="flex gap-3 text-xs text-gray-500"><span>ID: ${p.student_id||'N/A'}</span><span class="capitalize">${p.role}</span></div></div>`;
+            const initials = (p.name||'').split(' ').map(n => n[0]||'').slice(0,2).join('');
+            html += `<div class="p-4 bg-gray-50 rounded-xl border border-gray-100"><div class="flex items-center gap-3 mb-2"><div class="w-9 h-9 bg-primary-100 rounded-lg flex items-center justify-center text-primary-700 font-bold text-xs">${initials}</div><div><h4 class="font-bold text-sm text-gray-900">${p.name}</h4><p class="text-xs text-gray-500">${p.email}</p></div></div><div class="flex gap-3 text-xs text-gray-500"><span>ID: ${p.student_id||'N/A'}</span><span>${p.course||'N/A'}</span></div></div>`;
         });
         html += '</div>';
         document.getElementById('patientsResults').innerHTML = data.length ? html : '<div class="text-center py-8 text-gray-400 text-sm">No patients found</div>';
     }
 
     async function searchAppointments() {
-        const params = new URLSearchParams({ date_from: document.getElementById('apptDateFrom').value, date_to: document.getElementById('apptDateTo').value, status: document.getElementById('apptStatus').value, service: document.getElementById('apptService').value });
+        const params = new URLSearchParams({ date_from: document.getElementById('apptDateFrom').value, date_to: document.getElementById('apptDateTo').value, status: document.getElementById('apptStatus').value, service_type: document.getElementById('apptService').value });
         const response = await fetch(`/search/api/appointments?${params}`);
         const data = await response.json();
         const sc = { 'Pending':'bg-amber-100 text-amber-700', 'Confirmed':'bg-blue-100 text-blue-700', 'Completed':'bg-emerald-100 text-emerald-700', 'Cancelled':'bg-red-100 text-red-700', 'No Show':'bg-gray-200 text-gray-600' };
-        let html = '<div class="overflow-x-auto"><table class="min-w-full"><thead><tr class="border-b border-gray-100"><th class="px-4 py-3 text-left text-xs font-bold text-gray-500 uppercase">Date</th><th class="px-4 py-3 text-left text-xs font-bold text-gray-500 uppercase">Patient</th><th class="px-4 py-3 text-left text-xs font-bold text-gray-500 uppercase">Service</th><th class="px-4 py-3 text-left text-xs font-bold text-gray-500 uppercase">Status</th></tr></thead><tbody class="divide-y divide-gray-50">';
-        data.forEach(a => { html += `<tr class="hover:bg-gray-50 transition"><td class="px-4 py-3.5 text-sm text-gray-900">${a.appointment_date}</td><td class="px-4 py-3.5 text-sm text-gray-700">${a.student?.first_name||''} ${a.student?.last_name||''}</td><td class="px-4 py-3.5 text-sm text-gray-700">${a.service_type}</td><td class="px-4 py-3.5"><span class="px-2.5 py-1 text-xs font-bold rounded-full ${sc[a.status]||''}">${a.status}</span></td></tr>`; });
+        let html = '<div class="overflow-x-auto"><table class="min-w-full"><thead><tr class="border-b border-gray-100"><th class="px-4 py-3 text-left text-xs font-bold text-gray-500 uppercase">Date</th><th class="px-4 py-3 text-left text-xs font-bold text-gray-500 uppercase">Time</th><th class="px-4 py-3 text-left text-xs font-bold text-gray-500 uppercase">Patient</th><th class="px-4 py-3 text-left text-xs font-bold text-gray-500 uppercase">Service</th><th class="px-4 py-3 text-left text-xs font-bold text-gray-500 uppercase">Status</th></tr></thead><tbody class="divide-y divide-gray-50">';
+        data.forEach(a => { html += `<tr class="hover:bg-gray-50 transition"><td class="px-4 py-3.5 text-sm text-gray-900">${a.appointment_date}</td><td class="px-4 py-3.5 text-sm text-gray-500">${a.start_time||''}</td><td class="px-4 py-3.5 text-sm text-gray-700">${a.patient||''}</td><td class="px-4 py-3.5 text-sm text-gray-700">${a.service_type}</td><td class="px-4 py-3.5"><span class="px-2.5 py-1 text-xs font-bold rounded-full ${sc[a.status]||''}">${a.status}</span></td></tr>`; });
         html += '</tbody></table></div>';
         document.getElementById('appointmentsResults').innerHTML = data.length ? html : '<div class="text-center py-8 text-gray-400 text-sm">No appointments found</div>';
     }
@@ -216,7 +218,7 @@
         let html = '<div class="grid grid-cols-1 md:grid-cols-3 gap-3">';
         data.forEach(item => {
             const low = item.quantity <= (item.reorder_level || 10);
-            html += `<div class="p-4 rounded-xl border ${low ? 'border-red-200 bg-red-50/50' : 'border-gray-100 bg-gray-50'}"><h4 class="font-bold text-sm text-gray-900 mb-2">${item.medicine_name}</h4><div class="space-y-1 text-xs"><div class="flex justify-between"><span class="text-gray-500">Quantity</span><span class="${low ? 'text-red-600 font-bold' : 'text-gray-900 font-semibold'}">${item.quantity}</span></div><div class="flex justify-between"><span class="text-gray-500">Category</span><span class="text-gray-700">${item.category}</span></div>${item.expiry_date ? `<div class="flex justify-between"><span class="text-gray-500">Expires</span><span class="text-gray-700">${item.expiry_date}</span></div>` : ''}${low ? '<p class="text-red-600 font-bold mt-2"><i class="fas fa-exclamation-triangle mr-1"></i>Low Stock</p>' : ''}</div></div>`;
+            html += `<div class="p-4 rounded-xl border ${low ? 'border-red-200 bg-red-50/50' : 'border-gray-100 bg-gray-50'}"><h4 class="font-bold text-sm text-gray-900 mb-2">${item.name}</h4><div class="space-y-1 text-xs"><div class="flex justify-between"><span class="text-gray-500">Quantity</span><span class="${low ? 'text-red-600 font-bold' : 'text-gray-900 font-semibold'}">${item.quantity}</span></div><div class="flex justify-between"><span class="text-gray-500">Category</span><span class="text-gray-700">${item.category||'N/A'}</span></div>${item.expiry_date ? `<div class="flex justify-between"><span class="text-gray-500">Expires</span><span class="text-gray-700">${item.expiry_date}</span></div>` : ''}${low ? '<p class="text-red-600 font-bold mt-2"><i class="fas fa-exclamation-triangle mr-1"></i>Low Stock</p>' : ''}</div></div>`;
         });
         html += '</div>';
         document.getElementById('inventoryResults').innerHTML = data.length ? html : '<div class="text-center py-8 text-gray-400 text-sm">No medicines found</div>';
