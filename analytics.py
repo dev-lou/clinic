@@ -505,19 +505,64 @@ RULES:
 - Return ONLY valid JSON. No markdown fences or extra text."""
 
 
-def _get_predict_model():
-    global _predict_model
-    if _predict_model is None:
-        import google.generativeai as genai
+import requests
+
+class RestGeminiModel:
+    def __init__(self, model_name, system_instruction):
+        self.model_name = model_name
+        self.system_instruction = system_instruction
+        
+    def generate_content(self, text):
         api_key = os.environ.get('GEMINI_API_KEY')
         if not api_key:
             raise RuntimeError('GEMINI_API_KEY environment variable is not set.')
-        genai.configure(api_key=api_key)
+            
+        url = f"https://generativelanguage.googleapis.com/v1beta/models/{self.model_name}:generateContent?key={api_key}"
+        
+        payload = {
+            "systemInstruction": {
+                "parts": [{"text": self.system_instruction}]
+            },
+            "contents": [
+                {"parts": [{"text": text}]}
+            ],
+            "generationConfig": {
+                "temperature": 0.3,
+                "maxOutputTokens": 1024,
+                "responseMimeType": "application/json"
+            }
+        }
+        
+        headers = {"Content-Type": "application/json"}
+        
+        response = requests.post(url, json=payload, headers=headers, timeout=15)
+        response.raise_for_status()
+        
+        data = response.json()
+        
+        class RestResponse:
+            def __init__(self, text):
+                self.text = text
+                
+        try:
+            content_text = data['candidates'][0]['content']['parts'][0]['text']
+            return RestResponse(content_text)
+        except (KeyError, IndexError) as err:
+            raise ValueError(f"Unexpected response format from Gemini API: {data}") from err
+
+
+def _get_predict_model():
+    global _predict_model
+    if _predict_model is None:
         model_name = os.environ.get('GEMINI_MODEL', 'gemini-2.0-flash')
-        _predict_model = genai.GenerativeModel(
+        
+        # Fallback to a known working model string if the configured one is unreleased or invalid
+        if "gemini-3" in model_name:
+            model_name = "gemini-2.0-flash"
+            
+        _predict_model = RestGeminiModel(
             model_name=model_name,
             system_instruction=PREDICT_SYSTEM_PROMPT,
-            generation_config={'temperature': 0.3, 'max_output_tokens': 1024},
         )
     return _predict_model
 
@@ -525,11 +570,23 @@ def _get_predict_model():
 def _clean_json_response(text):
     """Strip markdown fences from Gemini response."""
     text = text.strip()
-    if text.startswith('```'):
-        text = text.split('\n', 1)[1] if '\n' in text else text[3:]
-        if text.endswith('```'):
-            text = text[:-3]
-        text = text.strip()
+    
+    # Simple strategy: find the first { or [ and last } or ]
+    start_idx = -1
+    for i, char in enumerate(text):
+        if char in ('{', '['):
+            start_idx = i
+            break
+            
+    end_idx = -1
+    for i in range(len(text)-1, -1, -1):
+        if text[i] in ('}', ']'):
+            end_idx = i
+            break
+            
+    if start_idx != -1 and end_idx != -1 and end_idx >= start_idx:
+        return text[start_idx:end_idx+1]
+        
     return text
 
 
@@ -671,5 +728,7 @@ Predict: Any trending symptoms suggesting an outbreak? Seasonal patterns? Concer
         result = json_mod.loads(_clean_json_response(response.text))
         return jsonify(result)
     except Exception as e:
+        import traceback
+        traceback.print_exc()
         print(f'[Predict Health Trends Error] {e}')
         return jsonify({'insights': [{'title': 'Analysis Unavailable', 'description': 'AI prediction is temporarily unavailable.', 'type': 'warning', 'icon': 'fa-exclamation-triangle'}], 'summary': 'Unable to generate prediction', 'confidence': 'low'})

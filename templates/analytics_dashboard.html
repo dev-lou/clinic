@@ -761,22 +761,6 @@
                             animateScale: true
                         }
                     },
-                                    color: 'rgb(100, 116, 139)'
-                                } 
-                            },
-                            tooltip: {
-                                backgroundColor: 'rgba(15, 23, 42, 0.9)',
-                                padding: 10,
-                                cornerRadius: 8,
-                                callbacks: {
-                                    label: function(ctx) {
-                                        const pct = ((ctx.raw / totalStudents) * 100).toFixed(1);
-                                        return ` ${ctx.label}: ${ctx.raw} (${pct}%)`;
-                                    }
-                                }
-                            }
-                        }
-                    },
                     plugins: [{
                         id: 'centerText',
                         beforeDraw(chart) {

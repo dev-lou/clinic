@@ -1,0 +1,32 @@
+name,generic_name,brand,dosage_form,strength,unit,price_php,stock,min_stock,supplier,category
+Paracetamol,Acetaminophen,Biogesic,Tablet,500,mg,5.00,1000,50,Unilab,Analgesic/Antipyretic
+Paracetamol Syrup,Acetaminophen,Tempra Forte,Syrup,250mg/5ml,ml,120.00,50,10,Taisho,Analgesic/Antipyretic
+Ibuprofen,Ibuprofen,Advil,Tablet,200,mg,8.00,500,30,Pfizer,Analgesic/NSAID
+Ibuprofen + Paracetamol,Ibuprofen/Acetaminophen,Alaxan FR,Capsule,200/325,mg,10.00,400,40,Unilab,Analgesic
+Mefenamic Acid,Mefenamic Acid,Dolfenal,Tablet,500,mg,12.00,600,50,Unilab,Analgesic/NSAID
+Mefenamic Acid,Mefenamic Acid,Ponstan,Tablet,500,mg,25.00,300,30,Pfizer,Analgesic/NSAID
+Phenylephrine/Chlorpheniramine,Phenylephrine HCl/Chlorpheniramine Maleate,Neozep Forte,Tablet,10/2,mg,6.00,800,100,Unilab,Cough/Cold
+Phenylephrine/Chlorpheniramine/Paracetamol,Phenylephrine/Chlorpheniramine/Acetaminophen,Bioflu,Tablet,10/2/500,mg,8.50,700,50,Unilab,Cough/Cold/Flu
+Carbocisteine,Carbocisteine,Solmux,Capsule,500,mg,11.50,600,50,Unilab,Mucolytic
+Lagundi,Vitex negundo,Ascof,Tablet,600,mg,9.00,300,30,Pascual,Herbal/Cough
+Cetirizine,Cetirizine,Virlix,Tablet,10,mg,15.00,500,50,GSK,Antihistamine
+Loratadine,Loratadine,Claritin,Tablet,10,mg,18.00,200,20,MSD,Antihistamine
+Salbutamol,Salbutamol,Ventolin,Inhaler,100,mcg,450.00,30,5,GSK,Bronchodilator
+Loperamide,Loperamide,Diatabs,Capsule,2,mg,7.50,400,40,Unilab,Antidiarrheal
+Antacid + Simethicone,Aluminum/Magnesium/Simethicone,Kremil-S,Tablet,Chewable,---,8.00,600,50,Unilab,Antacid
+Hyoscine N-Butylbromide,Hyoscine,Buscopan,Tablet,10,mg,15.00,200,20,Boehringer,Antispasmodic
+Probiotics,Bacillus clausii,Erceflora,Vial,2bn,5ml,45.00,150,20,Sanofi,Probiotic
+Multivitamins,Multivitamins,Enervon,Tablet,---,---,6.50,800,100,Unilab,Supplement
+Multivitamins + Zinc,Vitamins A/C/E/Zinc,Conzace,Capsule,---,---,13.00,500,50,Unilab,Supplement
+Vitamins B1/B6/B12,Thiamine/Pyridoxine/Cobalamin,Neurobion,Tablet,---,---,22.00,400,40,P&G,Supplement
+Ascorbic Acid,Vitamin C,Poten-Cee,Tablet,500,mg,5.50,1000,100,Pascual,Supplement
+Povidone-Iodine,Povidone-Iodine,Betadine,Solution,10%,60ml,145.00,100,10,MundiPharma,Antiseptic
+Isopropyl Alcohol,Isopropyl Alcohol,Green Cross,Solution,70%,500ml,85.00,200,20,GreenCross,Antiseptic
+Methyl Salicylate,Oil,Efficascent Oil,Liquid,---,100ml,65.00,60,10,Casino,Liniment
+Camphor/Menthol,Oil,White Flower,Liquid,---,5ml,55.00,100,10,WhiteFlower,Liniment
+Aspirin,Aspirin,Aspegic,Tablet,81,mg,2.50,300,30,Unilab,Antiplatelet
+Amoxicillin,Amoxicillin,Amoxil,Capsule,500,mg,12.00,200,20,Unilab,Antibiotic
+Metformin,Metformin,Glucophage,Tablet,500,mg,10.00,220,30,Merck,Antidiabetic
+Losartan,Losartan,Cozaar,Tablet,50,mg,25.00,100,15,Organon,Antihypertensive
+Omeprazole,Omeprazole,Losec,Capsule,20,mg,18.00,140,20,AstraZeneca,Proton Pump Inhibitor
+Oral Rehydration Salt,ORS,Hydrite,Powder,Sachet,---,15.00,400,50,Unilab,Rehydration
